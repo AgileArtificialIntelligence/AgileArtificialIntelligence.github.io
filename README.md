@@ -1,1 +1,0 @@
-# AgileNeuralNetworkAndGeneticProgramming.github.io
