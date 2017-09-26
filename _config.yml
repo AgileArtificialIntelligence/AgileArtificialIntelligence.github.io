@@ -16,7 +16,7 @@
 title: Agile Neural Network And Genetic Programming
 email: alexandre.bergel@me.com
 description: > # this means to ignore newlines until "baseurl:"
-  Agile Neural Network And Genetic Programming is a practical book about programming neural networks, genetic algorithm, and genetic programming
+  Agile Neural Network And Genetic Programming is a practical book about programming neural networks, genetic algorithm, and genetic programming.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://AgileNeuralNetworkAndGeneticProgramming.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: AlexBergel
