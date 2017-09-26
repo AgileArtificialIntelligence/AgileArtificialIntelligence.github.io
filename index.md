@@ -5,18 +5,15 @@ Agile Neural Network And Genetic Programming is a practical book about programmi
 ## Book content
 
 - Introduction
-- Part I: Neural Networks
-	- Perceptron
-	- Sigmoid Neuron
-	- Neural Network
-	- Data Classification
-	- Data Regression
-	- Game 
-		- Pong
-		- Tetris
-- Part II: Genetic Algorithm & Programming
-	- Genetic Algorithm
-	- Genetic Programming
+- Perceptron
+- Sigmoid Neuron
+- Neural Network
+- Predicting Data
+- Neural Network In Gaming
+- Genetic Algorithm
+- Genetic Programming
+- Genetic Algorithm and Neural Network
+
 
 
 
