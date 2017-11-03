@@ -5,5 +5,8 @@ _site/
 .jekyll-metadata
 *.DS_Store
 .DS_Store
+book/.DS_Store
+*/.DS_Store
+book/04-NeuralNetwork/.DS_Store
 *~
 #*

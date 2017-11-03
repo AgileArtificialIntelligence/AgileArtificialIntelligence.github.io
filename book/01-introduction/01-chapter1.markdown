@@ -1,0 +1,36 @@
+# Introduction
+
+## History
+
+Humans have always been fascinated by an intelligence emerging from something else than Human. Vikings have myth of monsters made of stones and metal.
+
+Modern Artificial Intelligence began with the invention of programmable digital computer in the 40s. In 1948, Alan Turing designed "Machine Intelligence" as machine automatically solving problems.
+
+Arthur Samuel, in his 1983 talk titled "AI: Where it Has Been and Where It is Going" said that the main goal of machine learning and artificial intelligence is *to get machines to exhibit behavior, which if done by humans, would be assumed to involve the use of intelligence.*
+
+## Artificial Intelligence
+
+"One of the central challenges of computer science is to get a computer to do what needs to be done, without telling it how to do it." -- John Koza
+
+
+## Agile Artificial Intelligence
+
+About bringing agility in the way techniques related to artificial intelligence are designed, implemented, and evaluated. 
+This implies that artificial intelligence systems is built in an iterative way and using an incremental design.
+
+Our code is often accompanied with unit tests and visualizations, and written in a programming environment supporting ...
+
+This book focus on implementing effective techniques that are commonly associated to Artificial Intelligence. Only a very small portion of what Artificial Intelligence is is covered in this book. 
+
+
+## Why this book?
+
+This book is meant to detail some easy-to-use recipes to solve punctual problems. This book highlights some technical details using the Pharo programming language. 
+
+## Additional Readings
+
+- http://www.gp-field-guide.org.uk by Riccardo Poli, Bill Langdon, and Nic McPhee
+- http://natureofcode.com by Daniel Shiffman
+- http://neuralnetworksanddeeplearning.com
+
+
