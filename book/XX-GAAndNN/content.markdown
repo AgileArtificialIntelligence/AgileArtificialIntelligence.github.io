@@ -8,3 +8,5 @@ This is very true. Backpropagation assumes that you know how to train the networ
 # Principle
 
 Use Genetic Algorithm to find the optimal set of weights and biases. 
+
+
