@@ -38,6 +38,10 @@ We first need to open a code _system browser_ by selecting the corresponding ent
 
 Right-click on the left-most top list to create a new package, let's call it `NeuralNetwork`. This package will contain most of the code we will write in this book. 
 
+[systemBrowser]: 02-Perceptron/figures/systemBrowser.png
+![systemBrowser][systemBrowser]
+
+
 When you select our package, a class template appears in the below code. Fill it to have the following:
 
 ~~~~~~~
@@ -47,36 +51,71 @@ Object subclass: #Perceptron
 	package: 'NeuralNetwork'
 ~~~~~~~
 
-You then need to compile the code by ''accept''-ing the source code. Right click on the text pane and select the option ''Accept''. We now have the 
+You then need to compile the code by ''accept''-ing the source code. Right click on the text pane and select the option ''Accept''. The class we have defined contains two instance variables, `weights` and `bias`. 
+We now have to add a few methods that manipulate these variables before some actual work. Let first focus on manipulating the `weights` variable. We will define two methods to write a value to that variable and another to read from it.
+
+Here is the code of the `weights:` method defined in the class `Perceptron`:
 
 ~~~~~~~
 Perceptron>>weights: someWeightsAsNumbers
 	weights := someWeightsAsNumbers copy
 ~~~~~~~
 
+To define this method, you need to select the class in the class panel (second top list panel). Then write the code given above *without* `Perceptron>>`. Then you should accept the code, by right clicking on the 'Accept' menu item. Accepting a method has the effect to compile it. The code define the method named `weights:` which accepts one argument, provided as a variable named `someWeightsAsNumbers`. 
+
+The expression `weights := someWeightsAsNumbers copy` creates a copy of the provided argument and assign it to the variable `weights`. The copy is not necessary, but it is useful to prevent some hard-to-debug issues.
+
+[systemBrowserAndMethodWeight]: 02-Perceptron/figures/systemBrowserAndMethodWeight.png
+![systemBrowserAndMethodWeight][systemBrowserAndMethodWeight]
+
+We know need a method to read the content of that variable. Here is the apropriate method: 
+
 ~~~~~~~
 Perceptron>>weights
 	^ weights
 ~~~~~~~
+
+The character `^` returns the value of an expression, the value of the variable `weights` in that case.
+
+Similarly we need to define a method to assign a value to the `bias` variable and to read its content. The method `bias:` can be defined as:
 
 ~~~~~~~
 Perceptron>>bias: aNumber
 	bias := aNumber
 ~~~~~~~
 
+And the reading may be defined using: 
 
 ~~~~~~~
 Perceptron>>bias
 	^ bias
 ~~~~~~~
 
+So far, we have defined the class `Perceptron` which contains two variables (`weights` and `bias`), and 4 methods (`weights:`, `weights`, `bias:`, and `bias`). The last piece to add is applying a set of inputs values and obtaining the output value. The method `feeds:` can be defined as:
+
 ~~~~~~~
 Perceptron>>feed: inputs
-	| r tmp |
-  	tmp := inputs with: weights collect: [ :x :w | x * w ].
-	r := tmp sum + bias.
-	^ r > 0 ifTrue: [ 1 ] ifFalse: [ 0 ]
+	| z |
+	z := (inputs with: weights collect: [ :x :w | x * w ]) sum + bias .
+	output := z > 0 ifTrue: [ 1 ] ifFalse: [ 0 ].
+	^ output
 ~~~~~~~
+
+The method `feed:` simply phrase the formula to model the activation of a perceptron into the Pharo programming language.
+The expression `inputs with: weights collect: [ :x :w | x * w ]` collects for each pair of elements (one from `inputs` and another from `weights`) using a function. Consider the following example:
+
+~~~~~~~
+#(1 2 3) with: #(10 20 30) collect: [ :a :b | a + b ]
+~~~~~~~
+
+The above expression evaluates to `#(11 22 33)`. Syntactically, it means that the literal value `#(1 2 3)` receives a message called `with:collect:`, with two arguments, the literal `#(10 20 30)` and the block `[ :a :b | a + b ]`.
+You can verify the value of that expression by opening a playground, accessible from the World menu. A playground is a kind of command terminal (''e.g.,'' xterm in the Unix World).
+
+[playground]: 02-Perceptron/figures/playground.png
+![playground][playground]
+
+
+## Testing our code
 
 
 ## Formulating Logical expressions

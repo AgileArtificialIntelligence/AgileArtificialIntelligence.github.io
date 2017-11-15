@@ -27,14 +27,22 @@ This book focus on implementing effective techniques that are commonly associate
 
 This book is meant to detail some easy-to-use recipes to solve punctual problems. This book highlights some technical details using the Pharo programming language. 
 
+## Requirements to read this book
+
+Agile Artificial Intelligence is designed to have a large audience. In particular, there no need to have knowledge in neural networks or genetic algorithm. There is even no need to have strong mathematical knowledge. However, 
+
 ## What if I am not a Pharo programmer?
 
 The only way to salve you is to learn Pharo :) Pharo has a very simple syntax, which means that even for a Java programmer, code should be understandable. Chapter 2 also presents the Pharo programming language and environment. 
 
 ## Additional Readings
 
+If you want to know more about some of the techniques presented here, I do recommand the following books:
 - http://www.gp-field-guide.org.uk by Riccardo Poli, Bill Langdon, and Nic McPhee
 - http://natureofcode.com by Daniel Shiffman
 - http://neuralnetworksanddeeplearning.com
 
-
+If I want to know more about Pharo:
+- http://files.pharo.org/books/updated-pharo-by-example/ provides a nice and smooth introduction to Pharo. 
+- http://agilevisualization.com describes the Roassal 
+- http://files.pharo.org/books contains many books and booklets that cover Pharo
