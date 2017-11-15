@@ -24,21 +24,30 @@ Not all inputs have the same importance for the perceptron. For example, an inpu
 
 How likely is the perceptron responding to the input stimulus? The bias is a value that indicates whether 
 
-## Modeling boolean gates
+## From transistor to logical gates
 
+% http://www.cs.bu.edu/~best/courses/modules/Transistors2Gates/
 A perceptron is a kind of artificial neuron, developed in the 50s and 60s by Frank Rosenblatt, Warren McCulloch, and Walter Pitts. 
 
 
 ## A Perceptron in action
 
+We have seen so far a great deal of theory. We will implement a perceptron from scratch.
 
+We first need to open a code _system browser_ by selecting the corresponding entry in the World menu. The system browser is where you read and write source code. Most of the programming activity will actually happens in a system browser. A system browser is composed of five different parts. The above part is composed of four lists. The left-most provides the packages, the following list gives the classes that belongs to a selected package. The third list gives the method cateogies for the selected class. A method category is a bit like a package, but for methods. The left-most list gives the methods that belongs in the class under a particular method category. The below part of a system browser gives source code, which is either a class template to fill in order to create a class, the source code of the selected class, or the source code of a selected method.
+
+Right-click on the left-most top list to create a new package, let's call it `NeuralNetwork`. This package will contain most of the code we will write in this book. 
+
+When you select our package, a class template appears in the below code. Fill it to have the following:
 
 ~~~~~~~
 Object subclass: #Perceptron
 	instanceVariableNames: 'weights bias'
 	classVariableNames: ''
-	package: 'NeuralNetworks-Core'
+	package: 'NeuralNetwork'
 ~~~~~~~
+
+You then need to compile the code by ''accept''-ing the source code. Right click on the text pane and select the option ''Accept''. We now have the 
 
 ~~~~~~~
 Perceptron>>weights: someWeightsAsNumbers
