@@ -13,6 +13,8 @@ Expressing a computation in terms of artificial neurons was first thought in 194
 
 ## Perceptron
 
+A perceptron is a kind of artificial neuron, developed in the 50s and 60s by Frank Rosenblatt, Warren McCulloch, and Walter Pitts. 
+
 A perceptron is a kind of miniature machine that produces an output for a provided input ([Perceptron](#Perceptron)). A perceptron may accept 0, 1, or more inputs, and result in a small and simple computation. A perceptron operates on numerical values, which means that the inputs and the output are numbers (integer or float, as we will see later).
 
 [Perceptron]: 02-Perceptron/figures/perceptron.png
@@ -23,12 +25,6 @@ The figure depicts a perceptron with three inputs, noted _x1_, _x2_, and _x3_. E
 Not all inputs have the same importance for the perceptron. For example, an input may be more important than the others. Relevance of an input is expressed using a weight associated to that input. In our figure, the input _x1_ has the weight _w1_, _x2_ has the weight _w2_, and _x3_ has _w3_. 
 
 How likely is the perceptron responding to the input stimulus? The bias is a value that indicates whether 
-
-## From transistor to logical gates
-
-% http://www.cs.bu.edu/~best/courses/modules/Transistors2Gates/
-A perceptron is a kind of artificial neuron, developed in the 50s and 60s by Frank Rosenblatt, Warren McCulloch, and Walter Pitts. 
-
 
 ## A Perceptron in action
 
@@ -96,9 +92,8 @@ So far, we have defined the class `Perceptron` which contains two variables (`we
 ~~~~~~~
 Perceptron>>feed: inputs
 	| z |
-	z := (inputs with: weights collect: [ :x :w | x * w ]) sum + bias .
-	output := z > 0 ifTrue: [ 1 ] ifFalse: [ 0 ].
-	^ output
+	z := (inputs with: weights collect: [ :x :w | x * w ]) sum + bias.
+	^ z > 0 ifTrue: [ 1 ] ifFalse: [ 0 ].
 ~~~~~~~
 
 The method `feed:` simply phrase the formula to model the activation of a perceptron into the Pharo programming language.
@@ -115,76 +110,259 @@ You can verify the value of that expression by opening a playground, accessible 
 ![playground][playground]
 
 
+We can now play a little bit with a perceptron. Evaluate the following code in a playground:
+
+~~~~~~~
+p := Perceptron new.
+p weights: #(1 2).
+p bias: -2.
+p feed: #(5 2)
+~~~~~~~
+
+If you do the math, this piece of code evaluates to `1` (since `(5*1 + 2*2) - 2` equals to `7`, which is greater than `0`).
+
+[playgroundAndPerceptron]: 02-Perceptron/figures/playgroundAndPerceptron.png
+![playgroundAndPerceptron][playgroundAndPerceptron]
+
 ## Testing our code
+
+Now is time to talk about testing. Testing will be a pillar of our activity of code production. Software and code testing is essential in agile methodologies and is about raising the confidence that the code we write does what it is supposed to do.
+
+Testing is a central concept that we will borrow from the field of Software Engineering. Although this book is not about writing large software artifact, we _do_ produce code. And making sure that this code can be tested in an automatic fashion significantly help improve the quality of what we are doing. More importantly, it is not only the author of the code (you!) that will appreciate the quality of the code, but anyone who will look at it. Along the chapters, we will improve our codebase. It is therefore very important to make sure that our improvement do not break some of the functionalities. 
+
+For example, above we defined a perceptron, and we informally tested it in a playground. This informal test costed us a few keystrokes and a little bit of time. What if we can automatically repeat this test each time we modify our definition of perceptron? This is exactly what _unit testing_ is all about. 
+
+We now define a class called `PerceptronTest`, defined as:
+
+~~~~~~~
+TestCase subclass: #PerceptronTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	package: 'NeuralNetwork'
+~~~~~~~
+
+
+The class `TestCase` belongs to the Pharo codebase and subclassing it is the first step to create a unit test. Tests can now be added to our `PerceptronTest`. Define the following method:
+
+~~~~~~~
+PerceptronTest>>testSmallExample
+	| p result |
+	p := Perceptron new.
+	p weights: #(1 2).
+	p bias: -2.
+	result := p feed: #(5 2).
+	self assert: result equals: 1.
+~~~~~~~
+
+The test can be run by clicking on the gray circle located next to the method name.
+
+[testingPerceptron01]: 02-Perceptron/figures/testingPerceptron01.png
+![testingPerceptron01][testingPerceptron01]
+
+A green color indicates that the test passes (_i.e.,_ no assertion failed and no error got raised). The method `testSmallExample` sends the message  `assert:equals:` which tests whether the first argument equals the second argument. 
+
+*EXERCISE:* So far, we have only shallowly tested our perceptron. We can improve our tests in two ways:
+	- In `testSmallExample`, test that feeding our perceptron `p` with differents values (_e.g.,_ `-2` and `2` gives 0 as result)
+	- Test our perceptron with different weights and bias
+
+In general, it is a very good practice to write a good amount of tests, even for a single component unit as for our class `Perceptron`.
+
+
+## From transistor to logical gates
+
+TODO: http://www.cs.bu.edu/~best/courses/modules/Transistors2Gates/
 
 
 ## Formulating Logical expressions
 
+A canonical example of using perceptron (or any other artificial neuron) is to express boolean logical gates. The idea is to have a perceptron with two inputs (each being a boolean value), and the result of a logical gate as output. 
+
+A little bit of arithmetic indicates that a perceptron with the weights `#(1 1)` and the bias `-1.5` formulates the AND logical gate. We could therefore verify this with a new test method:
 
 ~~~~~~~
-TestCase subclass: #NNPerceptronTest
-	instanceVariableNames: ''
-	classVariableNames: ''
-	package: 'NeuralNetworksTests'
-~~~~~~~
-
-
-~~~~~~~
-NNPerceptronTest>>testAND
+PerceptronTest>>testAND
 	| p |
-	p := MPPerceptron new.
+	p := Perceptron new.
 	p weights: { 1 . 1 }.
 	p bias: -1.5.
 	
 	self assert: (p feed: { 0 . 0 }) equals: 0.
 	self assert: (p feed: { 0 . 1 }) equals: 0.
 	self assert: (p feed: { 1 . 0 }) equals: 0.
-	self assert: (p feed: { 1 . 1 }) equals: 1
+	self assert: (p feed: { 1 . 1 }) equals: 1.
 ~~~~~~~
 
+Similarly, a perceptron can formulate the OR logical gate. Consider the following test:
+
 ~~~~~~~
-NNPerceptronTest>>testOR
+PerceptronTest>>testOR
 	| p |
-	p := MPPerceptron new.
+	p := Perceptron new.
 	p weights: { 1 . 1 }.
 	p bias: -0.5.
 	
 	self assert: (p feed: { 0 . 0 }) equals: 0.
 	self assert: (p feed: { 0 . 1 }) equals: 1.
 	self assert: (p feed: { 1 . 0 }) equals: 1.
-	self assert: (p feed: { 1 . 1 }) equals: 1
+	self assert: (p feed: { 1 . 1 }) equals: 1.
 ~~~~~~~
+
+Negating the weights and bias results in the negated logical gate:
+
+~~~~~~~
+PerceptronTest>>testNOR
+	| p |
+	p := Perceptron new.
+	p weights: { -1 . -1 }.
+	p bias: 0.5.
+	
+	self assert: (p feed: { 0 . 0 }) equals: 1.
+	self assert: (p feed: { 0 . 1 }) equals: 0.
+	self assert: (p feed: { 1 . 0 }) equals: 0.
+	self assert: (p feed: { 1 . 1 }) equals: 0.
+~~~~~~~
+
+So far we had perceptron with two inputs. A perceptron accepts the same number of inputs than the number of weights. Therefore, if only one weight is provided, only one input is required. Consider the NOT logical gate:
+
+~~~~~~~
+PerceptronTest>>testNOT
+	| p |
+	p := Perceptron new.
+	p weights: { -1 }.
+	p bias: 0.5.
+	
+	self assert: (p feed: { 1 }) equals: 0.
+	self assert: (p feed: { 0 }) equals: 1.
+~~~~~~~
+
+## Combining Perceptrons
+
+So far, we have defined the AND, OR, and NOT logical gates. A combination of these gates may produce a digital comparator circuit, illustrated as:
+
+The circuit compares the value of input A and B. We have possible three outcomes:
+- A is greater than B
+- A is equal to B
+- A is lesser than B
+
+We can therefore model our circuit with two inputs and three outputs. The following table summarizes the circuit"
+
+A | B | A > B | A = B | A < B
+--- | --- | :---: | :---: | :---:
+0 | 0 | 0 | 1 | 0
+0 | 1 | 1 | 0 | 0
+1 | 0 | 0 | 0 | 1
+1 | 1 | 0 | 1 | 0
+
+The circuit is defined as:
+
+[digitalComparator]: 02-Perceptron/figures/digitalComparator.png
+![digitalComparator][digitalComparator]
+
+Three logical gates are necessary: AND, NOT, and NOR. We then need to make the connection between these gates. As we previously did, some tests will drive our effort. The method `digitalComparator:`, defined in our unit test for convenience, models the digital comparator circuit:
+
+~~~~~~~
+PerceptronTest>>digitalComparator: inputs
+	"Return an array of three elements"
+	| not and nor A B AgB AeB AlB notA notB |
+	A := inputs first.
+	B := inputs second.
+
+	and := Perceptron new weights: { 1 . 1 }; bias: -1.5.
+	not := Perceptron new weights: { -1 }; bias: 0.5.
+	nor := Perceptron new weights: { -1 . -1 }; bias: 0.5.	
+
+	notA := not feed: { A }. 
+	notB := not feed: { B }.
+	
+	AgB := and feed: { notA . B }.
+	AlB := and feed: { A . notB }.
+	AeB := nor feed: { AgB . AlB }.
+	^ { AgB . AeB . AlB }
+~~~~~~~
+
+The method accept a set of inputs as argument. We first extract the first and second elements of these inputs and assign them to the temporary variables `A` and `B`. 
+
+We then create our three logical gates as perceptrons. We then wire then using the variables `notA`, `notB`, `AgB` (standing for `A` greater than `B`), `AlB` (`A` lesser than `B`), and `AeB` (`A` equals to `B`). The method returns an array with the result of the circuit evaluation. We can test it using a test method:
+
+~~~~~~~
+PerceptronTest>>testDigitalComparador
+	self assert: (self digitalComparator: { 0 . 0 }) equals: { 0 . 1 . 0 }.
+	self assert: (self digitalComparator: { 0 . 1 }) equals: { 1 . 0 . 0 }.
+	self assert: (self digitalComparator: { 1 . 0 }) equals: { 0 . 0 . 1 }.
+	self assert: (self digitalComparator: { 1 . 1 }) equals: { 0 . 1 . 0 }.
+~~~~~~~
+
+We have now seen how perceptrons may be "manually" combined by using variables having a particular order of the evaluation (_e.g.,_ the variable `notA` must be computed before computing an output). When we will discuss about training a neural network, we will come back to that particular example. A training will actually (i) compute some weights and bias and (ii) establish the wire between the neurons automatically. 
+
+## Training a Perceptron
+
+Making neurons learn is essential to make something useful. Learning typically involves a set of input examples with some known output. The learning process assess how good the artificial neuron is against the desired output. In particular, as defined by Frank Rosenblatt in the late 1950s, each weight of the perceptron is modified by an amount that is proportional to the product of the input and the difference between the real output and the desired output. 
+
+Learning in neural networks means adjusting the weights and the bias in order to make the output close to the set of training examples. Our way to train a perceptron will therefore has to adjust its weights and bias according to how good it performs for a given set of inputs.
+
+A way to make perceptron learn is given by the method `train:desiredOutput:`, as follow:
 
 ~~~~~~~
 Perceptron>>train: inputs desiredOutput: desiredOutput
-	| c newWeights output |
-	output := self feed: inputs.
-	c := 0.1.
-	"Works well"
-	desiredOutput = output
-		ifTrue: [ ^ self ].
-
-	"Basic check"
-	self assert: [ weights size = inputs size ] description: 'Wrong size'.
-	desiredOutput = 0
-		ifTrue: [ "we should decrease the weight"
-			newWeights := (1 to: weights size) collect: [ :i | (weights at: i) - (c * (inputs at: i)) ].
-			bias := bias - c ]
-		ifFalse: [ "We have: designedOutput = 1"
-			newWeights := (1 to: weights size) collect: [ :i | (weights at: i) + (c * (inputs at: i)) ].
-			bias := bias + c ].
-	weights := newWeights
+	| realOutput difference oldWeight currentInput learningRate newWeight |
+	realOutput := self feed: inputs.
+	difference := desiredOutput - realOutput.
+	learningRate := 0.1.
+	1 to: weights size do: [ :index |
+		oldWeight := weights at: index.
+		currentInput := inputs at: index.
+		newWeight := oldWeight + (learningRate * currentInput * difference). 
+		weights at: index put: newWeight.
+		
+		bias := bias + (learningRate * difference). ]
 ~~~~~~~
 
+Before doing any adjustment of the weights and bias, we need to know how well the perceptron evaluates the set of inputs. We therefore need to evaluate the perceptron with the argument `inputs`. The result is assigned to the variable `realOutput`. The variable `difference` represents the difference between the desired output and the real output. We also need to decide how fast the perceptron is supposed to learn. The `learningRate` value is a value between `0.0` and `1.0`. We arbitrarily picked the value `0.1`.
+
+Let's see how to use the training in practice. Consider the perceptron `p` given as (you can evaluate the following code in a playground):
 
 ~~~~~~~
-NNPerceptronTest>>testTrainingOR
+p := MPPerceptron new.
+p weights: { -1 . -1 }.
+p bias: 2.
+p feed: { 0 . 1 }.
+~~~~~~~
+
+As we have seen, we have `p feed: { 0 . 1 }` equals to `1`. What if we wish the perceptron to actually output `0` for the input `{ 0 . 1 }`? We therefore need to train `p` to actually output `0`. Let's try the following:
+
+~~~~~~~
+p := Perceptron new.
+p weights: { -1 . -1 }.
+p bias: 2.
+p train: { 0 . 1 } desiredOutput: 0.
+p feed: { 0 . 1 }.
+~~~~~~~
+
+Evaluating this expression still outputs `1`. Well... Were we not supposed to train our perceptron? The learning process is a rather slow process, and we need to actually teach the perceptron a few times what the designed output is. We can repeatably train the perceptron as in:
+
+~~~~~~~
+p := Perceptron new.
+p weights: { -1 . -1 }.
+p bias: 2.
+10 timesRepeat: [ p train: { 0 . 1 } desiredOutput: 0 ].
+p feed: { 0 . 1 }.
+~~~~~~~
+
+Evaluating the code given above produces `0`, as we were hopping for. Our perceptron has learned!
+
+[playgroundWithLearningPerceptron]: 02-Perceptron/figures/playgroundWithLearningPerceptron.png
+![playgroundWithLearningPerceptron][playgroundWithLearningPerceptron]
+
+We can now train some perceptron to actually learn how to express the logical gates. Consider the following `testTrainingOR`:
+
+~~~~~~~
+PerceptronTest>>testTrainingOR
 	| p |
-	p := MPPerceptron new.
+	p := Perceptron new.
 	p weights: { -1 . -1 }.
 	p bias: 2.
 	
-	100 timesRepeat: [ 
+	25 timesRepeat: [ 
 		p train: { 0 . 0 } desiredOutput: 0.
 		p train: { 0 . 1 } desiredOutput: 1.
 		p train: { 1 . 0 } desiredOutput: 1.
@@ -197,21 +375,206 @@ NNPerceptronTest>>testTrainingOR
 	self assert: (p feed: { 1 . 1 }) equals: 1
 ~~~~~~~
 
+The method `testTrainingOR` first creates a perceptron with some arbitrary weights and bias. We successfully train it with the four possible combinations of the OR logical gate. After the training, we test the perceptron to see if it has actually properly learn. 
+
+In `testTrainingOR`, we train the perceptron 25 times the complete set of examples. Training a perceptron (or a large neural network) with the complete set of examples is called _epoch_. So, in our example, we train `p` with 25 epochs. 
+
+*EXERCISE:*
+- What is the necessary minimum number of epochs to train `p`? You can try to modify `25` by a lower value and run the test to see if it still passes.
+- We have shown how to train a perceptron to learn the OR logical gate. Write a method `testTrainingNOR`, `testTrainingAND`, and `testTrainingNOT` for the other gates we have seen.
+- How the value of the `learningRate` impacts the minimum number of epochs for the training?
+
+## Predicting side of a 2D point
+
+A perceptron, even as the simple one we designed, can be used to classify data and make some predictions. Consider the following example:
+
+- We have a space composed of red and blue points
+- A straight line divides the red points from the blue points
+
+Some questions arise:
+
+- Can we teach a perceptron to correctly assign the color of a point?
+- How many example points do we need to train the perceptron with in order to make good prediction?
+
+Let's pick a linear function, such as $f(x) = -2x - 3$. A given point $(x, y)$ is colored in red if $y > f(x)$, else it is blue. Consider the following script:
+
 ~~~~~~~
-p := MPPerceptron new.
-p weights: { -1 . -1 }.
-p bias: 2.
-	
-100 timesRepeat: [ 
-	p train: { 0 . 0 } desiredOutput: 0.
-	p train: { 0 . 1 } desiredOutput: 1.
-	p train: { 1 . 0 } desiredOutput: 1.
-	p train: { 1 . 1 } desiredOutput: 1.
+somePoints := OrderedCollection new.
+500 timesRepeat: [ 
+	somePoints add: {(50 atRandom - 25) . (50 atRandom - 25)}
 ].
-p feed: { 1 . 0 }
+
+f := [ :x | (-2 * x) - 3 ].
+
+"We use the Grapher engine to plots our points"
+g := RTGrapher new.
+d := RTData new.
+d dotShape 
+	color: [ :p | (p second > (f value: p first)) 
+					ifTrue: [ Color red trans ] 
+					ifFalse: [ Color blue trans ] ].
+d points: somePoints.
+d x: #first.
+d y: #second.
+g add: d.
+g
 ~~~~~~~
+
+Inspecting this code snippet produces a graph with 500 colored dots.
+
+[simpleLine]: 02-Perceptron/figures/simpleLine.png
+![simpleLine][simpleLine]
+
+The script begins by defining a set of 500 points, ranging within a squared area of 50 (from -25 to +25). Each point is created by sending the message `atRandom` to the object number `50`. This message send return a number randomly picked between 1 and 50. Each point is represented as an array of two numbers. Our 500 points are kept in a collection, instanced of the class `OrderedCollection`.
+
+We then assign the block to the variable `f`. The block corresponds to the function $f(x)$ written using the Pharo syntax. A block may be evaluated with the message `value:`. For example, we have `f value: 3` that returns `-9` and `f value: -2` that returns `1`.
+
+The remaining of the script uses Grapher to plot the points. A point `p` is red if `p y` is greater than `f value: p x`, else it is blue. The color `Color red trans` indicates a transparent red color. 
+
+We can add the actual line defined by `f` in our graph. Consider the small revision:
+
+~~~~~~~
+somePoints := OrderedCollection new.
+500 timesRepeat: [ 
+	somePoints add: {(50 atRandom - 25) . (50 atRandom - 25)}
+].
+
+f := [ :x | (-2 * x) - 3 ].
+
+g := RTGrapher new.
+d := RTData new.
+d dotShape 
+	color: [ :p | (p second > (f value: p first)) 
+					ifTrue: [ Color red trans ] 
+					ifFalse: [ Color blue trans ] ].
+d points: somePoints.
+d x: #first.
+d y: #second.
+g add: d.
+
+"Added code below"
+d2 := RTData new.
+d2 noDot.
+d2 connectColor: Color red.
+d2 points: (-15 to: 15 by: 0.1).
+d2 y: f.
+d2 x: #yourself.
+g add: d2.
+g
+~~~~~~~
+
+[simpleLine2]: 02-Perceptron/figures/simpleLine2.png
+![simpleLine2][simpleLine2]
+
+We will now add a perceptron in our 
+
+~~~~~~~
+f := [ :x | (-2 * x) - 3 ].
+p := NNPerceptron new.
+p setWeights: { 1 . 2 }.
+p setBias: -1.
+
+"Training set"
+500 timesRepeat: [ 
+	anX := 50 atRandom - 25.
+	anY := 50 atRandom - 25.
+	designedOutput := (f value: anX) >= anY 
+								ifTrue: [ 1 ] ifFalse: [ 0 ].
+	p train: { anX . anY } desiredOutput: designedOutput 
+].
+
+"Test points"
+testPoints := OrderedCollection new.
+2000 timesRepeat: [ 
+	testPoints add: { (50 atRandom - 25) . (50 atRandom - 25) }
+].
+
+g := RTGrapher new.
+d := RTData new.
+d dotShape 
+	color: [ :point | (p feed: point) > 0.5 
+					ifTrue: [ Color red trans ] 
+					ifFalse: [ Color blue trans ] ].
+d points: testPoints.
+d x: #first.
+d y: #second.
+g add: d.
+
+d2 := RTData new.
+d2 noDot.
+d2 connectColor: Color red.
+d2 points: (-15 to: 15 by: 0.1).
+d2 y: f.
+d2 x: #yourself.
+g add: d2.
+g
+~~~~~~~
+
+## Measuring the precision
+
+~~~~~~~
+learningCurve := OrderedCollection new.
+f := [ :x | (2 * x) + 3 ].
+
+1 to: 2000 by: 10 do: [ :nbOfTrained |
+	r := Random new seed: 42.
+	p := Perceptron new.
+	p weights: { 1 . 2 }.
+	p bias: 2.
+
+	nbOfTrained timesRepeat: [ 
+		anX := (r nextInt: 100) - 50.
+		anY := (r nextInt: 100) - 50.
+		trainedOutput := (f value: anX) >= anY ifTrue: [ 1 ] ifFalse: [ 0 ].
+		p train: (Array with: anX with: anY) desiredOutput: trainedOutput ].
+	
+	nbOfGood := 0.
+	nbOfTries := 1000.
+	nbOfTries timesRepeat: [ 
+		anX := (r nextInt: 100) - 50.
+		anY := (r nextInt: 100)- 50.
+		realOutput := (f value: anX) >= anY ifTrue: [ 1 ] ifFalse: [ 0 ].
+		((p feed: { anX . anY }) - realOutput) abs < 0.2
+			ifTrue: [ nbOfGood := nbOfGood + 1 ].
+	].
+	learningCurve add: (nbOfGood / nbOfTries)
+].
+
+g := RTGrapher new.
+d := RTData new.
+d noDot.
+d connectColor: Color blue.
+d points: learningCurve.
+d y: #yourself.
+g add: d.
+g axisY title: 'Precision'.
+g axisX noDecimal; title: 'Training iteration'.
+g
+~~~~~~~
+
+[precisionWithLine]: 02-Perceptron/figures/precisionWithLine.png
+![precisionWithLine][precisionWithLine]
+
+
+
+## Learning rate
+
+What if we increase the learning rate?
+
+
+
+## What we have seen
+- Providing the concept of perceptron
+- A step-by-step guide on programming with Pharo
+- Implemented a perceptron 
+- Teaching a perceptron 
+
 
 ## Exercises
 
-The method `train:desiredOutput:` defines the learning rate `c` with the value `0.1`. Try using different values.
+- We have seen how the perceptron can be used to implement some logical gates. In particular, we have seen how the AND, OR, and NOT can be implemented. What about the XOR gate? Can you train a perceptron to learn the XOR behavior? (As a remainder, we have `0 XOR 0 = 0`, `0 XOR 1 = 1`, `1 XOR 0 = 1`, and `1 XOR 1 = 0`).
 
+## Further reading
+
+
+- Agile Programming
