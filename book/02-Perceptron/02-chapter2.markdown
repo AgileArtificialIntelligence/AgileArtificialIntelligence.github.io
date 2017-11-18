@@ -168,11 +168,6 @@ A green color indicates that the test passes (_i.e.,_ no assertion failed and no
 In general, it is a very good practice to write a good amount of tests, even for a single component unit as for our class `Perceptron`.
 
 
-## From transistor to logical gates
-
-TODO: http://www.cs.bu.edu/~best/courses/modules/Transistors2Gates/
-
-
 ## Formulating Logical expressions
 
 A canonical example of using perceptron (or any other artificial neuron) is to express boolean logical gates. The idea is to have a perceptron with two inputs (each being a boolean value), and the result of a logical gate as output. 
@@ -466,18 +461,19 @@ g
 [simpleLine2]: 02-Perceptron/figures/simpleLine2.png
 ![simpleLine2][simpleLine2]
 
-We will now add a perceptron in our 
+We will now add a perceptron in our script and see how good it performs to guess on which side of the line a point is. Consider the following script:
 
 ~~~~~~~
 f := [ :x | (-2 * x) - 3 ].
-p := NNPerceptron new.
-p setWeights: { 1 . 2 }.
-p setBias: -1.
+p := Perceptron new.
+p weights: { 1 . 2 }.
+p bias: -1.
+r := Random new seed: 42.
 
-"Training set"
+"We are training the perceptron"
 500 timesRepeat: [ 
-	anX := 50 atRandom - 25.
-	anY := 50 atRandom - 25.
+	anX := (r nextInt: 50) - 25.
+	anY := (r nextInt: 50) - 25.
 	designedOutput := (f value: anX) >= anY 
 								ifTrue: [ 1 ] ifFalse: [ 0 ].
 	p train: { anX . anY } desiredOutput: designedOutput 
@@ -486,7 +482,7 @@ p setBias: -1.
 "Test points"
 testPoints := OrderedCollection new.
 2000 timesRepeat: [ 
-	testPoints add: { (50 atRandom - 25) . (50 atRandom - 25) }
+	testPoints add: { ((r nextInt: 50) - 25) . ((r nextInt: 50) - 25) }
 ].
 
 g := RTGrapher new.
@@ -510,34 +506,69 @@ g add: d2.
 g
 ~~~~~~~
 
+As earlier, the script begins with the definition of the block function `f`. It then creates a perceptron with some arbitrary weights and bias. Subsequently, a random number generator is created. In our previous scripts, to obtain a random value between 1 and 50, we simply wrote `50 atRandom`. Using a random number generator, we need to write:
+
+~~~~~~~
+r := Random new seed: 42.
+r nextInt: 50.
+~~~~~~~
+
+Why this? First of all, being able to generate random numbers is necessary in all stochastic approaches, which includes neural networks and genetic algorithms. Although randomness is very important, we usually not want to let such random value creates situations that cannot be reproduced. Imagine that our code behaves erratically for a given random value, that we do not even know. How can we track down the anomaly in our code. If we have truly random numbers, it means that executing twice the same piece of code may produce (even slightly) different behaviors. It may therefore be complicated to properly test. Instead, we will use a random generator with a known seed to produce a known sequence of random numbers. Consider the expression:
+
+~~~~~~~
+(1 to: 5) collect: [ :i | 50 atRandom ]
+~~~~~~~
+
+Each time you will evaluate this expression, you will obtain a _new_ sequence of 5 random numbers. Using a generator you have:
+
+~~~~~~~
+r := Random new seed: 42.
+(1 to: 5) collect: [ :i | r nextInt: 50 ]
+~~~~~~~
+
+Evaluating several times this small script always produces the same sequence. This is key to have reproducible and deterministic behavior. In the remaining of the book, we will intensively use random generators.
+
+Our script then follow with training a perceptron with 500 points. We then create 2000 test points, which will be then displayed on the screen, using Grapher. Note that we write the condition `(p feed: point) > 0.5 ` to color a point as red. We could have `(p feed: point) = 1` instead, however in the future chapter we will replace the perceptron with another kind of artificial neuron, which will not exactly produce the value 1.
+
+We see that our the area of red points goes closely follows the red line. This means that our perceptron is able to classify points with a good accuracy. 
+
+What if reduce the number of training of our perceptron? You can try this by changing the value `500` by, let's say,`100`. What is the result? The perceptron does not do that well. This follow the intuition we elaborated when we first mentioned the training. More training a perceptron has, more accurate it will be (however, this is not always true with neural networks, as we will see later on).
+
+*EXERCISE:* Reduce the number of time the perceptron is trained. Verify that varying the value 500 to lower value leads to some errors, illustrated at a mismatch between the red line and the area of colored points. 
+
+
 ## Measuring the precision
+
+We have seen that the number of times we train a perceptron matters very much on how accurate the perceptron is able to classify points. How much training do we need to have a good precision? Keeping track of the precision and the training is essential to see how good our system is to do some classification.
+
+Consider the script:
 
 ~~~~~~~
 learningCurve := OrderedCollection new.
-f := [ :x | (2 * x) + 3 ].
+f := [ :x | (-2 * x) - 3 ].
 
-1 to: 2000 by: 10 do: [ :nbOfTrained |
+0 to: 2000 by: 10 do: [ :nbOfTrained |
 	r := Random new seed: 42.
 	p := Perceptron new.
 	p weights: { 1 . 2 }.
-	p bias: 2.
+	p bias: -1.
 
 	nbOfTrained timesRepeat: [ 
-		anX := (r nextInt: 100) - 50.
-		anY := (r nextInt: 100) - 50.
+		anX := (r nextInt: 50) - 25.
+		anY := (r nextInt: 50) - 25.
 		trainedOutput := (f value: anX) >= anY ifTrue: [ 1 ] ifFalse: [ 0 ].
 		p train: (Array with: anX with: anY) desiredOutput: trainedOutput ].
 	
 	nbOfGood := 0.
 	nbOfTries := 1000.
 	nbOfTries timesRepeat: [ 
-		anX := (r nextInt: 100) - 50.
-		anY := (r nextInt: 100)- 50.
+		anX := (r nextInt: 50) - 25.
+		anY := (r nextInt: 50)- 25.
 		realOutput := (f value: anX) >= anY ifTrue: [ 1 ] ifFalse: [ 0 ].
 		((p feed: { anX . anY }) - realOutput) abs < 0.2
 			ifTrue: [ nbOfGood := nbOfGood + 1 ].
 	].
-	learningCurve add: (nbOfGood / nbOfTries)
+	learningCurve add: { nbOfTrained . (nbOfGood / nbOfTries) }.
 ].
 
 g := RTGrapher new.
@@ -545,15 +576,19 @@ d := RTData new.
 d noDot.
 d connectColor: Color blue.
 d points: learningCurve.
-d y: #yourself.
+d x: #first.
+d y: #second.
 g add: d.
 g axisY title: 'Precision'.
 g axisX noDecimal; title: 'Training iteration'.
 g
 ~~~~~~~
 
-[precisionWithLine]: 02-Perceptron/figures/precisionWithLine.png
-![precisionWithLine][precisionWithLine]
+[perceptronPrecision]: 02-Perceptron/figures/perceptronPrecision.png
+![perceptronPrecision][perceptronPrecision]
+
+The script produces a curve with the precision on the Y-axis and the number of trainings on the X-axis. We see that 
+
 
 
 
