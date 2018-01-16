@@ -1,3 +1,12 @@
+---
+title: "Agile Artificial Intelligence"
+author: [Alexandre Bergel]
+date: 2017-12-13
+subject: "Agile Artificial Intelligence"
+tags: [AI, Neural networks, Genetic algorithm, Pharo]
+titlepage: true
+...
+
 # Introduction
 
 ## History
@@ -25,7 +34,13 @@ This book focus on implementing effective techniques that are commonly associate
 
 ## Why this book?
 
-This book is meant to detail some easy-to-use recipes to solve punctual problems. This book highlights some technical details using the Pharo programming language. 
+There exist many sophisticated libraries to build, train, and run neural networks and genetic algorithms. So, why this book? 
+
+Most of artificial intelligence techniques are often perceived as a black box that operates in a almost magical way. The purpose of Agile Artificial Intelligence is to reveals some of the most arcane algorithms. This book details how neural networks and genetic algorithms may be written from scratch, without any supporting libraries.
+
+Understanding the machinery behind fantastic algorithms and techniques is a natural goal that one should pursue. This first allow one to (i) easily hook into if necessary, and (ii) understand the scope of these algorithms. 
+
+This book is meant to detail some easy-to-use recipes to solve punctual problems and highlights some technical details using the Pharo programming language. 
 
 ## Requirements to read this book
 

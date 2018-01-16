@@ -1,3 +1,4 @@
+
 # Perceptron
 
 This chapters plays two roles. The first one, is to describes how and why a perceptron plays a role so important in the meaning of deep learning. The second role of this chapter, is to provide a gentle introduce to the Pharo programming language.
@@ -9,13 +10,12 @@ The primary visual cortex contains 140 millions of neurons, with tens of billion
 [Neuron]: 02-Perceptron/figures/neuron.png "Image Title" 
 ![Neuron][Neuron] 
 
-Expressing a computation in terms of artificial neurons was first thought in 1943, by Warren S. Mcculloch and Walter Pitts in their seminal article *A logical calculus of the ideas immanent in nervous activity*. This paper has been cited more than 14 000 times.
+Expressing a computation in terms of artificial neurons was first thought in 1943, by Warren S. Mcculloch and Walter Pitts in their seminal article *A logical calculus of the ideas immanent in nervous activity*. This paper has a significant impact in the field of artificial intelligence. It is interesting to realize the knowledge we had about neurons at that time. 
 
 ## Perceptron
 
-A perceptron is a kind of artificial neuron, developed in the 50s and 60s by Frank Rosenblatt, Warren McCulloch, and Walter Pitts. 
-
-A perceptron is a kind of miniature machine that produces an output for a provided input ([Perceptron](#Perceptron)). A perceptron may accept 0, 1, or more inputs, and result in a small and simple computation. A perceptron operates on numerical values, which means that the inputs and the output are numbers (integer or float, as we will see later).
+A perceptron is a kind of artificial neuron that models the behavior of a real neuron.
+A perceptron is a miniature machine that produces an output for a provided input ([Perceptron](#Perceptron)). A perceptron may accept 0, 1, or more inputs, and output the result of a small and simple computation. A perceptron operates on numerical values, which means that the inputs and the output are numbers (integer or float, as we will see later).
 
 [Perceptron]: 02-Perceptron/figures/perceptron.png
 ![Perceptron][Perceptron]
@@ -41,7 +41,7 @@ Right-click on the left-most top list to create a new package, let's call it `Ne
 When you select our package, a class template appears in the below code. Fill it to have the following:
 
 ~~~~~~~
-Object subclass: #Perceptron
+Object subclass: #Neuron
 	instanceVariableNames: 'weights bias'
 	classVariableNames: ''
 	package: 'NeuralNetwork'
@@ -50,14 +50,16 @@ Object subclass: #Perceptron
 You then need to compile the code by ''accept''-ing the source code. Right click on the text pane and select the option ''Accept''. The class we have defined contains two instance variables, `weights` and `bias`. 
 We now have to add a few methods that manipulate these variables before some actual work. Let first focus on manipulating the `weights` variable. We will define two methods to write a value to that variable and another to read from it.
 
+You may wonder why we define a class `Neuron` and not `Perceptron`. In the future chapter we will turn our class `Neuron` into an open abstraction to artificial neuron.
+
 Here is the code of the `weights:` method defined in the class `Perceptron`:
 
 ~~~~~~~
-Perceptron>>weights: someWeightsAsNumbers
+Neuron>>weights: someWeightsAsNumbers
 	weights := someWeightsAsNumbers copy
 ~~~~~~~
 
-To define this method, you need to select the class in the class panel (second top list panel). Then write the code given above *without* `Perceptron>>`. Then you should accept the code, by right clicking on the 'Accept' menu item. Accepting a method has the effect to compile it. The code define the method named `weights:` which accepts one argument, provided as a variable named `someWeightsAsNumbers`. 
+To define this method, you need to select the class in the class panel (second top list panel). Then write the code given above *without* `Neuron>>`. Then you should accept the code, by right clicking on the 'Accept' menu item. Accepting a method has the effect to compile it. The code define the method named `weights:` which accepts one argument, provided as a variable named `someWeightsAsNumbers`. 
 
 The expression `weights := someWeightsAsNumbers copy` creates a copy of the provided argument and assign it to the variable `weights`. The copy is not necessary, but it is useful to prevent some hard-to-debug issues.
 
@@ -67,7 +69,7 @@ The expression `weights := someWeightsAsNumbers copy` creates a copy of the prov
 We know need a method to read the content of that variable. Here is the apropriate method: 
 
 ~~~~~~~
-Perceptron>>weights
+Neuron>>weights
 	^ weights
 ~~~~~~~
 
@@ -76,21 +78,21 @@ The character `^` returns the value of an expression, the value of the variable 
 Similarly we need to define a method to assign a value to the `bias` variable and to read its content. The method `bias:` can be defined as:
 
 ~~~~~~~
-Perceptron>>bias: aNumber
+Neuron>>bias: aNumber
 	bias := aNumber
 ~~~~~~~
 
 And the reading may be defined using: 
 
 ~~~~~~~
-Perceptron>>bias
+Neuron>>bias
 	^ bias
 ~~~~~~~
 
 So far, we have defined the class `Perceptron` which contains two variables (`weights` and `bias`), and 4 methods (`weights:`, `weights`, `bias:`, and `bias`). The last piece to add is applying a set of inputs values and obtaining the output value. The method `feeds:` can be defined as:
 
 ~~~~~~~
-Perceptron>>feed: inputs
+Neuron>>feed: inputs
 	| z |
 	z := (inputs with: weights collect: [ :x :w | x * w ]) sum + bias.
 	^ z > 0 ifTrue: [ 1 ] ifFalse: [ 0 ].
@@ -113,7 +115,7 @@ You can verify the value of that expression by opening a playground, accessible 
 We can now play a little bit with a perceptron. Evaluate the following code in a playground:
 
 ~~~~~~~
-p := Perceptron new.
+p := Neuron new.
 p weights: #(1 2).
 p bias: -2.
 p feed: #(5 2)
@@ -147,7 +149,7 @@ The class `TestCase` belongs to the Pharo codebase and subclassing it is the fir
 ~~~~~~~
 PerceptronTest>>testSmallExample
 	| p result |
-	p := Perceptron new.
+	p := Neuron new.
 	p weights: #(1 2).
 	p bias: -2.
 	result := p feed: #(5 2).
@@ -177,7 +179,7 @@ A little bit of arithmetic indicates that a perceptron with the weights `#(1 1)`
 ~~~~~~~
 PerceptronTest>>testAND
 	| p |
-	p := Perceptron new.
+	p := Neuron new.
 	p weights: { 1 . 1 }.
 	p bias: -1.5.
 	
@@ -192,7 +194,7 @@ Similarly, a perceptron can formulate the OR logical gate. Consider the followin
 ~~~~~~~
 PerceptronTest>>testOR
 	| p |
-	p := Perceptron new.
+	p := Neuron new.
 	p weights: { 1 . 1 }.
 	p bias: -0.5.
 	
@@ -207,7 +209,7 @@ Negating the weights and bias results in the negated logical gate:
 ~~~~~~~
 PerceptronTest>>testNOR
 	| p |
-	p := Perceptron new.
+	p := Neuron new.
 	p weights: { -1 . -1 }.
 	p bias: 0.5.
 	
@@ -222,7 +224,7 @@ So far we had perceptron with two inputs. A perceptron accepts the same number o
 ~~~~~~~
 PerceptronTest>>testNOT
 	| p |
-	p := Perceptron new.
+	p := Neuron new.
 	p weights: { -1 }.
 	p bias: 0.5.
 	
@@ -262,9 +264,9 @@ PerceptronTest>>digitalComparator: inputs
 	A := inputs first.
 	B := inputs second.
 
-	and := Perceptron new weights: { 1 . 1 }; bias: -1.5.
-	not := Perceptron new weights: { -1 }; bias: 0.5.
-	nor := Perceptron new weights: { -1 . -1 }; bias: 0.5.	
+	and := Neuron new weights: { 1 . 1 }; bias: -1.5.
+	not := Neuron new weights: { -1 }; bias: 0.5.
+	nor := Neuron new weights: { -1 . -1 }; bias: 0.5.	
 
 	notA := not feed: { A }. 
 	notB := not feed: { B }.
@@ -298,18 +300,17 @@ Learning in neural networks means adjusting the weights and the bias in order to
 A way to make perceptron learn is given by the method `train:desiredOutput:`, as follow:
 
 ~~~~~~~
-Perceptron>>train: inputs desiredOutput: desiredOutput
-	| realOutput difference oldWeight currentInput learningRate newWeight |
-	realOutput := self feed: inputs.
-	difference := desiredOutput - realOutput.
+Neuron>>train: inputs desiredOutput: desiredOutput
+	| learningRate theError output |
+	output := self feed: inputs.
 	learningRate := 0.1.
-	1 to: weights size do: [ :index |
-		oldWeight := weights at: index.
-		currentInput := inputs at: index.
-		newWeight := oldWeight + (learningRate * currentInput * difference). 
-		weights at: index put: newWeight.
-		
-		bias := bias + (learningRate * difference). ]
+
+	theError := desiredOutput - output.
+
+	inputs withIndexDo: [ :anInput :index | 
+		weights at: index put: ((weights at: index) + (learningRate * theError * anInput)) ].
+
+	bias := bias + (learningRate * theError)
 ~~~~~~~
 
 Before doing any adjustment of the weights and bias, we need to know how well the perceptron evaluates the set of inputs. We therefore need to evaluate the perceptron with the argument `inputs`. The result is assigned to the variable `realOutput`. The variable `difference` represents the difference between the desired output and the real output. We also need to decide how fast the perceptron is supposed to learn. The `learningRate` value is a value between `0.0` and `1.0`. We arbitrarily picked the value `0.1`.
@@ -317,7 +318,7 @@ Before doing any adjustment of the weights and bias, we need to know how well th
 Let's see how to use the training in practice. Consider the perceptron `p` given as (you can evaluate the following code in a playground):
 
 ~~~~~~~
-p := MPPerceptron new.
+p := Neuron new.
 p weights: { -1 . -1 }.
 p bias: 2.
 p feed: { 0 . 1 }.
@@ -326,7 +327,7 @@ p feed: { 0 . 1 }.
 As we have seen, we have `p feed: { 0 . 1 }` equals to `1`. What if we wish the perceptron to actually output `0` for the input `{ 0 . 1 }`? We therefore need to train `p` to actually output `0`. Let's try the following:
 
 ~~~~~~~
-p := Perceptron new.
+p := Neuron new.
 p weights: { -1 . -1 }.
 p bias: 2.
 p train: { 0 . 1 } desiredOutput: 0.
@@ -336,7 +337,7 @@ p feed: { 0 . 1 }.
 Evaluating this expression still outputs `1`. Well... Were we not supposed to train our perceptron? The learning process is a rather slow process, and we need to actually teach the perceptron a few times what the designed output is. We can repeatably train the perceptron as in:
 
 ~~~~~~~
-p := Perceptron new.
+p := Neuron new.
 p weights: { -1 . -1 }.
 p bias: 2.
 10 timesRepeat: [ p train: { 0 . 1 } desiredOutput: 0 ].
@@ -353,11 +354,11 @@ We can now train some perceptron to actually learn how to express the logical ga
 ~~~~~~~
 PerceptronTest>>testTrainingOR
 	| p |
-	p := Perceptron new.
+	p := Neuron new.
 	p weights: { -1 . -1 }.
 	p bias: 2.
 	
-	25 timesRepeat: [ 
+	40 timesRepeat: [ 
 		p train: { 0 . 0 } desiredOutput: 0.
 		p train: { 0 . 1 } desiredOutput: 1.
 		p train: { 1 . 0 } desiredOutput: 1.
@@ -372,7 +373,7 @@ PerceptronTest>>testTrainingOR
 
 The method `testTrainingOR` first creates a perceptron with some arbitrary weights and bias. We successfully train it with the four possible combinations of the OR logical gate. After the training, we test the perceptron to see if it has actually properly learn. 
 
-In `testTrainingOR`, we train the perceptron 25 times the complete set of examples. Training a perceptron (or a large neural network) with the complete set of examples is called _epoch_. So, in our example, we train `p` with 25 epochs. 
+In `testTrainingOR`, we train the perceptron 40 times the complete set of examples. Training a perceptron (or a large neural network) with the complete set of examples is called _epoch_. So, in our example, we train `p` with 40 epochs. 
 
 *EXERCISE:*
 - What is the necessary minimum number of epochs to train `p`? You can try to modify `25` by a lower value and run the test to see if it still passes.
@@ -465,7 +466,7 @@ We will now add a perceptron in our script and see how good it performs to guess
 
 ~~~~~~~
 f := [ :x | (-2 * x) - 3 ].
-p := Perceptron new.
+p := Neuron new.
 p weights: { 1 . 2 }.
 p bias: -1.
 r := Random new seed: 42.
@@ -549,7 +550,7 @@ f := [ :x | (-2 * x) - 3 ].
 
 0 to: 2000 by: 10 do: [ :nbOfTrained |
 	r := Random new seed: 42.
-	p := Perceptron new.
+	p := Neuron new.
 	p weights: { 1 . 2 }.
 	p bias: -1.
 
@@ -590,26 +591,20 @@ g
 The script produces a curve with the precision on the Y-axis and the number of trainings on the X-axis. We see that 
 
 
-
-
-## Learning rate
-
-What if we increase the learning rate?
-
-
-
-## What we have seen
-- Providing the concept of perceptron
-- A step-by-step guide on programming with Pharo
-- Implemented a perceptron 
-- Teaching a perceptron 
+## What have we have
+This chapter covers the following topics:
+- _Providing the concept of perceptron._ We have seen what is a perceptron. The perceptron is an essential abstraction on which we will built on top of in the next chapters.
+- _A step-by-step guide on programming with Pharo._ While we implemented the perceptron, we have sketched out how programming happens in Pharo. This chapter is by no means an introduction to Pharo. Instead, it is an overview on how to use the Pharo programming environment. In particular, we have seen how to write code using the system browser and how to run code using the playground. These two tools are fundamental and deserve to be well understood. 
+- _Implemented a perceptron._ We implemented and tested the perceptron.  Testing is important as it is a way to formalize the behavior we wish for the perceptron.
+- _Making a perceptron learn._ We have seen a rudimentary way to make a perceptron learn. It is rather simple, but, as we will see in the future chapters, the very same technique can bring us very far. 
 
 
 ## Exercises
 
-- We have seen how the perceptron can be used to implement some logical gates. In particular, we have seen how the AND, OR, and NOT can be implemented. What about the XOR gate? Can you train a perceptron to learn the XOR behavior? (As a remainder, we have `0 XOR 0 = 0`, `0 XOR 1 = 1`, `1 XOR 0 = 1`, and `1 XOR 1 = 0`).
+- We have seen how the perceptron can be used to implement some logical gates. In particular, we have seen how the AND, OR, and NOT can be implemented. What about the XOR gate? Can you train a perceptron to learn the XOR behavior? (As a remainder, we have `0 XOR 0 = 0`, `0 XOR 1 = 1`, `1 XOR 0 = 1`, and `1 XOR 1 = 0`). 
+- We have seen how five perceptrons may be combined to form a digital comparator. Do you think you can train the combination of these five prceptrons as a whole to learn the behavior of the digital comparator? 
 
-## Further reading
+## Further reading about Pharo
+Pharo is a wonderful programming language and programming environment. This first chapter may be used as an introduction to programming with Pharo. However, it is highly recommended to seek for complementary reading in order to feel confortable with Pharo. In particular, the _Pharo by example_ book is an excellente introduction to learn and master Pharo. The website *http://books.pharo.org* contains a free copy of the book. Check it out!
 
 
-- Agile Programming
