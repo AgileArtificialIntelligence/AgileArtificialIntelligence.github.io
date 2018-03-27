@@ -28,7 +28,7 @@ do
 		--toc --toc-depth 2 \
 		--filter pandoc-fignos \
 		--mathml \
-		--template template.html --css template.css \
+		--template template.html --css Template/template.css \
 		$originalFile
 done
 
