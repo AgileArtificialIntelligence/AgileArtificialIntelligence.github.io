@@ -8,7 +8,7 @@
 
 
 
-FILES=`ls 01-introduction/*.markdown \
+FILES=`ls 01-Introduction/*.markdown \
 	02-Perceptron/*.markdown \
 	03-Neuron/*.markdown \
 	04-NeuralNetwork/*.markdown \
