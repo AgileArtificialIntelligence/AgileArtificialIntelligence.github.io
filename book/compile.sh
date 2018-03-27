@@ -1,14 +1,19 @@
 #!/bin/bash
 
-pandoc -o book.pdf --from markdown  --toc --toc-depth 1 \
+FILES=`ls 01-introduction/*.markdown \
+	02-Perceptron/*.markdown \
+	03-Neuron/*.markdown \
+	04-NeuralNetwork/*.markdown \
+	07-Learning/*.markdown`
+
+if [ ! -d "build" ]; then
+	mkdir build
+fi
+
+pandoc -o build/book.pdf --from markdown  --toc --toc-depth 1 \
 	--template mybook \
 	--number-sections \
 	--top-level-division=chapter \
 	--filter pandoc-fignos \
 	--listings \
-	01-introduction/*.markdown \
-	02-Perceptron/*.markdown \
-	03-Neuron/*.markdown \
-	04-NeuralNetwork/*.markdown \
-	XX-GeneticAlgorithm/*.markdown
-
+	$FILES

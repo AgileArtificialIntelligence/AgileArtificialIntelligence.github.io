@@ -1,24 +1,20 @@
 
 # Neural Networks
 
-In the previous chapter we have seen how to define single artificial neuron. This chapter belongs to the core of this book as it presents how to connect and give a meaning to a group of artificial neurons.
+The previous chapter covers the design and implementation of an individual neuron. This chapter follows the effort initiated in previous chapters by connecting multiple neurons. We provide a complete implementation of a neural network and a backpropagation algorithm, which makes use at the core of the book.
 
 ## General architecture
 
-An artificial neural network is a computing system inspired by biological neural networks which define animal brains. 
-An artificial neural network is a collection of connected artificial neurons. Each connection between artificial neurons can transmit a signal from one to another. The artificial neuron that receives the signal can process it, and then signal neurons connected to it. 
+An artificial neural network is a computing system inspired by biological neural networks part of an animal brain. 
+An artificial neural network is a collection of connected artificial neurons. Each connection between artificial neurons can transmit a signal from one to another. The artificial neuron that receives the signal can process it, and then signal neurons connected to it. Artificial neural networks are commonly employed to perform particular tasks, including clustering, classification, prediction, and pattern recognition. Similarly than with the perceptron and sigmoid neuron, a neural network acquires knowledge through learning.
 
-Artificial neural networks are commonly employed to perform particular tasks, including clustering, classification, prediction, and pattern recognition. 
-
-A neural network acquires knowledge through learning.
+![Example of a neural network](04-NeuralNetwork/figures/generalStructure.png){#fig:generalStructure width=400}
 
 
-[generalStructure]: 04-NeuralNetwork/figures/generalStructure.png "Image Title" {width=400}
-![generalStructure][generalStructure] 
+Figure @fig:generalStructure shows a simple neural network made of five neurons, three inputs, and two outputs. The left-most column is called the input layer. The input layers simply transmits some values to the hidden layer, without doing anything in particular. In the figure, the input layer contains three inputs, `x1`, `x2`, and `x3`. the middle of the network contains the hidden layers. The network above contains only one hidden layer, made of three neurons. The right-most part of the network is called output layer, and contains of two neurons. 
 
-The figure above shows a network made of five neurons, three inputs, and two outputs. The left-most column is called the inputs. The networks contains three inputs, `x1`, `x2`, and `x3`. the middle of the network contains the hidden layers. The network above contains only one hidden layer, made of three neurons. The right-most part of the network is called output layer, and is made of two neurons. 
+The depicted neural network is qualified as _full-connected_ since each neuron of the hidden layer is connected with _all_ the neurons of the input layer and _all_ the neuron of the output layer. The architecture of any fully-connected neural networks involves three different kind of layers. We will therefore build the necessary abstractions:
 
-We therefore needs three different components to model networks:
 - _Hidden layer_ representing layers within 
 - _Output layer_ representing the right-most column. This is that column that spits out computed values
 - _Neural Network_ made of several hidden layers and one output layer.
@@ -34,7 +30,7 @@ Object subclass: #NeuronLayer
 	package: 'NeuralNetwork'
 ```
 
-We can set the learning rate of a layer as 0.5 per default. A neuron layer may be initialized using the following method:
+We can set the learning rate of a layer as 0.1 per default. A neuron layer may be initialized using the following method:
 
 ```Smalltalk
 NeuronLayer>>initializeNbOfNeurons: nbOfNeurons nbOfWeights: nbOfWeights using: random
@@ -44,18 +40,19 @@ NeuronLayer>>initializeNbOfNeurons: nbOfNeurons nbOfWeights: nbOfWeights using: 
 	random : a random number generator
 	"
 	| weights |
-	learningRate := 0.5.
+	learningRate := 0.1.
 	neurons := (1 to: nbOfNeurons) collect: [ :i |
-		weights := (1 to: nbOfWeights) collect: [ :ii | random next * 2 - 1 ].
-		Neuron new sigmoid; weights: weights; bias: (random next * 2 - 1) ]  
+		weights := (1 to: nbOfWeights) collect: [ :ii | random next * 4 - 2 ].
+		Neuron new sigmoid; weights: weights; bias: (random next * 4 - 2) ]  
 
 ```
 
-The method `initializeNbOfNeurons:nbOfWeights:using:` accepts three arguments. The first one, `nbOfNeurons` is an integer number representing the number of neurons the layer should contains. The second argument, `nbOfWeights`, is an integer that indicates the number of weights each neuron should have. This number of weights reflects the number of input values the layer is accepting. The last argument, `random`, is a random number generator. 
 
-The method set the learning rate to `0.5`, and create `nbOfNeurons` neurons, each having `nbOfWeights` weight value. Each weight is a random number between -1 and +1. Each neuron has a sigmoid activation function.
+The method `initializeNbOfNeurons:nbOfWeights:using:` accepts three arguments. The first one, `nbOfNeurons` is an integer value and represents the number of neurons the layer should contains. The second argument, `nbOfWeights`, is an integer that indicates the number of weights each neuron should have. This number of weights reflects the number of input values the layer is accepting. The last argument, `random`, is a random number generator. As in the previous chapter, using a random number generator is useful to make the behavior deterministic. This random generator will be useful to initialize each individual neuron.
 
-Forward feeding the layer is an essential operation. It consists in feeding each neurons and forwarding the values to the next value. We define the method `feed:` as:
+The method first sets the learning rate to `0.1`, and creates `nbOfNeurons` different neurons, each having `nbOfWeights` weight values. Each weight is a random number between -2 and +2. The expression `random next` produces a random number within 0 and 1. Multiplying it by 4 and subtracting 2 produces a value between -2 and +2. Each neuron has a sigmoid activation function.
+
+Forward feeding the layer is an essential operation. It consists in feeding each neurons and forwarding the values to the next layer. We define the method `feed:` as:
 
 ```Smalltalk
 NeuronLayer>>feed: someInputValues
@@ -68,17 +65,24 @@ NeuronLayer>>feed: someInputValues
 		ifFalse: [ nextLayer feed: someOutputs ]
 ```
 
-The method invokes `feed:` on each of its neurons. The results is then kept as an Array. The method then check if the layer is an output layer. If this is the case, the result of the method is simply the results of each neurons. If the layer is not an output (_i.e.,_ it is  an hidden layer), we forward feed the next layer.
+The method invokes `feed:` on each of its neurons (we have have seen the method `Neuron>>feed:` in the previous chapter). The results is then kept as an array. The method then check if the layer is an output layer. If this is the case, the result of the method is simply the results of each neurons. If the layer is not an output (_i.e.,_ it is  an hidden layer), we forward feed the computed values to the next layer.
 
 
-We now need the following utility method:
+We need to determine if a neuron layer is the output layer or not. We can easily achieve this using the predicate `isOutputLayer`:
 ```Smalltalk
 NeuronLayer>>isOutputLayer
 	"Return true of the layer is the output layer (i.e., the last layer in the network)"
 	^ self nextLayer isNil
 ```
 
-We can now prepare a testbed for our new neuron layer class:
+We will also need a way to hook layers together:
+```Smalltalk
+NeuronLayer>>nextLayer: aLayer
+	"Set the next layer"
+	nextLayer := aLayer
+```
+
+We have now defined most of the `NeuronLayer` class. We can now start testing the class:
 ```Smalltalk
 TestCase subclass: #NeuronLayerTest
 	instanceVariableNames: ''
@@ -90,16 +94,40 @@ A simple test may be:
 
 ```Smalltalk
 NeuronLayerTest>>testBasic
-	| nl result |
+	| nl result r |
+	r := Random seed: 42.
 	nl := NeuronLayer new.
-	nl initializeNbOfNeurons: 3 nbOfWeights: 4 using: (Random seed: 42).
+	nl initializeNbOfNeurons: 3 nbOfWeights: 4 using: r.
 
 	self assert: nl isOutputLayer.
 
 	result := nl feed: { 1 . 2 . 3 . 4 }.
 	self assert: result size equals: 3.
- 	self assert: result closeTo: #(0 1.1277714465408457 1.9863987178478386).
+ 	self assert: result closeTo: #(0.037000501309787576 0.9051275824569505 0.9815269659126287)
 ```
+
+We can also test a chain of layers:
+```Smalltalk
+NeuronLayerTest>>testOutputLayer
+	| nl1 nl2 result random |
+	random := Random seed: 42.
+	nl1 := NeuronLayer new.
+	nl1 initializeNbOfNeurons: 3 nbOfWeights: 4 using: random.
+
+	nl2 := NeuronLayer new.
+	nl2 initializeNbOfNeurons: 4 nbOfWeights: 3 using: random.
+	nl1 nextLayer: nl2.
+
+	self deny: nl1 isOutputLayer.
+	self assert: nl2 isOutputLayer.
+
+	result := nl1 feed: { 1 . 2 . 3 . 4 }.
+	"Since nl2 has 4 neurons, we will obtain 4 outputs"
+	self assert: result size equals: 4.
+ 	self assert: result closeTo: #(0.030894022895187584 0.9220488835263312 0.5200462953493653 0.20276557516858304)
+```
+
+We can now wrap a chain of layers into a neural network.
 
 ## Neural network
 
@@ -112,7 +140,7 @@ Object subclass: #NNetwork
 	package: 'NeuralNetwork'
 ```
 
-We define a neural network simply as a container of layers. We also add an `errors` instance variable that will be useful to trace the error during a learning phase.
+We define a neural network simply as a container of layers. We also add an `errors` instance variable that will be useful to trace the evolution of error during the learning phase.
 
 The initialization of a network is done through the method `initialize`:
 ```Smalltalk
@@ -122,7 +150,7 @@ NNetwork>>initialize
 	errors := OrderedCollection new
 ```
 
-Both the `layers` and `errors` instance variables are initialized with an empty collection. The variable `layers` will contains instance of the class `NeuronLayer` and `errors` will contains numerical values, representing the errors during the training process. 
+Both the `layers` and `errors` instance variables are initialized with an empty collection. The variable `layers` will contains instances of the class `NeuronLayer` and `errors` will contains numerical values, representing the errors during the training process. 
 
 Adding a layer is simply done through the method `addLayer:`, which takes a layer as argument:
 ```Smalltalk
@@ -136,6 +164,7 @@ NNetwork>>addLayer: aNeuronLayer
 
 Layers are linked to each other. When a layer is added, it is linked to the previous layer and that layer is linked to the added layer.
 
+Feeding a neural network is simply feeding the first hidden layer:
 
 ```Smalltalk
 NNetwork>>feed: someInputValues
@@ -150,7 +179,7 @@ NNetwork>>configure: nbOfInputs hidden: nbOfNeurons nbOfOutputs: nbOfOutput
 	"Configure the network with the given parameters
 	The network has only one hidden layer"
 	| random |
-	random := Random seed: 1.
+	random := Random seed: 42.
 	self addLayer: (NeuronLayer new initializeNbOfNeurons: nbOfNeurons nbOfWeights: nbOfInputs using: random).
 	self addLayer: (NeuronLayer new initializeNbOfNeurons: nbOfOutput nbOfWeights: nbOfNeurons using: random).
 ```
@@ -188,16 +217,23 @@ NNetworkTest>>testBasic
 
 As you can see, `testBasic` is rather simplistic. It builds a simple network with two inputs, one hidden layer made of 2 neurons, and an output layer with only one neuron, and run the forward feeding. 
 
+So far, our network is pretty useless. The next section covers the learning mechanism for neural networks.
+
 ## Backpropagation
 
-Backpropagation is an algorithm commonly employed to train neural network. In this section we will focus on implementing the algorithm. The training process is composed of three steps:
-1.Forward feeding the inputs
-1.Backward propagating the errors through the network
-1.Updating the neurons weights and biases
+Backpropagation is an algorithm commonly employed to train neural networks. By training, we mean to make the network identify some patterns.
 
-The first phase is mostly implemented by the method `NNetwork>>feed:`, however, we need to improve our neuron to keep the output. During the forward feeding (_i.e.,_ when the method `feed:` is called), an output is produced by each neuron. This output has to be compared with an expected output. Making the network learn is based on the difference between the actual output of a neuron and the expected output. Each neuron has therefore to keep a reference to the output. 
+So far, we built a network as a set of neurons, each being initialized with random weights and random biases. Conceptually, backpropagation is an algorithm for supervised learning of gradient descent (next chapters will cover this terminology). In practice, this algorithm will find adequate weights and biases to identify patterns from the input values. This chapter focuses on informally presenting the algorithm and providing an implementation of it. Subsequent chapters will provide a theoretical foundation of the algorithm.
 
-We add two variables, `delta` and `output`, in the class `Neuron`, 
+The backpropagation algorithm is composed of three steps:
+
+1. _Forward feeding the inputs_. We first activate each neurons of our network to make the network produce an output.
+1. _Backward propagating the errors through the network_. The output produced in the previous step has to be contrasted with the actual training dataset. We can therefore compute an error, which indicates how far our network is from correctly predicting the training set. 
+1. _Updating the neurons weights and biases_. From the error computed in the previous step, we adequately adjust each neuron weights and bias to, hopefully, reduce the error made by the network.
+
+The first step is mostly implemented by the method `NNetwork>>feed:`, however, we need to slightly improve the class `Neuron` to actually remember the produced output. During the forward feeding (_i.e.,_ when the method `feed:` is called), an output is produced by each neuron. This output has to be compared with an expected output. Making the network learn is based on the difference between the actual output of a neuron and the expected output. Each neuron has therefore to keep a reference to the output. 
+
+We add two variables, `delta` and `output`, to the class `Neuron`, 
 
 ```Smalltalk
 Object subclass: #Neuron
@@ -206,7 +242,7 @@ Object subclass: #Neuron
 	package: 'NeuralNetwork'
 ```
 
-We now rewrite the method `feed:` on the class `Neuron`:
+We now rewrite the method `feed:` in the class `Neuron`:
 ```Smalltalk
 Neuron>>feed: inputs
 	| z |
@@ -215,9 +251,9 @@ Neuron>>feed: inputs
 	^ output    
 ```
 
-At that stage, it is important to run the unit tests we have run. We are now done with the first phase of the backpropagation. 
+At that stage, it is important to run the unit tests we have previously defined. In particular, we need to make sure that the small changes we have defined on the class `Neuron` does not break any invariant. We are now done with the first phase of the backpropagation. 
 
-The second phase consists in propagating the errors computed at the output layer back in the network. We define the following method:
+The second step of the backpropagation consists in propagating the errors computed at the output layer back in the network. We define the following method:
 
 ```Smalltalk
 NNetwork>>backwardPropagateError: expected
@@ -354,10 +390,10 @@ NNetworkTest>>testXOR
 		n train: { 1 . 1 } desiredOutputs: { 0 }.
 	].
 
-	self assert: ((n feed: { 1 . 1 }) first - 0.025) < 0.01.
-	self assert: ((n feed: { 0 . 1 }) first - 1) < 0.01.
-	self assert: ((n feed: { 1 . 0 }) first - 1) < 0.01.
-	self assert: ((n feed: { 0 . 0 }) first - 0.025) < 0.01.
+	self assert: (n feed: { 0 . 0 }) first < 0.1.
+	self assert: (n feed: { 0 . 1 }) first > 0.9.
+	self assert: (n feed: { 1 . 0 }) first > 0.9.
+	self assert: (n feed: { 1 . 1 }) first < 0.1.
 ```
 
 If you try to decrease the `10000` to a low value, `10` for example, the network does not receive enough training and the test ultimately fails.

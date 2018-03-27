@@ -21,7 +21,7 @@ Not all inputs have the same importance for the perceptron. For example, an inpu
 
 A perceptron receives a stimulus as input. How likely is the perceptron responding to the input stimulus? In addition to the pondered input value, a perceptron requires a _bias_, a numerical value acting as a threshold. We denote the bias as _b_.
 
-Formally, we write $z = x1 * w1 + x2 * w2 + x3 * w3 + b$. In the general case, we write $z = \sum_i{x_i * w_i}~ + b$. If $z$ is greater then 0, then the perceptron produces 1, else it produces 0.
+Formally, we write $z = x1 * w1 + x2 * w2 + x3 * w3 + b$. In the general case, we write $z = \sum_i{x_i * w_i}~ + b$, which is shortened as $z = x . w + b$. If $z$ is greater then 0, then the perceptron produces 1, else it produces 0.
 
 In the next section we will implement the perceptron model that is both extensible and maintainable. You may wonder what is the big deal about this. After all, the perceptron model may be implemented in a few lines of code. Yes, focusing on the functionalities is maybe less than half of the job. Implementing the perceptron model that is testable, well tested, and extensible is significantly harder.
 
@@ -334,6 +334,14 @@ Neurons have the ability to learn from examples. This _training_ is essential to
 
 Learning in neural networks means adjusting the weights and the bias in order to make the output close to the set of training examples. Training a perceptron therefore means to adjust its weights and bias according to how good it performs for a given set of inputs.
 
+The way a perceptron learns simply follows the rule: $w_i(t+1) = w_i(t) + (d - z) * x_i * \alpha$, in which:
+- $i$ is the weight index
+- $w_i(t+1)$ is the weight $i$ at a given time $t+1$
+- $d$ is the difference between the desired value and the actual value
+- $z$ is the actual output of the perceptron
+- $x_i$ corresponds to the provided input at index $i$
+- $\alpha$ is the learning rate
+
 A way to make perceptron learn is given by the method `train:desiredOutput:`, as follow:
 
 ~~~~~~~
@@ -350,6 +358,7 @@ Neuron>>train: inputs desiredOutput: desiredOutput
 ~~~~~~~
 
 Before doing any adjustment of the weights and bias, we need to know how well the perceptron evaluates the set of inputs. We therefore need to evaluate the perceptron with the argument `inputs`. The result is assigned to the variable `output`. The variable `theError` represents the difference between the desired output and the actual output. We also need to decide how fast the perceptron is supposed to learn. The `learningRate` value is a value between `0.0` and `1.0`. We arbitrarily picked the value `0.1`. 
+
 
 Let's see how to use the training in practice. Consider the perceptron `p` given as (you can evaluate the following code in a playground):
 
@@ -383,7 +392,7 @@ p feed: #(0 1).
 
 Evaluating the code given above produces `0`, as we were hopping for (Figure @fig:playgroundWithLearningPerceptron). Our perceptron has learned!
 
-![Teaching a perceptron.](02-Perceptron/figures/playgroundWithLearningPerceptron.png){#fig:playgroundWithLearningPerceptron width=200px}
+![Teaching a perceptron.](02-Perceptron/figures/playgroundWithLearningPerceptron.png){#fig:playgroundWithLearningPerceptron width=400px}
 
 We can now train a perceptron to actually learn how to express the logical gates. Consider the following `testTrainingOR`:
 
@@ -621,7 +630,7 @@ g axisX noDecimal; title: 'Training iteration'.
 g
 ~~~~~~~
 
-![Precision of the dot classification task.](02-Perceptron/figures/perceptronPrecision.png){#fig:perceptronPrecision}
+![Precision of the dot classification task.](02-Perceptron/figures/perceptronPrecision.png){#fig:perceptronPrecision width=400px}
 
 The script produces a curve with the precision on the Y-axis and the number of trainings on the X-axis (Figure @fig:perceptronPrecision). We see that the perceptron started with a rather poor performance, around 0.25. However, it quickly steps up to reach a precision close to 1.0.
 
@@ -632,11 +641,11 @@ Expressing a computation in terms of artificial neurons was first thought in 194
 
 ## What have we seen in this chapter
 This chapter covers the following topics:
-- _Providing the concept of perceptron._ We have seen what is a perceptron. The perceptron is an essential abstraction on which we will built on top of in the next chapters.
-- _A step-by-step guide on programming with Pharo._ While we implemented the perceptron, we have sketched out how programming happens in Pharo. This chapter is by no means an introduction to Pharo. Instead, it is an overview on how to use the Pharo programming environment. In particular, we have seen how to write code using the system browser and how to run code using the playground. These two tools are fundamental and deserve to be well understood. 
-- _Implemented a perceptron._ We implemented and tested the perceptron.  Testing is important as it is a way to formalize the behavior we wish for the perceptron.
-- _Making a perceptron learn._ We have seen a rudimentary way to make a perceptron learn. It is rather simple, but, as we will see in the future chapters, the very same technique can bring us very far. 
 
+* _Providing the concept of perceptron._ We have seen what is a perceptron. The perceptron is an essential abstraction on which we will built on top of in the next chapters.
+* _A step-by-step guide on programming with Pharo._ While we implemented the perceptron, we have sketched out how programming happens in Pharo. This chapter is by no means an introduction to Pharo. Instead, it is an overview on how to use the Pharo programming environment. In particular, we have seen how to write code using the system browser and how to run code using the playground. These two tools are fundamental and deserve to be well understood. 
+* _Implemented a perceptron._ We implemented and tested the perceptron.  Testing is important as it is a way to formalize the behavior we wish for the perceptron.
+* _Making a perceptron learn._ We have seen a rudimentary way to make a perceptron learn. It is rather simple, but, as we will see in the future chapters, the very same technique can bring us very far. 
 
 ## Exercises
 
