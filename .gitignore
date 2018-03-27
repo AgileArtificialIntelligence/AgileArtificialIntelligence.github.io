@@ -8,5 +8,6 @@ _site/
 book/.DS_Store
 */.DS_Store
 book/04-NeuralNetwork/.DS_Store
+book/build/book.pdf
 *~
 #*
