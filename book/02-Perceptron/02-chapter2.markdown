@@ -8,30 +8,32 @@ This chapter plays two essential role in the book. First, it presents the notion
 ## Perceptron
 
 A perceptron is a kind of artificial neuron that models the behavior of a real neuron.
-A perceptron is a machine that produces an output for a provided input ([Perceptron](#Perceptron)). 
+A perceptron is a machine that produces an output for a provided input (Figure @fig:perceptron). 
 
-A perceptron may accept 0, 1, or more numerical values, considered as inputs. It produces a numerical value as output, result of a simple equation. A perceptron operates on numbers, which means that the inputs and the output are integers or floating point values.
+A perceptron may accept 0, 1, or more numerical values, considered as inputs. It produces a numerical value as output, result of a simple equation. A perceptron operates on numbers, which means that the inputs and the output are numerical values (_e.g.,_ integers or floating point values).
 
 ![Representing the perceptron.](02-Perceptron/figures/perceptron.png){#fig:perceptron width=200px}
 
 
-Figure @fig:perceptron depicts a perceptron with three inputs, noted _x1_, _x2_, and _x3_. Each input is indicated with an incoming arrow and the output with the outgoing arrow. 
+Figure @fig:perceptron depicts a perceptron with three inputs, noted _x1_, _x2_, and _x3_. Each input is indicated with an incoming arrow and the output with an outgoing arrow. 
 
 Not all inputs have the same importance for the perceptron. For example, an input may be more important than the others inputs. Relevance of an input is expressed using a weight (also a numerical value) associated to that input. In our figure, the input _x1_ is associated to the weight _w1_, _x2_ to the weight _w2_, and _x3_ to _w3_. 
 
-A perceptron receives a stimulus as input. How likely is the perceptron responding to the input stimulus? In addition to the pondered input value, a perceptron requires a _bias_, a numerical value acting as a threshold. We denote the bias as _b_.
+In addition to the weighted input value, a perceptron requires a _bias_, a numerical value acting as a threshold. We denote the bias as _b_.
 
-Formally, we write $z = x1 * w1 + x2 * w2 + x3 * w3 + b$. In the general case, we write $z = \sum_i{x_i * w_i}~ + b$, which is shortened as $z = x . w + b$. If $z$ is greater then 0, then the perceptron produces 1, else it produces 0.
+A perceptron receives a stimulus as input and respond to that stimulus by producing an output value. The output obeys a very simple rule. First, we compute the sum of the weighted inputs and the bias. If this sum is above 0, then the perceptron produce 1, else it produces 0.
 
-In the next section we will implement the perceptron model that is both extensible and maintainable. You may wonder what is the big deal about this. After all, the perceptron model may be implemented in a few lines of code. Yes, focusing on the functionalities is maybe less than half of the job. Implementing the perceptron model that is testable, well tested, and extensible is significantly harder.
+More formally, for the perceptron given in Figure @fig:perceptron, we write $z = x1 * w1 + x2 * w2 + x3 * w3 + b$. In the general case, we write $z = \sum_i{x_i * w_i}~ + b$. If $z$ is greater then 0, then the perceptron produces 1, else it produces 0.
+
+In the next section we will implement the perceptron model that is both extensible and maintainable. You may wonder what is the big deal about this. After all, the perceptron model may be implemented in a few lines of code. Yes, focusing on the functionalities is just a fraction of our job. Implementing the perceptron model that is testable, well tested, and extensible requires some more work. 
 
 ## Implementing the perception
 
-In this section we put our hand to work and implement the perceptron model in the Pharo programming language. We will have an object-oriented implementation of the model. We will implement a class `Neuron` in a package called `NeuralNetwork`. Our class will have a method called `feed` which will be used to compute the $z$ value.
+In this section we put our hand to work and implement the perceptron model in the Pharo programming language. We will produce an object-oriented implementation of the model. We will implement a class `Neuron` in a package called `NeuralNetwork`. Our class will have a method called `feed` which will be used to compute the $z$ and output values of the perceptron.
 
-To create a new package, we first need to open a _system browser_ by selecting the corresponding entry in the World menu. The system browser is where you read and write source code. Most of the programming activity will actually happens in a system browser. 
+To create a new package, we first need to open a _system browser_ by selecting the corresponding entry in the Pharo menu. The system browser is where you read and write source code. Most of the programming activity will actually happens in a system browser. 
 
-Figure @fig:systemBrowser represents the system browser. A system browser is composed of five different parts. The above part is composed of four lists. The left-most list gives the available and ready to be used packages. The second list gives the classes that belongs to a selected package. The third list gives the method categories for the class you have selected. A method category is a container of methods. It is for methods what a package is for classes. The right-most list gives the methods that belongs in the class under a particular method category. If no category is selected, all the methods that belongs to the class are listed. The below part of a system browser gives source code, which is either a class template to fill in order to create a class, the source code of the selected class, or the source code of a selected method.
+Figure @fig:systemBrowser represents the system browser. A system browser is composed of five different parts. The above part is composed of four lists. The left-most list gives the available and ready-to-be-used packages. The second list gives the classes that belongs to a selected package. The third list gives the method categories for the class you have selected. A method category is a container of methods. It is for methods what a package is for classes. The right-most list gives the methods that belongs in the class under a particular method category. If no category is selected, all the methods that belongs to the selected class are listed. The below part of a system browser gives source code, which is either a class template to be filled in order to create a class, the source code of the selected class, or the source code of a selected method.
 
 ![The Pharo system browser.](02-Perceptron/figures/systemBrowser.png){#fig:systemBrowser}
 
@@ -47,22 +49,22 @@ Object subclass: #Neuron
 ~~~~~~~
 
 You then need to compile the code by accepting the source code. Right click on the text pane and select the option `Accept`. The class we have defined contains two instance variables, `weights` and `bias`. We need to add some methods to give a meaning to our class.
-In particular, we need a few methods that manipulate these variables in addition to the logic, which is to compute the $z$ value. Let first focus on the `weights` variable. We will define two methods to write a value to that variable and another to read from it.
+In particular, we need a few methods that manipulate these variables in addition to the logic, which is to compute the $z$ and output values. Let first focus on the `weights` variable. We will define two methods to write a value to that variable and another to read from it.
 
-You may wonder why we define a class `Neuron` and not `Perceptron`. In the future chapter we will turn our class `Neuron` into an open abstraction to artificial neuron. Our `Neuron` class is therefore a placeholder for improvements we will do in the subsequent chapters.
+You may wonder why we define a class `Neuron` and not `Perceptron`. In the next chapter we will expand our class `Neuron` by turning it into an open abstraction for artificial neuron. Our `Neuron` class is therefore a placeholder for improvements we will do in the subsequent chapters.
 
 Here is the code of the `weights:` method defined in the class `Neuron`:
 
 ~~~~~~~
 Neuron>>weights: someWeightsAsNumbers
-	weights := someWeightsAsNumbers copy
+	weights := someWeightsAsNumbers
 ~~~~~~~
 
 To define this method, you need to select the `Neuron` class in the class panel (second top list panel). Then write the code given above *without* `Neuron>>`. Then you should accept the code, by right clicking on the `Accept` menu item. In the Pharo Jargon, accepting a method means to compile it. Once compiled, it may be invoked. The code defines the method named `weights:` which accepts one argument, provided as a variable named `someWeightsAsNumbers`. 
 
-The expression `weights := someWeightsAsNumbers copy` creates a copy of the provided argument and assign it to the variable `weights`. The copy is not necessary, but it is useful to prevent some hard-to-debug issues.
+The expression `weights := someWeightsAsNumbers` assigns the value `someWeightsAsNumbers` to the variable `weights`.
 
-![The `weights:` method.](02-Perceptron/figures/systemBrowserAndMethodWeight.png){#fig:systemBrowserAndMethodWeight}
+![The `weights:` method of the `Neuron` class.](02-Perceptron/figures/systemBrowserAndMethodWeight.png){#fig:systemBrowserAndMethodWeight}
 
 You should now have a similar content than Figure @fig:systemBrowserAndMethodWeight.
 The method `weights:` write a value to the variable `weights`. A method that returns the value of it is:
@@ -81,14 +83,14 @@ Neuron>>bias: aNumber
 	bias := aNumber
 ~~~~~~~
 
-And the reading may be defined using: 
+And reading the variable `bias` is supported with the method:
 
 ~~~~~~~
 Neuron>>bias
 	^ bias
 ~~~~~~~
 
-So far, we have defined the class `Neuron` which contains two variables (`weights` and `bias`), and 4 methods (`weights:`, `weights`, `bias:`, and `bias`). The last piece to add is applying a set of inputs values and obtaining the output value. The method `feeds:` can be defined as:
+So far, we have defined the class `Neuron` which contains two variables (`weights` and `bias`), and 4 methods (`weights:`, `weights`, `bias:`, and `bias`). We need to define the logic of our perceptron by applying a set of inputs values and obtaining the output value. The method `feeds:` can be defined as:
 
 ~~~~~~~
 Neuron>>feed: inputs
@@ -105,11 +107,11 @@ The expression `inputs with: weights collect: [ :x :w | x * w ]` collects for ea
 ~~~~~~~
 
 The above expression evaluates to `#(11 22 33)`. Syntactically, it means that the literal value `#(1 2 3)` receives a message called `with:collect:`, with two arguments, the literal `#(10 20 30)` and the block `[ :a :b | a + b ]`.
-You can verify the value of that expression by opening a playground, accessible from the World menu. A playground is a kind of command terminal (_e.g.,_ xterm in the Unix World). Figure @fig:playground illustrates the evaluation of the expression given above.
+You can verify the value of that expression by opening a playground, accessible from the main Pharo menu. A playground is a kind of command terminal (_e.g.,_ xterm in the Unix World). Figure @fig:playground illustrates the evaluation of the expression given above.
 
 ![The Playground.](02-Perceptron/figures/playground.png){#fig:playground width=400px}
 
-We can now play a little bit with a perceptron. Evaluate the following code in a playground:
+We can now play a little bit with a perceptron. Evaluate the following code in the playground we just opened:
 
 ~~~~~~~
 p := Neuron new.
@@ -117,15 +119,16 @@ p weights: #(1 2).
 p bias: -2.
 p feed: #(5 2)
 ~~~~~~~
+
 This piece of code evaluates to `1` (since `(5*1 + 2*2) - 2` equals to `7`, which is greater than `0`).
 
 ![Evaluating the perceptron.](02-Perceptron/figures/playgroundAndPerceptron.png){#fig:playgroundAndPerceptron width=400px}
 
 ## Testing our code
 
-Now is time to talk about testing. Testing will be a pillar whenever we will write code. Software and code testing is essential in agile methodologies and is about raising the confidence that the code we write does what it is supposed to do.
+Now is time to talk about testing. Testing is an essential activity  whenever we write code. Software and code testing is essential in agile methodologies and is about raising the confidence that the code we write does what it is supposed to do.
 
-Testing is a central concept in the field of Software Engineering. Although this book is not about writing a large software artifact, we _do_ write source code. And making sure that this code can be tested in an automatic fashion significantly improve the quality of what we are doing. More importantly, it is not only the author of the code (you!) that will appreciate the quality of the code, but anyone who will look at it. Along the chapters, we will improve our codebase. It is therefore very important to make sure that our improvement do not break some of the functionalities. 
+Testing is a central concept in the field of Software Engineering. Although this book is not about writing large software artifacts, we _do_ write source code. And making sure that this code can be tested in an automatic fashion significantly improve the quality of what we are doing. More importantly, it is not only the author of the code (you) that will appreciate the quality of the code, but anyone who will look at it. Along the chapters, we will improve our codebase. It is therefore very important to make sure that our improvement do not break some of the functionalities. 
 
 For example, above we defined a perceptron, and we informally tested it in a playground. This informal test cost us a few keystrokes and a little bit of time. What if we can automatically repeat this test each time we modify our definition of perceptron? This is exactly what _unit testing_ is all about. 
 
@@ -160,8 +163,9 @@ The test can be run by clicking on the gray circle located next to the method na
 The green bullet next to the method name indicates that the test passes (_i.e.,_ no assertion failed and no error got raised). The method `testSmallExample` sends the message  `assert:equals:` which tests whether the first argument equals the second argument. 
 
 *EXERCISE:* So far, we have only shallowly tested our perceptron. We can improve our tests in two ways:
-	- Create a new test, called `testSmallExample`, that tests that feeding our perceptron `p` with different values (_e.g.,_ `-2` and `2` gives 0 as result)
-	- Test our perceptron with different weights and bias
+
+- Create a new test, called `testSmallExample`, that tests that feeding our perceptron `p` with different values (_e.g.,_ `-2` and `2` gives `0` as result)
+- Test our perceptron with different weights and bias
 
 In general, it is a very good practice to write a good amount of tests, even for a single component unit as for our class `Neuron`.
 
@@ -233,7 +237,7 @@ PerceptronTest>>testNOR
 	self assert: (p feed: #(1 1)) equals: 0.
 ~~~~~~~
 
-So far we had perceptron with two inputs. A perceptron accepts the same number of inputs than the number of weights. Therefore, if only one weight is provided, only one input is required. Consider the NOT logical gate:
+So far we built perceptrons with two inputs. A perceptron accepts the same number of inputs than the number of weights. Therefore, if only one weight is provided, only one input is required. Consider the NOT logical gate:
 
 ~~~~~~~
 PerceptronTest>>testNOT
@@ -266,11 +270,12 @@ The test `testWrongFeeding` passes only if the expression `p feed: #(1 1)` raise
 
 ![Running our tests.](02-Perceptron/figures/runningTests.png){#fig:runningTests}
 
-Until now, we have defined six tests, contained in one unit test, `PerceptronTest`. All the tests can be run by pressing the circle next to the unit test name (Figure @fig:runningTests).
+Until now, we have defined the class `Neuron` with five methods, and the unit test `PerceptronTest` with six test methods. All the tests can be run by pressing the circle next to the unit test name (Figure @fig:runningTests).
 
 ## Combining Perceptrons
 
 So far, we have defined the AND, NOR, NOT, and OR logical gates. Logical gates become interesting when combined. A digital comparator circuit is such a combination. It is useful to compare two values. In particular, we have three possible outcomes:
+
 - A is greater than B
 - A is equal to B
 - A is lesser than B
