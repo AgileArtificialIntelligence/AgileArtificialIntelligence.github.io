@@ -340,7 +340,7 @@ Neurons have the ability to learn from examples. This _training_ is essential to
 The way a perceptron learns simply follows the rule: $w_i(t+1) = w_i(t) + (d - z) * x_i * \alpha$, in which:
 
 - $i$ is the weight index
-- $w_i(t+1)$ is the weight $i$ at a given time $t+1$
+- $w_i(t)$ is the weight $i$ at a given time $t$
 - $d$ is the difference between the desired value and the actual value
 - $z$ is the actual output of the perceptron
 - $x_i$ corresponds to the provided input at index $i$
@@ -420,11 +420,12 @@ PerceptronTest>>testTrainingOR
 	self assert: (p feed: { 1 . 1 }) equals: 1.
 ~~~~~~~
 
-The method `testTrainingOR` first creates a perceptron with some arbitrary weights and bias. We successfully train it with the four possible combinations of the OR logical gate. After the training, we test the perceptron to see if it has actually properly learn. 
+The method `testTrainingOR` first creates a perceptron with some arbitrary weights and bias. We successfully train it with the four possible combinations of the OR logical gate. After the training, we test the perceptron to see if it has properly learned.
 
 In `testTrainingOR`, we train the perceptron 40 times the complete set of examples. Training a perceptron (or a large neural network) with the complete set of examples is called _epoch_. So, in our example, we train `p` with 40 epochs. The epoch is the unit of training.
 
 *EXERCISE:*
+
 - What is the necessary minimum number of epochs to train `p`? You can try to modify `25` by a lower value and run the test to see if it still passes.
 - We have shown how to train a perceptron to learn the OR logical gate. Write a method `testTrainingNOR`, `testTrainingAND`, and `testTrainingNOT` for the other gates we have seen.
 - How the value of the `learningRate` impacts the minimum number of epochs for the training?
@@ -563,7 +564,7 @@ r := Random new seed: 42.
 r nextInt: 50.
 ~~~~~~~
 
-Why this? First of all, being able to generate random numbers is necessary in all stochastic approaches, which includes neural networks and genetic algorithms. Although randomness is very important, we usually not want to let such random value creates situations that cannot be reproduced. Imagine that our code behaves erratically, likely due to a random value. How can we track down the anomaly in our code? If we have truly random numbers, it means that executing twice the same piece of code may produce (even slightly) different behaviors. It may therefore be complicated to properly test. Instead, we will use a random generator with a known seed to produce a known sequence of random numbers. Consider the expression:
+Why this? First of all, being able to generate random numbers is necessary in all stochastic approaches, which includes neural networks. Although randomness is very important, we usually not want to let such random value creates situations that cannot be reproduced. Imagine that our code behaves erratically, likely due to a random value. How can we track down the anomaly in our code? If we have truly random numbers, it means that executing twice the same piece of code may produce (even slightly) different behaviors. It may therefore be complicated to properly test. Instead, we will use a random generator with a known seed to produce a known sequence of random numbers. Consider the expression:
 
 ~~~~~~~
 (1 to: 5) collect: [ :i | 50 atRandom ]
@@ -578,9 +579,9 @@ r := Random new seed: 42.
 
 Evaluating several times this small script always produces the same sequence. This is key to have reproducible and deterministic behavior. In the remaining of the book, we will intensively use random number generators.
 
-Our script then follow with training a perceptron with 500 points. We then create 2,000 test points, which will be then displayed on the screen, using Grapher. We wrote the condition `(p feed: point) > 0.5` to color a point as red. We could have `(p feed: point) = 1` instead, however in the future chapter we will replace the perceptron with another kind of artificial neuron, which will not exactly produce the value 1.
+Our script then follows with training a perceptron with 500 points. We then create 2,000 test points, which will be then displayed on the screen, using Grapher. We wrote the condition `(p feed: point) > 0.5` to color a point as red. We could have `(p feed: point) = 1` instead, however in the future chapter we will replace the perceptron with another kind of artificial neuron, which will not exactly produce the value 1.
 
-We see that our the area of red points goes closely follows the red line. This means that our perceptron is able to classify points with a good accuracy. 
+We see that our the area of red points goes is very close to the red line. This means that our perceptron is able to classify points with a good accuracy. 
 
 What if reduce the number of training of our perceptron? You can try this by changing the value `500` by, let's say, `100`. What is the result? The perceptron does not classify points as accurately than with 500 trainings. This follow the intuition we elaborated when we first mentioned the training. More training a perceptron has, more accurate it will be (however, this is not always true with neural networks, as we will see later on).
 
@@ -641,7 +642,7 @@ The script produces a curve with the precision on the Y-axis and the number of t
 
 ## Historical Perspective
 
-Expressing a computation in terms of artificial neurons was first thought in 1943, by Warren S. McCulloch and Walter Pitts in their seminal article *A logical calculus of the ideas immanent in nervous activity*. This paper has a significant impact in the field of artificial intelligence. It is interesting to realize the knowledge we had about neurons at that time. The perceptron model presented originate from this seminal paper.
+Expressing a computation in terms of artificial neurons was first thought in 1943, by Warren S. McCulloch and Walter Pitts in their seminal article *A logical calculus of the ideas immanent in nervous activity*. This paper had a significant impact in the field of artificial intelligence. It is interesting to realize the knowledge we had about biological neurons at that time. The perceptron model presented in this chapter originate from this seminal paper.
 
 ## What have we seen in this chapter
 This chapter covers the following topics:
