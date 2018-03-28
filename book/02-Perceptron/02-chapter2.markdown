@@ -292,7 +292,7 @@ A | B | A < B | A = B | A > B
 
 ![Digital Comparator Circuit.](02-Perceptron/figures/digitalComparator.png){#fig:digitalComparator width=400px}
 
-Figure @fig:digitalComparator illustrates the circuit. Three logical gates are necessary: AND, NOT, and NOR. We then need to make the connection between these gates. As we previously did, some tests will drive our effort. The method `digitalComparator:`, defined in our unit test for convenience, models the digital comparator circuit:
+Figure @fig:digitalComparator illustrates the circuit. Three different logical gates are necessary: AND, NOT, and NOR. We then need to make the connection between these gates. As we previously did, some tests will drive our effort. The method `digitalComparator:`, defined in our unit test for convenience, models the digital comparator circuit:
 
 ~~~~~~~
 PerceptronTest>>digitalComparator: inputs
@@ -314,11 +314,11 @@ PerceptronTest>>digitalComparator: inputs
 	^ { AgB . AeB . AlB }
 ~~~~~~~
 
-The method accept a set of inputs as argument. We first extract the first and second elements of these inputs and assign them to the temporary variables `A` and `B`. 
+The method accepts a set of inputs as argument. We first extract the first and second elements of these inputs and assign them to the temporary variables `A` and `B`. 
 
 We then create our three logical gates as perceptrons. We then wire then using the variables `notA`, `notB`, `AgB` (standing for `A` greater than `B`), `AlB` (`A` lesser than `B`), and `AeB` (`A` equals to `B`). 
 
-We then compute `notA` and `notB`. We use an alternative way to define array. The expression `{ A }` creates an array with the object referenced by `A`. We use the notation `#(...)` only for array of numbers (_e.g.,_ `#(1 -1)`). Note that we can also write numbers using the `{...}` syntax (_e.g.,_ `{1 . -1}`)
+We then compute `notA` and `notB`. We use an alternative way to define array. The expression `{ A }` creates an array with the object referenced by `A`. We use the notation `#(...)` only for array of numbers (_e.g.,_ `#(1 -1)`). Note that we can also write numbers using the `{...}` syntax (_e.g.,_ `{1 . -1}`). It is important to keep in mind these two notations as we will heavily use them along the book.
 
 The method `digitalComparator:` returns an array with the result of the circuit evaluation. We can test it using a test method:
 
@@ -335,11 +335,10 @@ The overall behavior is cut down into parts, each referenced with a variable. Th
 
 ## Training a Perceptron
 
-Neurons have the ability to learn from examples. This _training_ is essential to actually do something useful. Learning typically involves a set of input examples with some known output. The learning process assess how good the artificial neuron is against the desired output. In particular, as defined by Frank Rosenblatt in the late 1950s, each weight of the perceptron is modified by an amount that is proportional to (i) the product of the input and (ii) the difference between the real output and the desired output. 
-
-Learning in neural networks means adjusting the weights and the bias in order to make the output close to the set of training examples. Training a perceptron therefore means to adjust its weights and bias according to how good it performs for a given set of inputs.
+Neurons have the ability to learn from examples. This _training_ is essential to actually do something useful. Learning typically involves a set of input examples with some known outputs. The learning process assesses how good the artificial neuron is against the desired output. In particular, as defined by Frank Rosenblatt in the late 1950s, each weight of the perceptron is modified by an amount that is proportional to (i) the product of the input and (ii) the difference between the real output and the desired output. Learning in neural networks means adjusting the weights and the bias in order to make the output close to the set of training examples. 
 
 The way a perceptron learns simply follows the rule: $w_i(t+1) = w_i(t) + (d - z) * x_i * \alpha$, in which:
+
 - $i$ is the weight index
 - $w_i(t+1)$ is the weight $i$ at a given time $t+1$
 - $d$ is the difference between the desired value and the actual value
