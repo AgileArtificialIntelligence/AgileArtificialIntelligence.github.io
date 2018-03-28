@@ -274,7 +274,7 @@ Until now, we have defined the class `Neuron` with five methods, and the unit te
 
 ## Combining perceptrons
 
-So far, we have defined the AND, NOR, NOT, and OR logical gates. Logical gates become interesting when combined. A digital comparator circuit is such a combination. It is useful to compare two values. In particular, we have three possible outcomes:
+So far, we have defined the AND, NOR, NOT, and OR logical gates. Logical gates become interesting when combined. A digital comparator circuit is such a combination. It is useful to compare two values, A and B. We have three possible outcomes:
 
 - A is greater than B
 - A is equal to B
@@ -290,7 +290,7 @@ A | B | A < B | A = B | A > B
 1 | 1 | 0 | 1 | 0
 
 
-![Digital Comparator Circuit.](02-Perceptron/figures/digitalComparator.png){#fig:digitalComparator}
+![Digital Comparator Circuit.](02-Perceptron/figures/digitalComparator.png){#fig:digitalComparator width=400px}
 
 Figure @fig:digitalComparator illustrates the circuit. Three logical gates are necessary: AND, NOT, and NOR. We then need to make the connection between these gates. As we previously did, some tests will drive our effort. The method `digitalComparator:`, defined in our unit test for convenience, models the digital comparator circuit:
 
