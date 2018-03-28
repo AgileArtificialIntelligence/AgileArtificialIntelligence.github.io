@@ -336,7 +336,7 @@ g
 No matter the learning rate defined in the method `train:desiredOutput:`, the perceptron is indeed much faster to learn. 
 
 
-## What have we have
+## What have we seen in this chapter
 This chapter covers the following topics:
 
 - _Briefly discussed the limitation of the perceptron._ The perceptron cannot learn when combined with other perceptrons. Although we have not discussed this aspect further, you need to trust me for now. In the next chapter we will develop this further.

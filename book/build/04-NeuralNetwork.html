@@ -22,7 +22,7 @@
         <li><a href="#neural-layer"><span class="toc-section-number">1.2</span> Neural layer</a></li>
         <li><a href="#neural-network"><span class="toc-section-number">1.3</span> Neural network</a></li>
         <li><a href="#backpropagation"><span class="toc-section-number">1.4</span> Backpropagation</a></li>
-        <li><a href="#cost-function"><span class="toc-section-number">1.5</span> Cost function</a></li>
+        <li><a href="#what-have-we-seen-in-this-chapter"><span class="toc-section-number">1.5</span> What have we seen in this chapter</a></li>
         </ul></li>
         </ul>
         </div>
@@ -38,19 +38,14 @@
 </div>
 <p>Figure <a href="#fig:generalStructure">1</a> shows a simple neural network made of five neurons, three inputs, and two outputs. The left-most column is called the input layer. The input layers simply transmits some values to the hidden layer, without doing anything in particular. In the figure, the input layer is made of three inputs, <code>x1</code>, <code>x2</code>, and <code>x3</code>. The middle of the network contains the hidden layers. The network above contains only one hidden layer, made of three neurons. However, a network may contains several hidden layers. The right-most column of the network is called output layer, and contains of two neurons.</p>
 <p>All values transmitted between neurons are numerical values. The output values, <code>o1</code> and <code>o2</code> are number ranging between 0 and 1.</p>
-<p>The depicted neural network is qualified as <em>full-connected</em> since each neuron of the hidden layer is connected with <em>all</em> the neurons of the input layer and <em>all</em> the neuron of the output layer. The architecture of any fully-connected neural networks involves three different kind of layers. We will therefore build the necessary abstractions:</p>
-<ul>
-<li><em>Hidden layer</em> representing layers within</li>
-<li><em>Output layer</em> representing the right-most column. This is that column that spits out computed values</li>
-<li><em>Neural Network</em> made of several hidden layers and one output layer.</li>
-</ul>
+<p>The depicted neural network is qualified as <em>fully-connected</em> since each neuron of the hidden layer is connected with <em>all</em> the neurons of the input layer and <em>all</em> the neurons of the output layer. The next sections provide an implementation of abstraction we informally presented.</p>
 <h2 id="neural-layer"><span class="header-section-number">1.2</span> Neural layer</h2>
 <p>We define a layer as a set of neurons. Each layer knows about the preceding layer using the variable <code>previousLayer</code> and the following layer using <code>nextLayer</code>. The <code>learningRate</code> variable refers to the learning rate of the layer. We define the class <code>NeuronLayer</code> as follows:</p>
 <pre class="smalltalk"><code>Object subclass: #NeuronLayer
     instanceVariableNames: 'previousLayer nextLayer neurons learningRate'
     classVariableNames: ''
     package: 'NeuralNetwork'</code></pre>
-<p>We can set the learning rate of a layer as 0.1 per default. A neuron layer may be initialized using the following method:</p>
+<p>A layer contains some neurons, kept in the variable <code>neurons</code>. We can set the learning rate of a layer as 0.1 per default. A neuron layer may be initialized using the following method:</p>
 <pre class="smalltalk"><code>NeuronLayer&gt;&gt;initializeNbOfNeurons: nbOfNeurons nbOfWeights: nbOfWeights using: random
     &quot;Main method to initialize a neuron layer
     nbOfNeurons : number of neurons the layer should be made of
@@ -64,8 +59,8 @@
         Neuron new sigmoid; weights: weights; bias: (random next * 4 - 2) ]  
 </code></pre>
 <p>The method <code>initializeNbOfNeurons:nbOfWeights:using:</code> accepts three arguments. The first one, <code>nbOfNeurons</code> is an integer value and represents the number of neurons the layer should contains. The second argument, <code>nbOfWeights</code>, is an integer that indicates the number of weights each neuron should have. This number of weights reflects the number of input values the layer is accepting. The last argument, <code>random</code>, is a random number generator. As in the previous chapter, using a random number generator is useful to make the behavior deterministic. This random generator will be useful to initialize each individual neuron.</p>
-<p>The method first sets the learning rate to <code>0.1</code>, and creates <code>nbOfNeurons</code> different neurons, each having <code>nbOfWeights</code> weight values. Each weight is a random number between -2 and +2. The expression <code>random next</code> produces a random number within 0 and 1. Multiplying it by 4 and subtracting 2 produces a value between -2 and +2. Each neuron has a sigmoid activation function.</p>
-<p>Forward feeding the layer is an essential operation. It consists in feeding each neurons and forwarding the values to the next layer. We define the method <code>feed:</code> as:</p>
+<p>The method first sets the learning rate to <code>0.1</code>, and creates <code>nbOfNeurons</code> different neurons, each having <code>nbOfWeights</code> weight values. Each weight is a random number between -2 and +2. The expression <code>random next</code> produces a random number within 0 and 1. Multiplying it by 4 and subtracting 2 produces a value between -2 and +2. Each neuron has a sigmoid activation function thanks to the message <code>sigmoid</code>.</p>
+<p>Forward feeding the layer is an essential operation. It consists in feeding each neuron and forwarding the values to the next layer. We define the method <code>feed:</code> as:</p>
 <pre class="smalltalk"><code>NeuronLayer&gt;&gt;feed: someInputValues
     &quot;Feed the neuron layer with some inputs&quot;
 
@@ -74,7 +69,7 @@
     ^ self isOutputLayer
         ifTrue: [ someOutputs ]
         ifFalse: [ nextLayer feed: someOutputs ]</code></pre>
-<p>The method invokes <code>feed:</code> on each of its neurons (we have have seen the method <code>Neuron&gt;&gt;feed:</code> in the previous chapter). The results is then kept as an array. The method then check if the layer is an output layer. If this is the case, the result of the method is simply the results of each neurons. If the layer is not an output (<em>i.e.,</em> it is an hidden layer), we forward feed the computed values to the next layer.</p>
+<p>The method invokes <code>feed:</code> on each of its neurons (we have have seen the method <code>Neuron&gt;&gt;feed:</code> in the previous chapter). The results is then kept as an array. The method then checks if the layer is an output layer. If this is the case, the result of the method is simply the results of each neurons. If the layer is not an output (<em>i.e.,</em> it is an hidden layer), we feed-forward the computed values to the next layer.</p>
 <p>We need to determine if a neuron layer is the output layer or not. We can easily achieve this using the predicate <code>isOutputLayer</code>:</p>
 <pre class="smalltalk"><code>NeuronLayer&gt;&gt;isOutputLayer
     &quot;Return true of the layer is the output layer (i.e., the last layer in the network)&quot;
@@ -83,7 +78,7 @@
 <pre class="smalltalk"><code>NeuronLayer&gt;&gt;nextLayer: aLayer
     &quot;Set the next layer&quot;
     nextLayer := aLayer</code></pre>
-<p>We have now defined most of the <code>NeuronLayer</code> class. We can now start testing the class:</p>
+<p>We have now defined most of the <code>NeuronLayer</code> class. We can now begin testing the class:</p>
 <pre class="smalltalk"><code>TestCase subclass: #NeuronLayerTest
     instanceVariableNames: ''
     classVariableNames: ''
@@ -100,7 +95,8 @@
     result := nl feed: { 1 . 2 . 3 . 4 }.
     self assert: result size equals: 3.
     self assert: result closeTo: #(0.037000501309787576 0.9051275824569505 0.9815269659126287)</code></pre>
-<p>We can also test a chain of layers:</p>
+<p>The method <code>testBasic</code> create a new neuron layer, composed of 3 neurons, each having 4 weights and 1 bias. The weights and biases are initialized using the random number generator <code>r</code>.</p>
+<p>We can also build up a chain of layers and see how they perform:</p>
 <pre class="smalltalk"><code>NeuronLayerTest&gt;&gt;testOutputLayer
     | nl1 nl2 result random |
     random := Random seed: 42.
@@ -144,7 +140,7 @@
 <pre class="smalltalk"><code>NNetwork&gt;&gt;feed: someInputValues
     &quot;Feed the first layer with the provided inputs&quot;
     ^ self firstLayer feed: someInputValues</code></pre>
-<p>We add the necessary to easily create a neural network. In case we wish to build a network with one hidden layer and one output layer:</p>
+<p>We need a way to easily create a neural network. In case we wish to build a network with one hidden layer and one output layer, we can define the following method:</p>
 <pre class="smalltalk"><code>NNetwork&gt;&gt;configure: nbOfInputs hidden: nbOfNeurons nbOfOutputs: nbOfOutput
     &quot;Configure the network with the given parameters
     The network has only one hidden layer&quot;
@@ -175,7 +171,7 @@
 <p>So far, our network is pretty useless. The next section covers the learning mechanism for neural networks.</p>
 <h2 id="backpropagation"><span class="header-section-number">1.4</span> Backpropagation</h2>
 <p>Backpropagation is an algorithm commonly employed to train neural networks. By training, we mean to make the network identify some patterns.</p>
-<p>So far, we built a network as a set of neurons, each being initialized with random weights and random biases. Conceptually, backpropagation is an algorithm for supervised learning of gradient descent (next chapters will cover this terminology). In practice, this algorithm will find adequate weights and biases to identify patterns from the input values. This chapter focuses on informally presenting the algorithm and providing an implementation of it. Subsequent chapters will provide a theoretical foundation of the algorithm.</p>
+<p>So far, we built a network as a set of neurons, each being initialized with random weights and random biases. Conceptually, backpropagation is an algorithm for supervised learning of gradient descent (next chapters will cover this terminology). In practice, this algorithm will find adequate weights and biases to identify patterns from the input values. This section focuses on informally presenting the algorithm and providing an implementation of it. Subsequent chapters will provide a theoretical foundation of the algorithm.</p>
 <p>The backpropagation algorithm is composed of three steps:</p>
 <ol style="list-style-type: decimal">
 <li><em>Forward feeding the inputs</em>. We first activate each neurons of our network to make the network produce an output.</li>
@@ -183,12 +179,12 @@
 <li><em>Updating the neurons weights and biases</em>. From the error computed in the previous step, we adequately adjust each neuron weights and bias to, hopefully, reduce the error made by the network.</li>
 </ol>
 <p>The first step is mostly implemented by the method <code>NNetwork&gt;&gt;feed:</code>, however, we need to slightly improve the class <code>Neuron</code> to actually remember the produced output. During the forward feeding (<em>i.e.,</em> when the method <code>feed:</code> is called), an output is produced by each neuron. This output has to be compared with an expected output. Making the network learn is based on the difference between the actual output of a neuron and the expected output. Each neuron has therefore to keep a reference to the output.</p>
-<p>We add two variables, <code>delta</code> and <code>output</code>, to the class <code>Neuron</code>,</p>
+<p>We add two variables, <code>delta</code> and <code>output</code>, to the class <code>Neuron</code>. So, our new definition of <code>Neuron</code> is:</p>
 <pre class="smalltalk"><code>Object subclass: #Neuron
     instanceVariableNames: 'weights bias delta output activationFunction'
     classVariableNames: ''
     package: 'NeuralNetwork'</code></pre>
-<p>We now rewrite the method <code>feed:</code> in the class <code>Neuron</code>:</p>
+<p>We also need to rewrite the method <code>feed:</code> in the class <code>Neuron</code> to remember the output value:</p>
 <pre class="smalltalk"><code>Neuron&gt;&gt;feed: inputs
     | z |
     z := (inputs with: weights collect: [ :x :w | x * w ]) sum + bias.
@@ -202,8 +198,9 @@
 <pre class="smalltalk"><code>NNetwork&gt;&gt;outputLayer
     &quot;Return the output layer, which is also the last layer&quot;
     ^ layers last</code></pre>
+<p>We add the method <code>backwardPropagateError:</code> to back propagate the error from the output layer:</p>
 <pre class="smalltalk"><code>NeuronLayer&gt;&gt;backwardPropagateError: expected
-    &quot;This is a recursive method. The back propagation begins with the output layer (i.e., the last later)&quot;
+    &quot;This is a recursive method. The back propagation begins with the output layer (i.e., the last layer)&quot;
     &quot;We are in the output layer&quot;
     neurons with: expected do: [ :neuron :exp | 
         | theError |
@@ -214,8 +211,10 @@
     self previousLayer notNil
         ifTrue: [
              self previousLayer backwardPropagateError ].</code></pre>
+<p>The method <code>backwardPropagateError:</code> takes as argument the expected output values. It then computes the error for each neuron in the output layers and call the method <code>adjustDeltaWith:</code>. We will soon see this method.</p>
+<p>Once the neuron in the output layer have their delta value adjusted, previous layers have to be recursively updated. The method <code>backwardPropagateError</code> exactly implements this behavior:</p>
 <pre class="smalltalk"><code>NeuronLayer&gt;&gt;backwardPropagateError
-    &quot;This is a recursive method. The back propagation begins with the output layer (i.e., the last later)&quot;
+    &quot;This is a recursive method. The back propagation begins with the output layer (i.e., the last layer)&quot;
 
     &quot;We are in an hidden layer&quot;
     neurons doWithIndex: [ :neuron :j |
@@ -230,30 +229,16 @@
     self previousLayer notNil
         ifTrue: [
              self previousLayer backwardPropagateError ].</code></pre>
-<p>We also need the following helper method:</p>
+<p>The recursion end on the first hidden layer, which is the layer with no previous layer. Note that we do not explicitly model the input layer.</p>
+<p>We also need the following helper method on the class <code>Neuron</code>:</p>
 <pre class="smalltalk"><code>Neuron&gt;&gt;adjustDeltaWith: anError
     delta := anError * (activationFunction derivative: output)</code></pre>
-<p>The recursion happens in this method:</p>
-<pre class="smalltalk"><code>NeuronLayer&gt;&gt;backwardPropagateError
-    &quot;This is a recursive method. The back propagation begins with the output layer&quot;
-
-    &quot;We are in an hidden layer&quot;
-    neurons doWithIndex: [ :neuron :j |
-        | theError |
-        theError := 0.0.
-        self nextLayer neurons do: [ :nextNeuron |
-            theError := theError + ((nextNeuron weights at: j) * nextNeuron delta)
-        ].
-        neuron adjustDeltaWith: theError
-    ].
-
-    previousLayer notNil
-        ifTrue: [
-             previousLayer backwardPropagateError ].</code></pre>
-<p>The third phase is rather simple:</p>
+<p>We are now done with the second phase. Only the third phase remains to be implemented.</p>
+<p>Luckily, the third phase is rather simple. We recursively update the weights and biases based on the delta computed in the previous step. The main method is <code>updateWeight:</code>:</p>
 <pre class="smalltalk"><code>NNetwork&gt;&gt;updateWeight: initialInputs
     &quot;Update the weights of the neurons using the initial inputs&quot;
     layers first updateWeight: initialInputs</code></pre>
+<p>This method simply invokes <code>updateWeight:</code> on each first hidden layer:</p>
 <pre class="smalltalk"><code>NeuronLayer&gt;&gt;updateWeight: initialInputs
     &quot;Update the weights of the neuron based on the set of initial input. This method assumes that the receiver of the message invoking that method is the first hidden layer.&quot;
     | inputs |
@@ -265,13 +250,22 @@
     
     self nextLayer ifNotNil: [ 
         self nextLayer updateWeight ]</code></pre>
-<p>And we need the following methods to update a neuron state:</p>
+<p>The recursion happens in the method <code>updateWeight</code>:</p>
+<pre class="smalltalk"><code>NeuronLayer&gt;&gt;updateWeight
+    &quot;Update the weights of the neuron based on the set of initial input. This method assumes that the receiver of the message invoking that method is the first hidden layer.
+    We are now in the second hidden layers or in the output layer&quot; 
+    | inputs |
+    inputs := self previousLayer neurons collect: #output.
+        
+    self updateWeight: inputs</code></pre>
+<p>And we need the following methods to update a neuron's weights:</p>
 <pre class="smalltalk"><code>Neuron&gt;&gt;adjustWeightWithInput: inputs learningRate: learningRate
     inputs withIndexDo: [ :anInput :index | 
         weights at: index put: ((weights at: index) + (learningRate * delta * anInput)) ]</code></pre>
+<p>We also need to update the bias:</p>
 <pre class="smalltalk"><code>Neuron&gt;&gt;adjustBiasUsingLearningRate: learningRate
     bias := bias + (learningRate * delta)</code></pre>
-<p>We are now ready to hook the backpropagation phases all together:</p>
+<p>This ends the third and last phase of the backpropagation algorithm. We are now ready to hook the backpropagation phases all together:</p>
 <pre class="smalltalk"><code>NNetwork&gt;&gt;train: someInputs desiredOutputs: desiredOutputs
     &quot;Train the neural network with a set of inputs and some expected output&quot;
     | realOutputs t |
@@ -280,6 +274,7 @@
             [ :i | ((desiredOutputs at: i) - (realOutputs at: i)) raisedTo: 2 ].
     self backwardPropagateError: desiredOutputs.
     self updateWeight: someInputs.</code></pre>
+<p>And Voila! We have implemented the necessary to train a neural network.</p>
 <p>We can now test our network with the XOR example:</p>
 <pre class="smalltalk"><code>NNetworkTest&gt;&gt;testXOR
     | n |
@@ -298,8 +293,8 @@
     self assert: (n feed: { 1 . 0 }) first &gt; 0.9.
     self assert: (n feed: { 1 . 1 }) first &lt; 0.1.</code></pre>
 <p>If you try to decrease the <code>10000</code> to a low value, <code>10</code> for example, the network does not receive enough training and the test ultimately fails.</p>
-<h2 id="cost-function"><span class="header-section-number">1.5</span> Cost function</h2>
-<p>A cost function is a measure of how well a neural networks leans. A cost function is a single value since it rates how good the neural network did as a whole.</p>
+<h2 id="what-have-we-seen-in-this-chapter"><span class="header-section-number">1.5</span> What have we seen in this chapter</h2>
+<p>This chapter covers the following topics: - <em>Presented the general architecture of a fully-connected network</em>. This architecture drove our implementation effort. - <em>Implemented a neural network library</em>. We build a small API to build neural networks. - <em>Implemented the backpropagation algorithm</em>. Making neural network learn is a fundamental operation to give values to a network. A properly trained network is able to identify patterns. This chapter ends with a trivial example, the XOR logical gate. The coming chapters will see real and representative examples.</p>
             </div>
     </div>
   </div>

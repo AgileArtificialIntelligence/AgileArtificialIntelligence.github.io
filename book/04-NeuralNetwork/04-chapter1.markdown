@@ -15,11 +15,7 @@ Figure @fig:generalStructure shows a simple neural network made of five neurons,
 
 All values transmitted between neurons are numerical values. The output values, `o1` and `o2` are number ranging between 0 and 1.
 
-The depicted neural network is qualified as _full-connected_ since each neuron of the hidden layer is connected with _all_ the neurons of the input layer and _all_ the neuron of the output layer. The architecture of any fully-connected neural networks involves three different kind of layers. We will therefore build the necessary abstractions:
-
-- _Hidden layer_ representing layers within 
-- _Output layer_ representing the right-most column. This is that column that spits out computed values
-- _Neural Network_ made of several hidden layers and one output layer.
+The depicted neural network is qualified as _fully-connected_ since each neuron of the hidden layer is connected with _all_ the neurons of the input layer and _all_ the neurons of the output layer. The next sections provide an implementation of abstraction we informally presented.
 
 ## Neural layer
 
@@ -32,7 +28,7 @@ Object subclass: #NeuronLayer
 	package: 'NeuralNetwork'
 ```
 
-We can set the learning rate of a layer as 0.1 per default. A neuron layer may be initialized using the following method:
+A layer contains some neurons, kept in the variable `neurons`. We can set the learning rate of a layer as 0.1 per default. A neuron layer may be initialized using the following method:
 
 ```Smalltalk
 NeuronLayer>>initializeNbOfNeurons: nbOfNeurons nbOfWeights: nbOfWeights using: random
@@ -52,9 +48,9 @@ NeuronLayer>>initializeNbOfNeurons: nbOfNeurons nbOfWeights: nbOfWeights using: 
 
 The method `initializeNbOfNeurons:nbOfWeights:using:` accepts three arguments. The first one, `nbOfNeurons` is an integer value and represents the number of neurons the layer should contains. The second argument, `nbOfWeights`, is an integer that indicates the number of weights each neuron should have. This number of weights reflects the number of input values the layer is accepting. The last argument, `random`, is a random number generator. As in the previous chapter, using a random number generator is useful to make the behavior deterministic. This random generator will be useful to initialize each individual neuron.
 
-The method first sets the learning rate to `0.1`, and creates `nbOfNeurons` different neurons, each having `nbOfWeights` weight values. Each weight is a random number between -2 and +2. The expression `random next` produces a random number within 0 and 1. Multiplying it by 4 and subtracting 2 produces a value between -2 and +2. Each neuron has a sigmoid activation function.
+The method first sets the learning rate to `0.1`, and creates `nbOfNeurons` different neurons, each having `nbOfWeights` weight values. Each weight is a random number between -2 and +2. The expression `random next` produces a random number within 0 and 1. Multiplying it by 4 and subtracting 2 produces a value between -2 and +2. Each neuron has a sigmoid activation function thanks to the message `sigmoid`.
 
-Forward feeding the layer is an essential operation. It consists in feeding each neurons and forwarding the values to the next layer. We define the method `feed:` as:
+Forward feeding the layer is an essential operation. It consists in feeding each neuron and forwarding the values to the next layer. We define the method `feed:` as:
 
 ```Smalltalk
 NeuronLayer>>feed: someInputValues
@@ -67,7 +63,7 @@ NeuronLayer>>feed: someInputValues
 		ifFalse: [ nextLayer feed: someOutputs ]
 ```
 
-The method invokes `feed:` on each of its neurons (we have have seen the method `Neuron>>feed:` in the previous chapter). The results is then kept as an array. The method then check if the layer is an output layer. If this is the case, the result of the method is simply the results of each neurons. If the layer is not an output (_i.e.,_ it is  an hidden layer), we forward feed the computed values to the next layer.
+The method invokes `feed:` on each of its neurons (we have have seen the method `Neuron>>feed:` in the previous chapter). The results is then kept as an array. The method then checks if the layer is an output layer. If this is the case, the result of the method is simply the results of each neurons. If the layer is not an output (_i.e.,_ it is  an hidden layer), we feed-forward the computed values to the next layer.
 
 
 We need to determine if a neuron layer is the output layer or not. We can easily achieve this using the predicate `isOutputLayer`:
@@ -84,7 +80,7 @@ NeuronLayer>>nextLayer: aLayer
 	nextLayer := aLayer
 ```
 
-We have now defined most of the `NeuronLayer` class. We can now start testing the class:
+We have now defined most of the `NeuronLayer` class. We can now begin testing the class:
 ```Smalltalk
 TestCase subclass: #NeuronLayerTest
 	instanceVariableNames: ''
@@ -108,7 +104,9 @@ NeuronLayerTest>>testBasic
  	self assert: result closeTo: #(0.037000501309787576 0.9051275824569505 0.9815269659126287)
 ```
 
-We can also test a chain of layers:
+The method `testBasic` create a new neuron layer, composed of 3 neurons, each having 4 weights and 1 bias. The weights and biases are initialized using the random number generator `r`.
+
+We can also build up a chain of layers and see how they perform:
 ```Smalltalk
 NeuronLayerTest>>testOutputLayer
 	| nl1 nl2 result random |
@@ -174,7 +172,7 @@ NNetwork>>feed: someInputValues
 	^ self firstLayer feed: someInputValues
 ```
 
-We add the necessary to easily create a neural network. In case we wish to build a network with one hidden layer and one output layer:
+We need a way to easily create a neural network. In case we wish to build a network with one hidden layer and one output layer, we can define the following method:
 
 ```Smalltalk
 NNetwork>>configure: nbOfInputs hidden: nbOfNeurons nbOfOutputs: nbOfOutput
@@ -225,7 +223,7 @@ So far, our network is pretty useless. The next section covers the learning mech
 
 Backpropagation is an algorithm commonly employed to train neural networks. By training, we mean to make the network identify some patterns.
 
-So far, we built a network as a set of neurons, each being initialized with random weights and random biases. Conceptually, backpropagation is an algorithm for supervised learning of gradient descent (next chapters will cover this terminology). In practice, this algorithm will find adequate weights and biases to identify patterns from the input values. This chapter focuses on informally presenting the algorithm and providing an implementation of it. Subsequent chapters will provide a theoretical foundation of the algorithm.
+So far, we built a network as a set of neurons, each being initialized with random weights and random biases. Conceptually, backpropagation is an algorithm for supervised learning of gradient descent (next chapters will cover this terminology). In practice, this algorithm will find adequate weights and biases to identify patterns from the input values. This section focuses on informally presenting the algorithm and providing an implementation of it. Subsequent chapters will provide a theoretical foundation of the algorithm.
 
 The backpropagation algorithm is composed of three steps:
 
@@ -235,7 +233,7 @@ The backpropagation algorithm is composed of three steps:
 
 The first step is mostly implemented by the method `NNetwork>>feed:`, however, we need to slightly improve the class `Neuron` to actually remember the produced output. During the forward feeding (_i.e.,_ when the method `feed:` is called), an output is produced by each neuron. This output has to be compared with an expected output. Making the network learn is based on the difference between the actual output of a neuron and the expected output. Each neuron has therefore to keep a reference to the output. 
 
-We add two variables, `delta` and `output`, to the class `Neuron`, 
+We add two variables, `delta` and `output`, to the class `Neuron`. So, our new definition of `Neuron` is:
 
 ```Smalltalk
 Object subclass: #Neuron
@@ -244,7 +242,7 @@ Object subclass: #Neuron
 	package: 'NeuralNetwork'
 ```
 
-We now rewrite the method `feed:` in the class `Neuron`:
+We also need to rewrite the method `feed:` in the class `Neuron` to remember the output value:
 ```Smalltalk
 Neuron>>feed: inputs
 	| z |
@@ -269,10 +267,11 @@ NNetwork>>outputLayer
 	^ layers last
 ```
 
+We add the method `backwardPropagateError:` to back propagate the error from the output layer:
 
 ```Smalltalk
 NeuronLayer>>backwardPropagateError: expected
-	"This is a recursive method. The back propagation begins with the output layer (i.e., the last later)"
+	"This is a recursive method. The back propagation begins with the output layer (i.e., the last layer)"
 	"We are in the output layer"
 	neurons with: expected do: [ :neuron :exp | 
 		| theError |
@@ -285,9 +284,13 @@ NeuronLayer>>backwardPropagateError: expected
 			 self previousLayer backwardPropagateError ].
 ```
 
+The method `backwardPropagateError:` takes as argument the expected output values. It then computes the error for each neuron in the output layers and call the method `adjustDeltaWith:`. We will soon see this method.
+
+Once the neuron in the output layer have their delta value adjusted, previous layers have to be recursively updated. The method `backwardPropagateError` exactly implements this behavior:
+
 ```Smalltalk
 NeuronLayer>>backwardPropagateError
-	"This is a recursive method. The back propagation begins with the output layer (i.e., the last later)"
+	"This is a recursive method. The back propagation begins with the output layer (i.e., the last layer)"
 
 	"We are in an hidden layer"
 	neurons doWithIndex: [ :neuron :j |
@@ -304,40 +307,25 @@ NeuronLayer>>backwardPropagateError
 			 self previousLayer backwardPropagateError ].
 ```
 
-We also need the following helper method:
+The recursion end on the first hidden layer, which is the layer with no previous layer. Note that we do not explicitly model the input layer. 
+
+We also need the following helper method on the class `Neuron`:
 ```Smalltalk
 Neuron>>adjustDeltaWith: anError
 	delta := anError * (activationFunction derivative: output)
 ```
 
-The recursion happens in this method:
+We are now done with the second phase. Only the third phase remains to be implemented. 
 
-```Smalltalk
-NeuronLayer>>backwardPropagateError
-	"This is a recursive method. The back propagation begins with the output layer"
-
-	"We are in an hidden layer"
-	neurons doWithIndex: [ :neuron :j |
-		| theError |
-		theError := 0.0.
-		self nextLayer neurons do: [ :nextNeuron |
-			theError := theError + ((nextNeuron weights at: j) * nextNeuron delta)
-		].
-		neuron adjustDeltaWith: theError
-	].
-
-	previousLayer notNil
-		ifTrue: [
-			 previousLayer backwardPropagateError ].
-```
-
-The third phase is rather simple:
+Luckily, the third phase is rather simple. We recursively update the weights and biases based on the delta computed in the previous step. The main method is `updateWeight:`:
 
 ```Smalltalk
 NNetwork>>updateWeight: initialInputs
 	"Update the weights of the neurons using the initial inputs"
 	layers first updateWeight: initialInputs
 ```
+
+This method simply invokes `updateWeight:` on each first hidden layer: 
 
 ```Smalltalk
 NeuronLayer>>updateWeight: initialInputs
@@ -353,19 +341,32 @@ NeuronLayer>>updateWeight: initialInputs
 		self nextLayer updateWeight ]
 ```
 
-And we need the following methods to update a neuron state:
+The recursion happens in the method `updateWeight`:
+
+```Smalltalk
+NeuronLayer>>updateWeight
+	"Update the weights of the neuron based on the set of initial input. This method assumes that the receiver of the message invoking that method is the first hidden layer.
+	We are now in the second hidden layers or in the output layer" 
+	| inputs |
+	inputs := self previousLayer neurons collect: #output.
+		
+	self updateWeight: inputs
+```
+
+And we need the following methods to update a neuron's weights:
 ```Smalltalk
 Neuron>>adjustWeightWithInput: inputs learningRate: learningRate
 	inputs withIndexDo: [ :anInput :index | 
 		weights at: index put: ((weights at: index) + (learningRate * delta * anInput)) ]
 ```
 
+We also need to update the bias:
 ```Smalltalk
 Neuron>>adjustBiasUsingLearningRate: learningRate
 	bias := bias + (learningRate * delta)
 ```
 
-We are now ready to hook the backpropagation phases all together:
+This ends the third and last phase of the backpropagation algorithm. We are now ready to hook the backpropagation phases all together:
 
 ```Smalltalk
 NNetwork>>train: someInputs desiredOutputs: desiredOutputs
@@ -377,6 +378,8 @@ NNetwork>>train: someInputs desiredOutputs: desiredOutputs
 	self backwardPropagateError: desiredOutputs.
 	self updateWeight: someInputs.
 ```
+
+And Voila! We have implemented the necessary to train a neural network. 
 
 We can now test our network with the XOR example:
 ```Smalltalk
@@ -400,8 +403,9 @@ NNetworkTest>>testXOR
 
 If you try to decrease the `10000` to a low value, `10` for example, the network does not receive enough training and the test ultimately fails.
 
+## What have we seen in this chapter
 
-
-## Cost function
-
-A cost function is a measure of how well a neural networks leans. A cost function is a single value since it rates how good the neural network did as a whole.
+This chapter covers the following topics:
+- _Presented the general architecture of a fully-connected network_. This architecture drove our implementation effort.
+- _Implemented a neural network library_. We build a small API to build neural networks. 
+- _Implemented the backpropagation algorithm_. Making neural network learn is a fundamental operation to give values to a network. A properly trained network is able to identify patterns. This chapter ends with a trivial example, the XOR logical gate. The coming chapters will see real and representative examples.
