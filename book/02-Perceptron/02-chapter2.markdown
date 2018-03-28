@@ -272,7 +272,7 @@ The test `testWrongFeeding` passes only if the expression `p feed: #(1 1)` raise
 
 Until now, we have defined the class `Neuron` with five methods, and the unit test `PerceptronTest` with six test methods. All the tests can be run by pressing the circle next to the unit test name (Figure @fig:runningTests).
 
-## Combining Perceptrons
+## Combining perceptrons
 
 So far, we have defined the AND, NOR, NOT, and OR logical gates. Logical gates become interesting when combined. A digital comparator circuit is such a combination. It is useful to compare two values. In particular, we have three possible outcomes:
 
