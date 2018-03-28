@@ -1,14 +1,14 @@
 
 # Neural Networks
 
-The previous chapter covers the design and implementation of an individual neuron. This chapter follows the effort initiated in previous chapters by connecting multiple neurons. We provide a complete implementation of a neural network and a backpropagation algorithm, which makes use at the core of the book.
+The previous chapter covers the design and implementation of an individual neuron. This chapter builds upon the effort initiated in previous chapters by connecting multiple neurons. We provide a complete implementation of a neural network and a backpropagation algorithm, which bring us at the core of the book.
 
 ## General architecture
 
 An artificial neural network is a computing system inspired by biological neural networks part of an animal brain. 
 An artificial neural network is a collection of connected artificial neurons. Each connection between artificial neurons can transmit a signal from one to another. The artificial neuron that receives the signal can process it, and then signal neurons connected to it. Artificial neural networks are commonly employed to perform particular tasks, including clustering, classification, prediction, and pattern recognition. Similarly than with the perceptron and sigmoid neuron, a neural network acquires knowledge through learning.
 
-![Example of a neural network](04-NeuralNetwork/figures/generalStructure.png){#fig:generalStructure width=400}
+![Example of a neural network](04-NeuralNetwork/figures/generalStructure.png){#fig:generalStructure width=300}
 
 
 Figure @fig:generalStructure shows a simple neural network made of five neurons, three inputs, and two outputs. The left-most column is called the input layer. The input layers simply transmits some values to the hidden layer, without doing anything in particular. In the figure, the input layer contains three inputs, `x1`, `x2`, and `x3`. the middle of the network contains the hidden layers. The network above contains only one hidden layer, made of three neurons. The right-most part of the network is called output layer, and contains of two neurons. 
