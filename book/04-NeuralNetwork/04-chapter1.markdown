@@ -11,7 +11,9 @@ An artificial neural network is a collection of connected artificial neurons. Ea
 ![Example of a neural network](04-NeuralNetwork/figures/generalStructure.png){#fig:generalStructure width=300}
 
 
-Figure @fig:generalStructure shows a simple neural network made of five neurons, three inputs, and two outputs. The left-most column is called the input layer. The input layers simply transmits some values to the hidden layer, without doing anything in particular. In the figure, the input layer contains three inputs, `x1`, `x2`, and `x3`. the middle of the network contains the hidden layers. The network above contains only one hidden layer, made of three neurons. The right-most part of the network is called output layer, and contains of two neurons. 
+Figure @fig:generalStructure shows a simple neural network made of five neurons, three inputs, and two outputs. The left-most column is called the input layer. The input layers simply transmits some values to the hidden layer, without doing anything in particular. In the figure, the input layer is made of three inputs, `x1`, `x2`, and `x3`. The middle of the network contains the hidden layers. The network above contains only one hidden layer, made of three neurons. However, a network may contains several hidden layers. The right-most column of the network is called output layer, and contains of two neurons. 
+
+All values transmitted between neurons are numerical values. The output values, `o1` and `o2` are number ranging between 0 and 1.
 
 The depicted neural network is qualified as _full-connected_ since each neuron of the hidden layer is connected with _all_ the neurons of the input layer and _all_ the neuron of the output layer. The architecture of any fully-connected neural networks involves three different kind of layers. We will therefore build the necessary abstractions:
 
