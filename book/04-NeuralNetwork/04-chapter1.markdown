@@ -406,6 +406,7 @@ If you try to decrease the `10000` to a low value, `10` for example, the network
 ## What have we seen in this chapter
 
 This chapter covers the following topics:
+
 - _Presented the general architecture of a fully-connected network_. This architecture drove our implementation effort.
 - _Implemented a neural network library_. We build a small API to build neural networks. 
 - _Implemented the backpropagation algorithm_. Making neural network learn is a fundamental operation to give values to a network. A properly trained network is able to identify patterns. This chapter ends with a trivial example, the XOR logical gate. The coming chapters will see real and representative examples.
