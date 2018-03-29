@@ -32,9 +32,15 @@
 <p>This chapter covers the classification and regression of data, which are the most prominent applications of neural networks.</p>
 <h2 id="support-to-easily-train-network"><span class="header-section-number">1.1</span> Support to easily train network</h2>
 <p>In the previous chapter, we have seen that we can obtain a trained neural network to express the XOR logical gate with:</p>
-<p>```Smalltalkn := NNetwork new. n configure: 2 hidden: 3 nbOfOutputs: 1.</p>
-<p>10000 timesRepeat: [ n train: { 0 . 0 } desiredOutputs: { 0 }.<br />
-n train: { 0 . 1 } desiredOutputs: { 1 }. n train: { 1 . 0 } desiredOutputs: { 1 }. n train: { 1 . 1 } desiredOutputs: { 0 }.]. ```</p>
+<pre class="smalltalk"><code>n := NNetwork new.
+n configure: 2 hidden: 3 nbOfOutputs: 1.
+
+10000 timesRepeat: [ 
+    n train: { 0 . 0 } desiredOutputs: { 0 }.   
+    n train: { 0 . 1 } desiredOutputs: { 1 }.
+    n train: { 1 . 0 } desiredOutputs: { 1 }.
+    n train: { 1 . 1 } desiredOutputs: { 0 }.
+].</code></pre>
 <p>After evaluating this script, the expression <code>n feed: {1 . 0}</code> evaluates to <code>#(0.9735546630024936)</code>, an array having a float close to 1.</p>
 <p>We will</p>
 <h2 id="neural-network-as-a-hashmap"><span class="header-section-number">1.2</span> Neural network as a Hashmap</h2>

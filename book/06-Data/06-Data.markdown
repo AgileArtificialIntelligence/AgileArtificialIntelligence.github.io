@@ -7,7 +7,8 @@ This chapter covers the classification and regression of data, which are the mos
 
 In the previous chapter, we have seen that we can obtain a trained neural network to express the XOR logical gate with:
 
-```Smalltalkn := NNetwork new.
+```Smalltalk
+n := NNetwork new.
 n configure: 2 hidden: 3 nbOfOutputs: 1.
 
 10000 timesRepeat: [ 
