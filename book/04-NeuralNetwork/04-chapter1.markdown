@@ -80,6 +80,36 @@ NeuronLayer>>nextLayer: aLayer
 	nextLayer := aLayer
 ```
 
+To access the next layer, we need the method:
+
+```Smalltalk
+NeuronLayer>>nextLayer
+	"Return the next layer connected to me"
+	^ nextLayer
+```
+
+Similarly, we need a way to set and access the previous layer:
+
+```Smalltalk
+NeuronLayer>>previousLayer: aLayer
+	"Set the previous layer"
+	previousLayer := aLayer
+```
+
+```Smalltalk
+NeuronLayer>>previousLayer
+	"Return the previous layer connected to me"
+	^ previousLayer
+```
+
+Neurons for a given layer needs to be accessed:
+```Smalltalk
+NeuronLayer>>neurons
+	"Return the neurons I am composed of"
+	^ neurons
+```
+
+
 We have now defined most of the `NeuronLayer` class. We can now begin testing the class:
 ```Smalltalk
 TestCase subclass: #NeuronLayerTest
@@ -168,8 +198,8 @@ Feeding a neural network is simply feeding the first hidden layer:
 
 ```Smalltalk
 NNetwork>>feed: someInputValues
-	"Feed the first layer with the provided inputs"
-	^ self firstLayer feed: someInputValues
+    "Feed the first layer with the provided inputs"
+    ^ layers first feed: someInputValues
 ```
 
 We need a way to easily create a neural network. In case we wish to build a network with one hidden layer and one output layer, we can define the following method:
@@ -209,10 +239,10 @@ TestCase subclass: #NNetworkTest
 
 ```Smalltalk
 NNetworkTest>>testBasic
-	| n |
-	n := NNetwork new.
-	n configure: 2 hidden: 2 nbOfOutputs: 1.
-	self assert: (n feed: { 1 . 3 }) closeTo: { 0.35859281167322443 } 
+    | n |
+    n := NNetwork new.
+    n configure: 2 hidden: 2 nbOfOutputs: 1.
+    self assert: (n feed: { 1 . 3 }) closeTo: #(0.6745388083637035)
 ```
 
 As you can see, `testBasic` is rather simplistic. It builds a simple network with two inputs, one hidden layer made of 2 neurons, and an output layer with only one neuron, and run the forward feeding. 
@@ -242,6 +272,14 @@ Object subclass: #Neuron
 	package: 'NeuralNetwork'
 ```
 
+The delta value has to be accessible:
+
+```Smalltalk
+Neuron>>delta
+	"Return the delta value computed when propagating the error"
+	^ delta
+```
+
 We also need to rewrite the method `feed:` in the class `Neuron` to remember the output value:
 ```Smalltalk
 Neuron>>feed: inputs
@@ -250,6 +288,14 @@ Neuron>>feed: inputs
 	output := activationFunction eval: z.
 	^ output    
 ```
+
+We also need to access the output value for a given neuron:
+```Smalltalk
+Neuron>>output
+	"Return the output value, previous computed when doing a feed:"
+	^ output
+```
+
 
 At that stage, it is important to run the unit tests we have previously defined. In particular, we need to make sure that the small changes we have defined on the class `Neuron` does not break any invariant. We are now done with the first phase of the backpropagation. 
 

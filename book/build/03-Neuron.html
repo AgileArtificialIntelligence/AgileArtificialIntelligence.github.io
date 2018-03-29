@@ -78,7 +78,7 @@
 <pre class="smalltalk"><code>ActivationFunction&gt;&gt;eval: z
     ^ self subclassResponsibility</code></pre>
 <p>and</p>
-<pre class="smalltalk"><code>ActivationFunction&gt;&gt;derivative: z
+<pre class="smalltalk"><code>ActivationFunction&gt;&gt;derivative: output
     ^ self subclassResponsibility</code></pre>
 <p>We can now define the two activation functions, each as being a subclass of <code>ActivationFunction</code>. The sigmoid function may be defined as:</p>
 <pre class="smalltalk"><code>ActivationFunction subclass: #SigmoidAF
@@ -89,10 +89,8 @@
 <pre class="smalltalk"><code>SigmoidAF&gt;&gt;&gt;eval: z
     ^ 1 / (1 + z negated exp)</code></pre>
 <p>We then implement the <code>derivative:</code> method, which represents the mathematical derivative of <code>eval:</code>:</p>
-<pre class="smalltalk"><code>SigmoidAF&gt;&gt;&gt;derivative: z
-    | t |
-    t := self eval: z.
-    ^ t * (1 - t)</code></pre>
+<pre class="smalltalk"><code>SigmoidAF&gt;&gt;&gt;derivative: output
+    ^ output * (1 - output)</code></pre>
 <p>Without entering into details, we have <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi><mo stretchy="false" form="prefix">(</mo><mi>z</mi><mo stretchy="false" form="postfix">)</mo><mi>′</mi><mo>=</mo><mi>σ</mi><mo stretchy="false" form="prefix">(</mo><mi>z</mi><mo stretchy="false" form="postfix">)</mo><mo>*</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mi>σ</mi><mo stretchy="false" form="prefix">(</mo><mi>z</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\sigma(z)' = \sigma(z) * (1 - \sigma(z))</annotation></semantics></math>. We will come back on that point in a future chapter.</p>
 <p>Similarly, we can define the step function as follows:</p>
 <pre class="smalltalk"><code>ActivationFunction subclass: #StepAF
@@ -100,11 +98,11 @@
     classVariableNames: ''
     package: 'NeuralNetwork'</code></pre>
 <p>We implement the <code>eval:</code></p>
-<pre class="smalltalk"><code>StepAF&gt;&gt;&gt;eval: z
+<pre class="smalltalk"><code>StepAF&gt;&gt;eval: z
     ^ (z &gt; 0) ifTrue: [ 1 ] ifFalse: [ 0 ]</code></pre>
 <p>We also need to implement the <code>derivative:</code>. We will simply make this method return the argument:</p>
-<pre class="smalltalk"><code>StepAF&gt;&gt;&gt;derivative: z
-    ^ z</code></pre>
+<pre class="smalltalk"><code>StepAF&gt;&gt;derivative: output
+    ^ 1</code></pre>
 <p>The formulation of the <code>derivative:</code> of the step function does not match the mathematical truth, which is 0 with an undefined value for <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>z</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">z = 0</annotation></semantics></math>. However, returning <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>z</mi><annotation encoding="application/x-tex">z</annotation></semantics></math> instead eases the implementation of the revised <code>Neuron</code> as we will see in the next section.</p>
 <h2 id="extending-the-neuron-with-the-activation-functions"><span class="header-section-number">1.5</span> Extending the neuron with the activation functions</h2>
 <p>We can now extend our definition of neuron to use an activation function. We can do so by adding a new instance variable <code>activationFunction</code> to the<code>Neuron</code> class:</p>
@@ -203,6 +201,7 @@
     self assert: ((p feed: {1 . 0}) closeTo: 1 precision: 0.1).
     self assert: ((p feed: {1 . 1}) closeTo: 1 precision: 0.1).</code></pre>
 <p>As you can see, using a sigmoid neuron does not mess up our tests. We simply need (i) to increase the number of epochs to which we train the neuron, and we need (ii) to be more careful when comparing floating values.</p>
+<p><em>EXERCISE:</em> We wrote an adapted version of the OR and AND logical gates for the sigmoid neuron. Adapt the other logical gates.</p>
 <h2 id="slower-to-learn"><span class="header-section-number">1.8</span> Slower to learn</h2>
 <p>This chapter started by bashing the perceptron for its limitations. This has motivated us to formulate the sigmoid neuron. We see one drawback of the sigmoid neuron: it is slower to learn than the perceptron. We are here making a bet, which is trading efficiency for flexibility: as we will see in the next chapter, sigmoid neuron can be combined and still can learn.</p>
 <p>We can easily make the comparison between the sigmoid neuron and perceptron. Consider the following script:</p>

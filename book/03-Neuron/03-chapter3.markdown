@@ -67,7 +67,7 @@ ActivationFunction>>eval: z
 and
 
 ```Smalltalk
-ActivationFunction>>derivative: z
+ActivationFunction>>derivative: output
 	^ self subclassResponsibility
 ```
 
@@ -90,10 +90,8 @@ SigmoidAF>>>eval: z
 We then implement the `derivative:` method, which represents the mathematical derivative of `eval:`:
 
 ```Smalltalk
-SigmoidAF>>>derivative: z
-	| t |
-	t := self eval: z.
-	^ t * (1 - t)
+SigmoidAF>>>derivative: output
+	^ output * (1 - output)
 ```
 
 Without entering into details, we have $\sigma(z)' = \sigma(z) * (1 - \sigma(z))$. We will come back on that point in a future chapter.
@@ -108,15 +106,15 @@ ActivationFunction subclass: #StepAF
 
 We implement the `eval:`
 ```Smalltalk
-StepAF>>>eval: z
+StepAF>>eval: z
 	^ (z > 0) ifTrue: [ 1 ] ifFalse: [ 0 ]
 ```
 
 We also need to implement the `derivative:`. We will simply make this method return the argument:
 
 ```Smalltalk
-StepAF>>>derivative: z
-	^ z
+StepAF>>derivative: output
+	^ 1
 ```
 
 The formulation of the `derivative:` of the step function does not match the mathematical truth, which is 0 with an undefined value for $z = 0$. However, returning $z$ instead eases the implementation of the revised `Neuron` as we will see in the next section.
@@ -264,6 +262,8 @@ NeuronTest>>testTrainingOR
 ```
 
 As you can see, using a sigmoid neuron does not mess up our tests. We simply need (i) to increase the number of epochs to which we train the neuron, and we need (ii) to be more careful when comparing floating values.
+
+*EXERCISE:* We wrote an adapted version of the OR and AND logical gates for the sigmoid neuron. Adapt the other logical gates.
 
 ## Slower to learn
 

@@ -78,6 +78,21 @@
 <pre class="smalltalk"><code>NeuronLayer&gt;&gt;nextLayer: aLayer
     &quot;Set the next layer&quot;
     nextLayer := aLayer</code></pre>
+<p>To access the next layer, we need the method:</p>
+<pre class="smalltalk"><code>NeuronLayer&gt;&gt;nextLayer
+    &quot;Return the next layer connected to me&quot;
+    ^ nextLayer</code></pre>
+<p>Similarly, we need a way to set and access the previous layer:</p>
+<pre class="smalltalk"><code>NeuronLayer&gt;&gt;previousLayer: aLayer
+    &quot;Set the previous layer&quot;
+    previousLayer := aLayer</code></pre>
+<pre class="smalltalk"><code>NeuronLayer&gt;&gt;previousLayer
+    &quot;Return the previous layer connected to me&quot;
+    ^ previousLayer</code></pre>
+<p>Neurons for a given layer needs to be accessed:</p>
+<pre class="smalltalk"><code>NeuronLayer&gt;&gt;neurons
+    &quot;Return the neurons I am composed of&quot;
+    ^ neurons</code></pre>
 <p>We have now defined most of the <code>NeuronLayer</code> class. We can now begin testing the class:</p>
 <pre class="smalltalk"><code>TestCase subclass: #NeuronLayerTest
     instanceVariableNames: ''
@@ -139,7 +154,7 @@
 <p>Feeding a neural network is simply feeding the first hidden layer:</p>
 <pre class="smalltalk"><code>NNetwork&gt;&gt;feed: someInputValues
     &quot;Feed the first layer with the provided inputs&quot;
-    ^ self firstLayer feed: someInputValues</code></pre>
+    ^ layers first feed: someInputValues</code></pre>
 <p>We need a way to easily create a neural network. In case we wish to build a network with one hidden layer and one output layer, we can define the following method:</p>
 <pre class="smalltalk"><code>NNetwork&gt;&gt;configure: nbOfInputs hidden: nbOfNeurons nbOfOutputs: nbOfOutput
     &quot;Configure the network with the given parameters
@@ -166,7 +181,7 @@
     | n |
     n := NNetwork new.
     n configure: 2 hidden: 2 nbOfOutputs: 1.
-    self assert: (n feed: { 1 . 3 }) closeTo: { 0.35859281167322443 } </code></pre>
+    self assert: (n feed: { 1 . 3 }) closeTo: #(0.6745388083637035)</code></pre>
 <p>As you can see, <code>testBasic</code> is rather simplistic. It builds a simple network with two inputs, one hidden layer made of 2 neurons, and an output layer with only one neuron, and run the forward feeding.</p>
 <p>So far, our network is pretty useless. The next section covers the learning mechanism for neural networks.</p>
 <h2 id="backpropagation"><span class="header-section-number">1.4</span> Backpropagation</h2>
@@ -184,12 +199,20 @@
     instanceVariableNames: 'weights bias delta output activationFunction'
     classVariableNames: ''
     package: 'NeuralNetwork'</code></pre>
+<p>The delta value has to be accessible:</p>
+<pre class="smalltalk"><code>Neuron&gt;&gt;delta
+    &quot;Return the delta value computed when propagating the error&quot;
+    ^ delta</code></pre>
 <p>We also need to rewrite the method <code>feed:</code> in the class <code>Neuron</code> to remember the output value:</p>
 <pre class="smalltalk"><code>Neuron&gt;&gt;feed: inputs
     | z |
     z := (inputs with: weights collect: [ :x :w | x * w ]) sum + bias.
     output := activationFunction eval: z.
     ^ output    </code></pre>
+<p>We also need to access the output value for a given neuron:</p>
+<pre class="smalltalk"><code>Neuron&gt;&gt;output
+    &quot;Return the output value, previous computed when doing a feed:&quot;
+    ^ output</code></pre>
 <p>At that stage, it is important to run the unit tests we have previously defined. In particular, we need to make sure that the small changes we have defined on the class <code>Neuron</code> does not break any invariant. We are now done with the first phase of the backpropagation.</p>
 <p>The second step of the backpropagation consists in propagating the errors computed at the output layer back in the network. We define the following method:</p>
 <pre class="smalltalk"><code>NNetwork&gt;&gt;backwardPropagateError: expected
