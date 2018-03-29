@@ -10,7 +10,7 @@ A perceptron works well as an independent small machine. We have seen that we ca
 - _Only 0 or 1 as output_: The fact that a perceptron can have only two different output values, 0 or 1, seriously limits the kind of problem it can solve. In particular, when some perceptrons are chained, using binary values significantly reduce the space we live in. Not everything can be reduced as a set of 0 and 1 without leading to an explosion of perceptrons.
 - _A chain of perceptrons cannot learn_: We have seen how to combine perceptrons, and we have seen how a single perceptron can learn. But, can a combination of perceptrons also learn? The answer is no. This is another consequence of having only two output value. An essential property of most common learning algorithm is to be able to express a learning curve, which cannot be expressing using two different values. How can we tell if a perceptron is learning well, poorly, or not at all with only two different output values?
 
-We have written that $z = w.x + b$, for which $w$ is a vector of weights, $b$ a vector of bias, and $x$ the input vector. We said that the output of perceptron is 1 if $z > 0$, else the output is 0. One important problem with the formulation of the perceptron is that a small variation of $z$ can produce a large variation of the output: the output can goes from 0 to 1, or to 1 from 0.
+We have written that $z = w.x + b$, for which $w$ is a vector of weights, $b$ a vector of bias, and $x$ the input vector. We said that the output of perceptron is 1 if $z > 0$, else the output is 0. One important problem with the formulation of the perceptron is that a small variation of $z$ can produce a large variation of the output: the output can goes from 0 to 1, or from 1 to 0.
 
 Learning algorithms that are commonly employed in neural networks require a very important property: a small variation of $z$ _must_ produce a small variation of the output. And the perceptron does not fulfill this since a small variation of $z$ can produce a large variation of the output. 
 
@@ -24,9 +24,11 @@ The activation function used by the perceptron is called the _step function_ and
 
 ![The step function](03-Neuron/figures/stepFunction.png){#fig:stepFunction width=400px}
 
+The step function is characterized with having a vertical step, which produces two angles in its curve. These angles are problematic as we will shortly see.
+
 ## The Sigmoid Neuron
 
-We will expression a new kind of artificial neuron, called the _sigmoid neuron_. The increment we are here making is to use a new activation function, called the _sigmoid function_. Consider the function $\sigma(z)=\frac{1}{1+e^{-z}}$, which may be plotted as shown in @fig:sigmoidFunction.
+We will expression a new kind of artificial neuron, called the _sigmoid neuron_. The increment we are here making is to use a new activation function, called the _sigmoid function_. Consider the function $\sigma(z)=\frac{1}{1+e^{-z}}$, plotted in Figure @fig:sigmoidFunction.
 
 ![The sigmoid function](03-Neuron/figures/sigmoid.png){#fig:sigmoidFunction width=400px}
 
@@ -36,7 +38,7 @@ This sigmoid function has several advantages:
 - It is differentiable everywhere on the curve, or said in other words, it has no vertical lines, and even better, no angle. We can easily draw a straight line for any value $z$ that indicates the slope of $\sigma(z)$. When plotted, $\sigma(z)$ is very smooth by having no angle, which is a very good property.
 - Its derivative has some interesting properties, as we will see later.
 - The sigmoid function behave similarly than the step function for very small and very large $z$ values. 
-- A small increment in $z$ will produce a small variation of $\sigma(z)$, and as we have previously said, this is important for learning. 
+- A small increment in $z$ produces a small variation of $\sigma(z)$, and as we have previously said, this is important for learning. 
 
 We define a sigmoid neuron as a neuron having the sigmoid function as activation function. The sigmoid neuron is widely accepted as a mathematical representation of a biological neuron behavior. 
 
@@ -55,13 +57,14 @@ Object subclass: #ActivationFunction
 	package: 'NeuralNetwork'
 ```
 
-An activation function object has two main responsibility: computing (i) the activation value and (ii) the transfer derivative. This transfer derivative is an essential piece of the the backpropagation learning algorithm, but we will that into detail later on.
+An activation function object has two main responsibilities: computing (i) the activation value and (ii) the transfer derivative. This transfer derivative is an essential piece of the the backpropagation learning algorithm, but we will go into detail later on.
 
 We define the following two abstract methods:
 ```Smalltalk
 ActivationFunction>>eval: z
 	^ self subclassResponsibility
 ```
+and
 
 ```Smalltalk
 ActivationFunction>>derivative: z
@@ -84,7 +87,7 @@ SigmoidAF>>>eval: z
 	^ 1 / (1 + z negated exp)
 ```
 
-We then implement the `derivative:` method, which represent the mathematical derivative of `eval:`:
+We then implement the `derivative:` method, which represents the mathematical derivative of `eval:`:
 
 ```Smalltalk
 SigmoidAF>>>derivative: z
@@ -93,7 +96,7 @@ SigmoidAF>>>derivative: z
 	^ t * (1 - t)
 ```
 
-Without too much mixing of theory with implementation details, we have $\sigma(z)' = \sigma(z) * (1 - \sigma(z))$. We will come back on that point in a future chapter.
+Without entering into details, we have $\sigma(z)' = \sigma(z) * (1 - \sigma(z))$. We will come back on that point in a future chapter.
 
 Similarly, we can define the step function as follows:
 ```Smalltalk
@@ -156,7 +159,7 @@ Neuron>>train: inputs desiredOutput: desiredOutput
 	bias := bias + (learningRate * delta)
 ```
 
-The method `train:desiredOutput:` is very similar to what we have seen with the perceptron. We have introduced a `delta` local variable that simply equals to the error multiplied by the transfer derivative. We use the transfer derivative to formulate a _gradient descent_. We will explore that topic in detail in a future chapter. 
+The method `train:desiredOutput:` is very similar to what we have seen with the perceptron. We have introduced a `delta` local variable is represents the error multiplied by the transfer derivative. We use the transfer derivative to formulate a _gradient descent_. We will explore that topic in detail in a future chapter. 
 
 We now need to initialize a neuron as being a sigmoid:
 
@@ -199,7 +202,7 @@ PerceptronTest>>testAND
 
 Adding the call to `step` make the neuron behaves as a perceptron. Omitting this line would instead use a sigmoid neuron, and the tests would fail since the output would not exactly be `0` or `1`.
 
-*EXERCISE:* Adapt all the test methods of `PerceptronTest`.
+*EXERCISE:* Adapt all the test methods of `PerceptronTest` to use a neuron with a step function.
 
 ## Testing the sigmoid neuron
 
@@ -235,8 +238,9 @@ NeuronTest>>testTrainingAND
 ```
 
 There are two differences:
+
 - The number of epochs is significantly increased. The reason is that the sigmoid neuron learns slower than the perceptron. 
-- The result of feeding the neuron is compared using the call `closeTo:precision:`. 
+- The result of feeding the neuron is compared using the call `closeTo:precision:`. Since the result of the `feed:` method is now a floating value and not an integer, we need to adapt our way of comparing these values. If you are still unsure what's wrong in `==` between floats, evaluate the expression `0.1 + 0.2 - 0.3`. It returns `5.551115123125783e-17` and not `0` as one would expect. The way that float values are encoded causes this behavior.
 
 Similarly we can train a sigmoid neuron to learn the OR behavior:
 ```Smalltalk
@@ -259,9 +263,11 @@ NeuronTest>>testTrainingOR
 	self assert: ((p feed: {1 . 1}) closeTo: 1 precision: 0.1).
 ```
 
+As you can see, using a sigmoid neuron does not mess up our tests. We simply need (i) to increase the number of epochs to which we train the neuron, and we need (ii) to be more careful when comparing floating values.
+
 ## Slower to learn
 
-This chapter started by bashing the perceptron for its limitations. This has motivated us to formulate the sigmoid neuron. We see one drawback of the sigmoid neuron: it is slower to learn than the perceptron. We are here making a bet, which is trading efficiency for flexibility: as we will see in the next chapter, sigmoid neuron can be orchestrated.
+This chapter started by bashing the perceptron for its limitations. This has motivated us to formulate the sigmoid neuron. We see one drawback of the sigmoid neuron: it is slower to learn than the perceptron. We are here making a bet, which is trading efficiency for flexibility: as we will see in the next chapter, sigmoid neuron can be combined and still can learn.
 
 We can easily make the comparison between the sigmoid neuron and perceptron. Consider the following script:
 
@@ -331,9 +337,11 @@ g legend addText: 'Perceptron vs Sigmoid neuron'.
 g
 ```
 
-![Perceptron vs Sigmoid neuron](03-Neuron/figures/perceptronVsSigmoid.png){width=400px}
+![Perceptron vs Sigmoid neuron](03-Neuron/figures/perceptronVsSigmoid.png){#fig:perceptronVsSigmoid width=400px}
 
-No matter the learning rate defined in the method `train:desiredOutput:`, the perceptron is indeed much faster to learn. 
+The script produces Figure @fig:perceptronVsSigmoid. No matter the learning rate defined in the method `train:desiredOutput:`, the perceptron is indeed much faster to learn then the sigmoid neuron. 
+
+The next chapter will reveals the true power of sigmoid neuron, which will shadow the fact it is slower to learn.
 
 
 ## What have we seen in this chapter
@@ -343,5 +351,5 @@ This chapter covers the following topics:
 - _Definition of the sigmoid neuron._ The sigmoid neuron is an improvement of the perceptron since it can be combined with other sigmoid neurons and this combination can learn. In the next chapter we will detail the backpropagation algorithm, a central aspect when making a neural network learn.
 - _Activation functions._ We have seen two activation functions, the step and sigmoid functions. Many other activation functions are around. We will develop activation functions later on in the book.
 
-The next chapter is about composing sigmoid neuron to build network.
+The next chapter is about composing sigmoid neuron to build artificial neural networks.
 
