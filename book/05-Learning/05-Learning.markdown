@@ -26,7 +26,7 @@ g add: d.
 g
 ~~~~~~
 
-![Plotting four points.](07-Learning/figures/plottingPoints.png){#fig:plottingSomePoints width=400px}
+![Plotting four points.](05-Learning/figures/plottingPoints.png){#fig:plottingSomePoints width=400px}
 
 Figure @fig:plottingSomePoints shows the plot of these four points. Solving the problem means that we need to find the best value of `a` and `b` to have the function `y = f(x) = a*x + b` that is the closest to these points. 
 
@@ -57,7 +57,7 @@ g add: d.
 g
 ~~~~~~
 
-![Points and a line.](07-Learning/figures/pointsAndLine.png){#fig:pointsAndLine width=400px}
+![Points and a line.](05-Learning/figures/pointsAndLine.png){#fig:pointsAndLine width=400px}
 
 Figure @fig:pointsAndLine shows the result. As you can see, the value we picked for `a` and `b` are not really good since the blue line is rather far away from the first and the fourth points. If we want to look for better `a` and `b`, then we need to translate in some way how far the blue lines is from the points. And we need a _loss function_ for this. 
 
@@ -134,7 +134,7 @@ g add: d.
 g
 ~~~~~~~
 
-![Gradient descent.](07-Learning/figures/gradientDescent.png){#fig:gradientDescent}
+![Gradient descent.](05-Learning/figures/gradientDescent.png){#fig:gradientDescent}
 
 Figure @fig:gradientDescent gives the execution of the script.
 
@@ -206,7 +206,7 @@ g add: d.
 g
 ~~~~~
 
-![Variation of the MSE cost function](07-Learning/figures/gradientDescent2.png){#fig:gradientDescent2 width=400px}
+![Variation of the MSE cost function](05-Learning/figures/gradientDescent2.png){#fig:gradientDescent2 width=400px}
 
 Figure @fig:gradientDescent2 gives the variation of the cost function at each update of the `a` and `b` values. You can see that it gets closer to 0, but still remains far away. The reason is that since the points we used are not perfectly lined up, there is no `a` and `b` that makes the cost value equals to 0. If you pick points that are perfectly lined up, (_e.g.,_ `{(4@6.5). (2@3.5). (2@3.5). (2@3.5)}`), then the cost function is asymptotic to 0.
 

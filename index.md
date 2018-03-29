@@ -8,7 +8,7 @@ Agile Artificial Intelligence is a book series that covers classical algorithms 
 1. [Neuron](./book/build/03-Neuron.html)
 1. [Neural network](./book/build/04-NeuralNetwork.html)
 1. Theory on Backpropagation
-1. Application: Predicting data
+1. [Application: Classification and Regression](./book/build/06-Data.html)
 1. Application: the Snake game
 1. Application: the Pong game
 1. Activation function

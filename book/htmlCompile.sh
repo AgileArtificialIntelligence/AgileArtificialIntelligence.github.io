@@ -8,11 +8,13 @@
 
 
 
-FILES=`ls 01-Introduction/*.markdown \
+FILES=`ls 01-introduction/*.markdown \
 	02-Perceptron/*.markdown \
 	03-Neuron/*.markdown \
 	04-NeuralNetwork/*.markdown \
-	07-Learning/*.markdown`
+	05-Learning/*.markdown \
+	06-PredictingData/*.markdown`
+
 
 if [ ! -d "build" ]; then
 	mkdir build
