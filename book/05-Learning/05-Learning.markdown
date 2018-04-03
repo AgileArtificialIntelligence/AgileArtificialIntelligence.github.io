@@ -210,11 +210,6 @@ g
 
 Figure @fig:gradientDescent2 gives the variation of the cost function at each update of the `a` and `b` values. You can see that it gets closer to 0, but still remains far away. The reason is that since the points we used are not perfectly lined up, there is no `a` and `b` that makes the cost value equals to 0. If you pick points that are perfectly lined up, (_e.g.,_ `{(4@6.5). (2@3.5). (2@3.5). (2@3.5)}`), then the cost function is asymptotic to 0.
 
-
-## Stochastic gradient descent
-
-## Cross-validation
-
 ## The derivative of the sigmoid function
 
 We have $\sigma(x)=\frac{1}{1+e^{-x}}$.
@@ -244,7 +239,55 @@ $=\sigma(x) . (1 - \sigma(x))$
 
 ## Backpropagation
 
-https://brilliant.org/wiki/backpropagation/
+### Loss function
 
+Consider two values $y$ and $y'$, each being a vector living in $\mathbb{R}^n$. We pick the Euclidean distance between the vector $y$ and $y'$ as our loss function:
+
+$$
+E(y, y') = \frac{1}{2}||y - y'||^2
+$$
+
+The expression $|| ... ||$ represents the magnitude of the vector enclosed between the sets of double vertical bars. For example, if $v$ is a vector of length three with elements $v_1$, $v_2$, $v_4$, then $||v|| = \sqrt{v_1^2+v_3^2+v_3^2}$.
+
+For example, considering elements of $\mathbb{R}^2$, if $y = (1, 0)$ and $y' = (0.5, 0.5)$, then $E(y, y') = \frac{1}{2}\sqrt{(1 - 0.5)^2 + (0 - 0.5)^2} = 0.353$. 
+
+Note that the fact of $\frac{1}{2}$ canvas the exponent when the function $E$ is differentiated. In particular, we have:
+
+$$
+\frac{\partial E}{\partial y'} = y' - y
+$$
+
+The error function over $n$ training examples can simply be written as an average of losses over individual examples:
+
+$$
+E = \frac{1}{2n}\sum_{x \in X}||y(x) - y'(x)||^2
+$$
+
+### Applying gradient descent to weights
+
+Let $N$ be a neural network with $e$ connections, $m$ inputs, and $n$ outputs. We consider $x_1, x_2, ...$ vectors in $\mathbb{R}^m$, and $y_1, y_2, ...$ vectors in $\mathbb{R}^n$, and $w_0, w_1, w_2, ...$ vectors in $\mathbb{R}^e$. We call these sets _inputs_, _outputs_, _weights_ respectively. The neural network corresponds to a function $y = f_N(w, x)$, which, given a weight $w$, maps an input $x$ to an output $y$. 
+
+Training $N$ refers to producing a sequence of weights $w_0, w_1, ..., w_p$ for a sequence of _training examples_ $(x_1, y_1), ..., (x_p, y_p)$. The initial weight $w_0$ is randomly chosen.
+
+The weights are computed in turn. First compute $w_i$ using only $(x_i, y_i, w_{i-1})$ for $i = 1, ..., p$. The output of the backpropagation algorithm is $w_p$, which gives us a new function $x \longmapsto f_N(w_p, x)$. The computation is the same in each step, hense only the case $i = 1$ is described below.
+
+Calculating $w_1$ from $(x_1, y_1, w_0)$ is done by considering a variable weight $w$ and applying gradient descent to the function $w \longmapsto E(f_N(w, x_1), y_1)$ to find a local minimum, starting at $w = w_0$. This make $w_1$ the minimizing weight found by gradient descent. 
+
+
+
+## What we have seen
+
+This section presents some of theoretical foundations of the implementation found in the previous chapters. In particular, we have seen:
+
+- The loss function as a measure of the amount of error made by a particular model, such as a neural network
+- We briefly presented the backpropagation algorithm, a central algorithm in making learn neural networks.
 
 ## Further readings
+
+- Wikipedia offers a great introduction to the backpropagation algorithm, from which the description presented in this chapter is heavily inspired from (https://en.wikipedia.org/wiki/Backpropagation)
+
+Many blog entries are available across the net. For example:
+
+- A more complete description of the backpropagation: https://brilliant.org/wiki/backpropagation/
+- A nice illustration of the backpropagation algorithm: https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
+
