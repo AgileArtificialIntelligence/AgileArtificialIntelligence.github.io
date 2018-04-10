@@ -76,7 +76,8 @@ Another example of using the syntax we have just introduced:
 n := NNetwork new.
 n configure: 3 hidden: 8 nbOfOutputs: 8.
 
-data := {{0 . 0 . 0 . 0}.
+data := {
+	{0 . 0 . 0 . 0}.
 	{0 . 0 . 1 . 1}.
 	{0 . 1 . 0 . 2}.
 	{0 . 1 . 1 . 3}.
