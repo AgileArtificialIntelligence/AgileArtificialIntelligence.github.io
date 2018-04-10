@@ -102,7 +102,8 @@ The way `train:nbEpoch:` and `predict:` are implemented enforces the training da
 Let's step back a bit. We have spent more than five chapters motivating, describing, incrementally building neural networks. But we are using a neural network pretty much the way we would use a regular hash map. Consider the following example:
 
 ```Smalltalk
-data := {{0 . 0 . 0 . 0}.
+data := {
+	{0 . 0 . 0 . 0}.
 	{0 . 0 . 1 . 1}.
 	{0 . 1 . 0 . 2}.
 	{0 . 1 . 1 . 3}.

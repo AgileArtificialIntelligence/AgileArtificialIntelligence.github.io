@@ -99,7 +99,8 @@ n train: data nbEpoch: 1000.</code></pre>
 <p>The way <code>train:nbEpoch:</code> and <code>predict:</code> are implemented enforces the training data to follow some rules. Each element contained in <code>data</code> must be a collection of numbers. All but the last numbers represents the inputs values. The last value of an example is a number representing the expected output. The expected output is a positive value ranging from 0 and the number of output of the neural network.</p>
 <h2 id="neural-network-as-a-hashmap"><span class="header-section-number">1.2</span> Neural network as a Hashmap</h2>
 <p>Let's step back a bit. We have spent more than five chapters motivating, describing, incrementally building neural networks. But we are using a neural network pretty much the way we would use a regular hash map. Consider the following example:</p>
-<pre class="smalltalk"><code>data := {{0 . 0 . 0 . 0}.
+<pre class="smalltalk"><code>data := {
+    {0 . 0 . 0 . 0}.
     {0 . 0 . 1 . 1}.
     {0 . 1 . 0 . 2}.
     {0 . 1 . 1 . 3}.
