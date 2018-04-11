@@ -130,24 +130,27 @@ n predict: {0.4 . 0.7 . 0.6}
 
 The network somehow matches the input values `{0.4 . 0.7 . 0.6}` to `{0 . 1 . 1}`, which returns the value `3`. 
 
-
-## Classification 
+## Classifying 
 
 Classification can be defined as grouping elements based on their features. Elements shared the similar features are grouped together. 
 
 ## One hot encoding
 
-One hot encoding is a simple mechanism that convert categorical variables into a numerical form, eligible to be fed into a neural network. 
+One hot encoding is a simple mechanism that convert a categorical variable into a numerical form, eligible to be fed into a neural network. 
 
 
+## Iris Dataset
 
+The Iris flower dataset is a popular dataset used by the machine learning community (http://archive.ics.uci.edu/ml/datasets/Iris). This dataset was collected in 1936 by Ronald Fisher and presented in the seminal paper _The use of multiple measurements in taxonomic problems_.
+
+The data set contains 50 samples of three families of Iris, called _Iris setosa_, _Iris virginica_ and _Iris versicolor_. We refer to these families as _classes_.
+
+We provide a copy of this dataset on https://agileartificialintelligence.github.io/Datasets/iris.csv. Within Pharo, you can fetch the dataset using the expression:
+
+```Smalltalk
+(ZnEasy get: 'https://agileartificialintelligence.github.io/Datasets/iris.csv') contents.
+```
 
 ## Normalization
 
 Before 
-
-## Iris Dataset
-
-## Classifying
-
-
