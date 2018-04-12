@@ -222,7 +222,7 @@ NNetwork>>viewNetwork
 	^ b view
 ```
 
-Similarly, we need to extend GTInspector to consider the visualization within GTInspector:
+Similarly, we need to extend GTInspector to consider the visualization within GTInspector (Figure @fig:networkTopology):
 
 ```Smalltalk
 NNetwork>>viewNetworkIn: composite
@@ -233,6 +233,7 @@ NNetwork>>viewNetworkIn: composite
 			self viewNetwork ]
 ```
 
+![Representing the perceptron.](06-Data/figures/networkTopology.png){#fig:networkTopology width=400px}
 
 
 ## Classifying data & one hot encoding
