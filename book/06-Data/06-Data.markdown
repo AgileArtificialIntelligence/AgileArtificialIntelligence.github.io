@@ -34,7 +34,8 @@ NNetwork>>train: train nbEpoch: nbEpoch
 			expectedOutput := (1 to: self numberOfOutputs) collect: [ :notUsed | 0 ].
 			expectedOutput at: (row last) + 1 put: 1.
 			 
-			t := (1 to: expectedOutput size) collect: [ :i | ((expectedOutput at: i) - (outputs at: i)) raisedTo: 2 ].
+			t := (1 to: expectedOutput size) 
+					collect: [ :i | ((expectedOutput at: i) - (outputs at: i)) raisedTo: 2 ].
 			sumError := sumError + t sum.
 			self backwardPropagateError: expectedOutput.
 			self updateWeight: row allButLast.
@@ -47,7 +48,7 @@ The method makes the network training significantly less verbose.
 
 ```Smalltalk
 n := NNetwork new.
-n configure: 2 hidden: 3 nbOfOutputs: 1.
+n configure: 2 hidden: 3 nbOfOutputs: 2.
 
 data := {
 	#(0 0 0) .
@@ -57,7 +58,7 @@ data := {
 n train: data nbEpoch: 10000
 ```
 
-The `data` variable is an array of array of numbers. Each row represents an example and it contains the input values and the output value. For example, the row `#(0 1 1)` represents the line `n train: { 0 . 1 } desiredOutputs: { 1 }` given above. 
+The `data` variable is an array of array of numbers. Each row represents an example and it contains the input values and the output value. For example, the row `#(0 1 1)` represents the line `n train: { 0 . 1 } desiredOutputs: { 1 }` given above. Note that we have two outputs, and not one. We use a one-hot encoding for the output, as explained later on in this chapter.
 
 Predicting the output for a given set of input values could be defined using:
 
@@ -130,11 +131,117 @@ n predict: {0.4 . 0.7 . 0.6}
 
 The network somehow matches the input values `{0.4 . 0.7 . 0.6}` to `{0 . 1 . 1}`, which returns the value `3`. 
 
-## Classifying 
+## Visualizing the error and the topology
+
+We have seen that the first step of the backpropagation is to actually evaluate the network with the provided inputs. The output values are then compared with the expected output values. The difference between the actual output and the expected output is then used to adjust the weights and biases by back-propagating this difference to the network. 
+
+The method `NNetwork>>train:nbEpoch:` contains the statement `errors add: sumError`. This line of code has the effect to record the value of the `sumError`, indicating how well the network has performed for the provided example. This list of errors can be visualized.
+
+We define the method `viewErrorCurve` on the class `NNetwork`:
+
+```Smalltalk
+NNetwork>>viewErrorCurve
+	| b ds |
+	errors ifEmpty: [ 
+		^ RTView new 
+			add: (RTLabel elementOn: 'Should first run the network'); 
+			yourself ].
+	
+	b := RTGrapher new.
+	
+	"We define the size of the charting area"
+	b extent: 500 @ 300.
+	
+	ds := RTData new.
+	ds noDot. 
+	ds connectColor: Color blue.
+	ds points: errors.
+	ds dotShape rectangle color: Color blue.
+	b add: ds.
+	
+	b axisX noDecimal; title: 'Epoch'.
+	b axisY title: 'Error'.
+	^ b
+```
+
+The following method makes the visualization of the `errors` variable always shown:
+```Smalltalk
+NNetwork>>viewErrorCurveIn: composite
+	<gtInspectorPresentationOrder: -10>
+	composite roassal2
+		title: 'Error';
+		initializeView: [
+			self viewErrorCurve ]
+```
+
+The method `NNetwork>>viewErrorCurveIn:` uses the GTInspector framework to add particularized tab in the inspector.
+
+Inspecting the following code snippet displays the error curve (Figure @fig:errorCurve):
+
+```Smalltalk
+n := NNetwork new.
+n configure: 2 hidden: 3 nbOfOutputs: 2.
+
+data := {
+    #(0 0 0) .
+    #(0 1 1) .
+    #(1 0 1) .
+    #(1 1 0) }.
+n train: data nbEpoch: 10000.
+```
+
+![Representing the perceptron.](06-Data/figures/errorCurve.png){#fig:errorCurve width=400px}
+
+The error curve indicates the effect of the number of epochs on making the neural network learn. Being that close to 0 is a strong indicator that the neural network is properly learning. 
+
+
+Similarly, we can visualize the topology of the network using the following method:
+
+```Smalltalk
+NNetwork>>viewNetwork
+	| b lb |
+	b := RTMondrian new.
+	
+	b nodes: layers forEach: [ :aLayer |
+		b shape circle size: 20.
+		b nodes: aLayer neurons.
+		b layout verticalLine.
+	].
+
+	b shape arrowedLine; withShorterDistanceAttachPoint.
+	b edges connectTo: #nextLayer.
+	b layout horizontalLine gapSize: 30; center.
+	
+	b build.
+	
+	lb := RTLegendBuilder new.
+	lb view: b view.
+	lb addText: self numberOfNeurons asString, ' neurons'.
+	lb addText: self numberOfInputs asString, ' inputs'.
+	lb build.
+	^ b view
+```
+
+Similarly, we need to extend GTInspector to consider the visualization within GTInspector:
+
+```Smalltalk
+NNetwork>>viewNetworkIn: composite
+	<gtInspectorPresentationOrder: -10>
+	composite roassal2
+		title: 'network';
+		initializeView: [
+			self viewNetwork ]
+```
+
+
+
+## Classifying data & one hot encoding
+
+The two examples given below may be considered as two classification models, based on neural networks. 
 
 Classification can be defined as grouping elements based on their features. Elements shared the similar features are grouped together. 
 
-## One hot encoding
+
 
 One hot encoding is a simple mechanism that convert a categorical variable into a numerical form, eligible to be fed into a neural network. 
 
