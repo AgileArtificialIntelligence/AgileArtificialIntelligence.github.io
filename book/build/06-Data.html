@@ -220,9 +220,27 @@ n train: data nbEpoch: 1000.</code></pre>
 <p>Figure <a href="#fig:contradictionInData">3</a> illustrates the error curve in presence of contradiction data. The script given above makes the neural network learn two different outputs for exactly the same input values. As a consequence, the network will have to make mistake during the learning phase.</p>
 <p>Using a real and non-trivial dataset it is likely that this situation will happens. In case that the occurrence of the contradiction is low, then the network will handle the dataset properly.</p>
 <h2 id="classifying-data-one-hot-encoding"><span class="header-section-number">1.5</span> Classifying data &amp; one hot encoding</h2>
-<p>The two examples given below may be considered as two classification models, based on neural networks.</p>
-<p>Classification can be defined as grouping elements based on their features. Elements shared the similar features are grouped together.</p>
-<p>One hot encoding is a simple mechanism that convert a categorical variable into a numerical form, eligible to be fed into a neural network.</p>
+<p>Classification can be defined as grouping elements based on their features. Elements shared the similar features are grouped together. The XOR dataset given above may be considered as a (simple) classification model, in which each group is made of two elements. The group 0 is made of the elements [0, 0] and [1, 1], while the group 1 is made of [0, 1] and [1, 0].</p>
+<p>Have you noticed that when we introduced the <code>train:nbEpoch:</code> when we have to define a neural network with two output for the XOR dataset? The reason is that we encode the output value using the <em>one-hot encoding</em>.</p>
+<p>One hot encoding is a simple mechanism that converts a categorical variable into a numerical form, eligible to be fed into a neural network. Consider the variable <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>v</mi><annotation encoding="application/x-tex">v</annotation></semantics></math> which represents a word within the set { <em>&quot;hello&quot;, &quot;bonjour&quot;, &quot;Buenos dias&quot;</em> }. Applying one-hot encoding would assign to each word a unique number. For example, <em>&quot;hello&quot;</em> is associated to the index 0, <em>&quot;bonjour&quot;</em> associated to index 1, and <em>&quot;Buenos dias&quot;</em> to 2. The value of <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>v</mi><annotation encoding="application/x-tex">v</annotation></semantics></math> can then be encoded with 3 different bits, since the dataset has 3 different words. We can then encode the word</p>
+<ul>
+<li><em>&quot;hello&quot;</em> = [1, 0, 0]</li>
+<li><em>&quot;bonjour&quot;</em> = [0, 1, 0]</li>
+<li><em>&quot;Buenos dias&quot;</em> = [0, 0, 1]</li>
+</ul>
+<p>If the variable <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>v</mi><annotation encoding="application/x-tex">v</annotation></semantics></math> has to be provided to a neural network, then 3 input values can be used for that purpose.</p>
+<p>We have defined the XOR dataset as:</p>
+<pre class="smalltalk"><code>n := NNetwork new.
+n configure: 2 hidden: 3 nbOfOutputs: 2.
+
+data := {
+    #(0 0 0) .
+    #(0 1 1) .
+    #(1 0 1) .
+    #(1 1 0) }.
+n train: data nbEpoch: 10000</code></pre>
+<p>Since there are two different values of the datasets, 0 and 1, we have two output neuron in out neural networks: the value 0 is encoded [1, 0], and 1 is encoded [0, 1].</p>
+<p>Now we explain the one-hot encoding, we can go into larger a dataset.</p>
 <h2 id="iris-dataset"><span class="header-section-number">1.6</span> Iris Dataset</h2>
 <p>The Iris flower dataset is a popular dataset used by the machine learning community (http://archive.ics.uci.edu/ml/datasets/Iris). This dataset was collected in 1936 by Ronald Fisher and presented in the seminal paper <em>The use of multiple measurements in taxonomic problems</em>.</p>
 <p>The data set contains 50 samples of three families of Iris, called <em>Iris setosa</em>, <em>Iris virginica</em> and <em>Iris versicolor</em>. We refer to these families as <em>classes</em>.</p>

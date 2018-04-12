@@ -259,14 +259,35 @@ Using a real and non-trivial dataset it is likely that this situation will happe
 
 ## Classifying data & one hot encoding
 
-The two examples given below may be considered as two classification models, based on neural networks. 
+Classification can be defined as grouping elements based on their features. Elements shared the similar features are grouped together. The XOR dataset given above may be considered as a (simple) classification model, in which each group is made of two elements. The group 0 is made of the elements [0, 0] and [1, 1], while the group 1 is made of [0, 1] and [1, 0]. 
 
-Classification can be defined as grouping elements based on their features. Elements shared the similar features are grouped together. 
+Have you noticed that when we introduced the `train:nbEpoch:` when we have to define a neural network with two output for the XOR dataset? The reason is that we encode the output value using the _one-hot encoding_. 
 
+One hot encoding is a simple mechanism that converts a categorical variable into a numerical form, eligible to be fed into a neural network. Consider the variable $v$ which represents a word within the set { _"hello", "bonjour", "Buenos dias"_ }. Applying one-hot encoding would assign to each word a unique number. For example, _"hello"_ is associated to the index 0, _"bonjour"_ associated to index 1, and _"Buenos dias"_ to 2. The value of $v$ can then be encoded with 3 different bits, since the dataset has 3 different words. We can then encode the word
 
+- _"hello"_ = [1, 0, 0]
+- _"bonjour"_ = [0, 1, 0] 
+- _"Buenos dias"_ = [0, 0, 1]
 
-One hot encoding is a simple mechanism that convert a categorical variable into a numerical form, eligible to be fed into a neural network. 
+If the variable $v$ has to be provided to a neural network, then 3 input values can be used for that purpose. 
 
+We have defined the XOR dataset as:
+
+```Smalltalk
+n := NNetwork new.
+n configure: 2 hidden: 3 nbOfOutputs: 2.
+
+data := {
+	#(0 0 0) .
+	#(0 1 1) .
+	#(1 0 1) .
+	#(1 1 0) }.
+n train: data nbEpoch: 10000
+```
+
+Since there are two different values of the datasets, 0 and 1, we have two output neuron in out neural networks: the value 0 is encoded [1, 0], and 1 is encoded [0, 1].
+
+Now we explain the one-hot encoding, we can go into larger a dataset.
 
 ## Iris Dataset
 
