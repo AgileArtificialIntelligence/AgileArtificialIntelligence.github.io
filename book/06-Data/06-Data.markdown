@@ -190,7 +190,7 @@ data := {
 n train: data nbEpoch: 10000.
 ```
 
-![Representing the perceptron.](06-Data/figures/errorCurve.png){#fig:errorCurve width=400px}
+![Visualizing the error curve.](06-Data/figures/errorCurve.png){#fig:errorCurve}
 
 The error curve indicates the effect of the number of epochs on making the neural network learn. Being that close to 0 is a strong indicator that the neural network is properly learning. 
 
@@ -233,8 +233,29 @@ NNetwork>>viewNetworkIn: composite
 			self viewNetwork ]
 ```
 
-![Representing the perceptron.](06-Data/figures/networkTopology.png){#fig:networkTopology width=400px}
+![Visualizing the network topology.](06-Data/figures/networkTopology.png){#fig:networkTopology}
 
+## Contradictory data
+
+The error curve quantifies the error made by the network during the learning phase. It may happens that the error has has some plateaus. In such a case, increasing the number of epochs may have the effect to reduce the error curve. 
+
+In some case, the error curve may indicates some contradiction in the data. Consider the following example:
+
+```Smalltalk
+n := NNetwork new.
+n configure: 2 hidden: 3 nbOfOutputs: 2.
+
+data := {
+   	#(0 0 0) .
+	#(0 0 1) }.
+n train: data nbEpoch: 1000.
+```
+
+![Contradiction in data.](06-Data/figures/contradictionInData.png){#fig:contradictionInData}
+
+Figure @fig:contradictionInData illustrates the error curve in presence of contradiction data. The script given above makes the neural network learn two different outputs for exactly the same input values. As a consequence, the network will have to make mistake during the learning phase. 
+
+Using a real and non-trivial dataset it is likely that this situation will happens. In case that the occurrence of the contradiction is low, then the network will handle the dataset properly.
 
 ## Classifying data & one hot encoding
 
@@ -258,6 +279,8 @@ We provide a copy of this dataset on https://agileartificialintelligence.github.
 ```Smalltalk
 (ZnEasy get: 'https://agileartificialintelligence.github.io/Datasets/iris.csv') contents.
 ```
+
+
 
 ## Normalization
 
