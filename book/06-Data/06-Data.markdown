@@ -301,7 +301,61 @@ We provide a copy of this dataset on https://agileartificialintelligence.github.
 (ZnEasy get: 'https://agileartificialintelligence.github.io/Datasets/iris.csv') contents.
 ```
 
+The code above fetches the file `iris.csv` and returns its content. The file structure, as given by the CSV header is:
+```
+sepal_length,sepal_width,petal_length,petal_width,species
+```
 
+However, fetching the file is just a small step toward making the file processable by a neural networks. For example, we need to convert each row of the file into a set of numerical values. 
+
+In order to feed a network with the iris data set, we need to perform the following steps:
+
+1. Fetch the file from the net
+2. Cut the file content, which is a big sting, into lines
+3. Ignore the first line of the line, which contains the CSV header
+4. Each row has 5 entries for which the first 4 ones are numerical values and the last one is the flower name. We need to extract subtrings of a row, each substring separated by a comma. The last column needs to be presented, which is processed in the next step
+5. We replace in the table each flower name by a numerical value, ranging from 0 to 2.
+
+The following code snippet exactly performs these five steps.
+
+```Smalltalk
+irisCSV := (ZnEasy get: 'https://agileartificialintelligence.github.io/Datasets/iris.csv') contents.
+lines := irisCSV lines. 
+lines := lines allButFirst.
+tLines := lines collect: [ :l | 
+		| ss |
+		ss := l substrings: ','.
+		(ss allButLast collect: [ :w | Float readFrom: w ]), (Array with: ss last) ].
+
+
+irisData := tLines collect: [ :row | 
+		| l |
+		row last = 'setosa' ifTrue: [ l := #( 0 ) ].
+		row last = 'versicolor' ifTrue: [ l := #( 1 ) ].
+		row last = 'virginica' ifTrue: [ l := #( 2 ) ].
+		row allButLast, l ].
+	
+irisData.
+```
+
+To summarize, the script convert a string similar to:
+
+```
+'sepal_length,sepal_width,petal_length,petal_width,species
+5.1,3.5,1.4,0.2,setosa
+4.9,3.0,1.4,0.2,setosa
+4.7,3.2,1.3,0.2,setosa
+...
+'
+```
+
+into 
+```
+#(#(5.1 3.5 1.4 0.2 0) #(4.9 3.0 1.4 0.2 0) #(4.7 3.2 1.3 0.2 0) ...
+```
+
+
+The result of the script is the value of the `irisData` variable.
 
 ## Normalization
 

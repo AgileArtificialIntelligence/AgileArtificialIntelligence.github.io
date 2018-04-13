@@ -246,6 +246,45 @@ n train: data nbEpoch: 10000</code></pre>
 <p>The data set contains 50 samples of three families of Iris, called <em>Iris setosa</em>, <em>Iris virginica</em> and <em>Iris versicolor</em>. We refer to these families as <em>classes</em>.</p>
 <p>We provide a copy of this dataset on https://agileartificialintelligence.github.io/Datasets/iris.csv. Within Pharo, you can fetch the dataset using the expression:</p>
 <pre class="smalltalk"><code>(ZnEasy get: 'https://agileartificialintelligence.github.io/Datasets/iris.csv') contents.</code></pre>
+<p>The code above fetches the file <code>iris.csv</code> and returns its content. The file structure, as given by the CSV header is:</p>
+<pre><code>sepal_length,sepal_width,petal_length,petal_width,species</code></pre>
+<p>However, fetching the file is just a small step toward making the file processable by a neural networks. For example, we need to convert each row of the file into a set of numerical values.</p>
+<p>In order to feed a network with the iris data set, we need to perform the following steps:</p>
+<ol style="list-style-type: decimal">
+<li>Fetch the file from the net</li>
+<li>Cut the file content, which is a big sting, into lines</li>
+<li>Ignore the first line of the line, which contains the CSV header</li>
+<li>Each row has 5 entries for which the first 4 ones are numerical values and the last one is the flower name. We need to extract subtrings of a row, each substring separated by a comma. The last column needs to be presented, which is processed in the next step</li>
+<li>We replace in the table each flower name by a numerical value, ranging from 0 to 2.</li>
+</ol>
+<p>The following code snippet exactly performs these five steps.</p>
+<pre class="smalltalk"><code>irisCSV := (ZnEasy get: 'https://agileartificialintelligence.github.io/Datasets/iris.csv') contents.
+lines := irisCSV lines. 
+lines := lines allButFirst.
+tLines := lines collect: [ :l | 
+        | ss |
+        ss := l substrings: ','.
+        (ss allButLast collect: [ :w | Float readFrom: w ]), (Array with: ss last) ].
+
+
+irisData := tLines collect: [ :row | 
+        | l |
+        row last = 'setosa' ifTrue: [ l := #( 0 ) ].
+        row last = 'versicolor' ifTrue: [ l := #( 1 ) ].
+        row last = 'virginica' ifTrue: [ l := #( 2 ) ].
+        row allButLast, l ].
+    
+irisData.</code></pre>
+<p>To summarize, the script convert a string similar to:</p>
+<pre><code>'sepal_length,sepal_width,petal_length,petal_width,species
+5.1,3.5,1.4,0.2,setosa
+4.9,3.0,1.4,0.2,setosa
+4.7,3.2,1.3,0.2,setosa
+...
+'</code></pre>
+<p>into</p>
+<pre><code>#(#(5.1 3.5 1.4 0.2 0) #(4.9 3.0 1.4 0.2 0) #(4.7 3.2 1.3 0.2 0) ...</code></pre>
+<p>The result of the script is the value of the <code>irisData</code> variable.</p>
 <h2 id="normalization"><span class="header-section-number">1.7</span> Normalization</h2>
 <p>Before</p>
             </div>
