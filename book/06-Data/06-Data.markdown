@@ -355,7 +355,24 @@ into
 ```
 
 
-The result of the script is the value of the `irisData` variable.
+The result of the script is the value of the `irisData` variable. In the remaining of the chapter, when we will refer to the iris dataset, we actually mean the `irisData` value.
+
+## Training a network with irisData
+
+Training a network is actually easy. Consider the following code:
+
+```Smalltalk
+n := NNetwork new.
+n configure: 4 hidden: 6 nbOfOutputs: 3.
+n train: irisData nbEpoch: 1000.
+```
+
+The code above builds a network with 4 input values, one hidden layer with 6 neurons, and has an output layer of 3 neurons. The number of inputs represents the size of a iris example row minus 1 (the expected output value). We pick an arbitrary 6 as the size of the hidden layer. A general rule for the hidden layer size, is to contain 50% more neuron than the number of input. We have three neurons in the output layers since there are three different families of Iris.
+
+![Learning the Iris dataset.](06-Data/figures/networkOnIris.png){#fig:networkOnIris}
+
+Figure @fig:networkOnIris 
+
 
 ## Normalization
 
