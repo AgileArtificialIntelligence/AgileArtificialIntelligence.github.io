@@ -11,7 +11,6 @@ Agile Artificial Intelligence is a book series that covers classical algorithms 
 1. [Application: Classifying data](./book/build/06-Data.html)
 1. Application: the Snake game
 1. Application: the Pong game
-1. Activation function
 
 # Future books
 
