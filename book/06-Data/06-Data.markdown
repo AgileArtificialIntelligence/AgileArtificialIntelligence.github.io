@@ -1,11 +1,11 @@
 
 # Classification 
 
-This chapter covers the classification and regression of data, which are the most prominent applications of neural networks.
+This chapter covers the classification of data, which is one of the most prominent applications of neural networks.
 
 ## Support to easily train network
 
-In the previous chapter, we have seen that we can obtain a trained neural network to express the XOR logical gate with:
+In the previous chapter, we have seen that we can obtain a trained neural network to express the XOR logical gate. In particular, we have seen the following script:
 
 ```Smalltalk
 n := NNetwork new.
@@ -19,9 +19,9 @@ n configure: 2 hidden: 3 nbOfOutputs: 1.
 ].
 ```
 
-After evaluating this script, the expression `n feed: {1 . 0}` evaluates to `#(0.9735546630024936)`, an array having an expected float value close to 1. The example is actually very verbose. 
+After evaluating this script, the expression `n feed: {1 . 0}` evaluates to `#(0.9735546630024936)`, an array having an expected float value close to 1. If we step back a bit, we see that the script is actually very verbose. For example, why should we manually handle the repetition? Why having the message `train:desiredOutputs:` called so many times? We can greatly simplify the way network are trained by providing a bit of infrastructure.
 
-We define the following method:
+Consider the following method:
 
 ```Smalltalk
 NNetwork>>train: train nbEpoch: nbEpoch
@@ -44,7 +44,7 @@ NNetwork>>train: train nbEpoch: nbEpoch
 	] 
 ```
 
-The method makes the network training significantly less verbose.
+The method makes the network training significantly less verbose. The script provided above can now be written:
 
 ```Smalltalk
 n := NNetwork new.
@@ -58,9 +58,9 @@ data := {
 n train: data nbEpoch: 10000
 ```
 
-The `data` variable is an array of array of numbers. Each row represents an example and it contains the input values and the output value. For example, the row `#(0 1 1)` represents the line `n train: { 0 . 1 } desiredOutputs: { 1 }` given above. Note that we have two outputs, and not one. We use a one-hot encoding for the output, as explained later on in this chapter.
+The `data` variable is an array of array of numbers. Each row represents an example and it contains the input values and the output value. For example, the row `#(0 1 1)` represents the line `n train: { 0 . 1 } desiredOutputs: { 1 }` given above. Note that we have two outputs, and not only one. This is the result of using a one-hot encoding for the output. Later on in this chapter we will explain this encoding.
 
-Predicting the output for a given set of input values could be defined using:
+Predicting the output for a given set of input values may be implemented using a `predict:` method:
 
 ```Smalltalk
 NNetwork>>predict: inputs
@@ -96,7 +96,7 @@ n predict: {0 . 1 . 1}
 "==> 3"
 ```
 
-The way `train:nbEpoch:` and `predict:` are implemented enforces the training data to follow some rules. Each element contained in `data` must be a collection of numbers. All but the last numbers represents the inputs values. The last value of an example is a number representing the expected output. The expected output is a positive value ranging from 0 and the number of output of the neural network.
+The way `train:nbEpoch:` and `predict:` are implemented enforces the training data to follow some rules. Each element contained in `data` must be a collection of numbers. All but the last numbers represents the inputs values. The last value of an example is a number representing the expected output. The expected output is a positive value ranging from 0 and the number of outputs of the neural network minus one. In the script above, the expected output ranges from 0 to 7, and the neural network has 8 outputs.
 
 
 ## Neural network as a Hashmap
@@ -120,7 +120,7 @@ data do: [ :anExample |
 d at: #(1 0 1)
 ```
 
-The variable `d` is a dictionary filled with the example data. The values we used as input in the neural network are used as keys in the dictionary. Indeed, using a dictionary has many benefits here: filling a dictionary is significantly faster than training a neural network (with several order of magnitude), and getting a value for a particular key is also significantly faster then feed forwarding a network.
+The variable `d` is a dictionary filled with the example data. The values we used as input in the neural network are used as keys in the dictionary. Indeed, using a dictionary has many benefits here: filling a dictionary is significantly faster than training a neural network (by several order of magnitude!), and getting a value for a particular key is also significantly faster then feed forwarding a network.
 
 However, a hash map requires the exact same key (or at least adequately answers to the message `=`). A neural network does not requires the exact same input values. Consider the following expression:
 
@@ -129,13 +129,13 @@ n predict: {0.4 . 0.7 . 0.6}
 "==> 3"
 ```
 
-The network somehow matches the input values `{0.4 . 0.7 . 0.6}` to `{0 . 1 . 1}`, which returns the value `3`. 
+The network somehow matches the input values `{0.4 . 0.7 . 0.6}` to `{0 . 1 . 1}`, which returns the value `3`. A hashmap is not able to do such a connection without the programmer to explicitly doing so.
 
 ## Visualizing the error and the topology
 
 We have seen that the first step of the backpropagation is to actually evaluate the network with the provided inputs. The output values are then compared with the expected output values. The difference between the actual output and the expected output is then used to adjust the weights and biases by back-propagating this difference to the network. 
 
-The method `NNetwork>>train:nbEpoch:` contains the statement `errors add: sumError`. This line of code has the effect to record the value of the `sumError`, indicating how well the network has performed for the provided example. This list of errors can be visualized.
+The method `NNetwork>>train:nbEpoch:` contains the statement `errors add: sumError`. This line of code has the effect to record the value of `sumError`, indicating how well the network has performed for the provided example. This list of errors can be visualized as a helper to characterize the overall network learning.
 
 We define the method `viewErrorCurve` on the class `NNetwork`:
 
@@ -235,9 +235,11 @@ NNetwork>>viewNetworkIn: composite
 
 ![Visualizing the network topology.](06-Data/figures/networkTopology.png){#fig:networkTopology}
 
+Note that by clicking on a neural reveals its weights and bias.
+
 ## Contradictory data
 
-The error curve quantifies the error made by the network during the learning phase. It may happens that the error has has some plateaus. In such a case, increasing the number of epochs may have the effect to reduce the error curve. 
+The error curve quantifies the error made by the network during the learning phase. It may happens that the error has some plateaus. In such a case, increasing the number of epochs may have the effect to lower the error curve. 
 
 In some case, the error curve may indicates some contradiction in the data. Consider the following example:
 
@@ -251,17 +253,17 @@ data := {
 n train: data nbEpoch: 1000.
 ```
 
-![Contradiction in data.](06-Data/figures/contradictionInData.png){#fig:contradictionInData}
+![Data contradiction.](06-Data/figures/contradictionInData.png){#fig:contradictionInData}
 
-Figure @fig:contradictionInData illustrates the error curve in presence of contradiction data. The script given above makes the neural network learn two different outputs for exactly the same input values. As a consequence, the network will have to make mistake during the learning phase. 
+Figure @fig:contradictionInData illustrates the error curve in presence of contradicting data. The script given above makes the neural network learn two different outputs for exactly the same input values. As a consequence, the network will have to make mistake during the learning phase. 
 
 Using a real and non-trivial dataset it is likely that this situation will happens. In case that the occurrence of the contradiction is low, then the network will handle the dataset properly.
 
 ## Classifying data & one hot encoding
 
-Classification can be defined as grouping elements based on their features. Elements shared the similar features are grouped together. The XOR dataset given above may be considered as a (simple) classification model, in which each group is made of two elements. The group 0 is made of the elements [0, 0] and [1, 1], while the group 1 is made of [0, 1] and [1, 0]. 
+Classification can be defined as grouping elements based on their features. Elements sharing similar features are grouped together. The XOR dataset given above may be considered as a (simple) classification model, in which each group is made of two elements. The group 0 is made of the elements [0, 0] and [1, 1], while the group 1 is made of [0, 1] and [1, 0]. 
 
-Have you noticed that when we introduced the `train:nbEpoch:` when we have to define a neural network with two output for the XOR dataset? The reason is that we encode the output value using the _one-hot encoding_. 
+Have you noticed that when we introduced the `train:nbEpoch:` when we have to define a neural network with two outputs for the XOR dataset? The reason is that we encode the output value using the _one-hot encoding_. 
 
 One hot encoding is a simple mechanism that converts a categorical variable into a numerical form, eligible to be fed into a neural network. Consider the variable $v$ which represents a word within the set { _"hello", "bonjour", "Buenos dias"_ }. Applying one-hot encoding would assign to each word a unique number. For example, _"hello"_ is associated to the index 0, _"bonjour"_ associated to index 1, and _"Buenos dias"_ to 2. The value of $v$ can then be encoded with 3 different bits, since the dataset has 3 different words. We can then encode the word
 
@@ -285,9 +287,9 @@ data := {
 n train: data nbEpoch: 10000
 ```
 
-Since there are two different values of the datasets, 0 and 1, we have two output neuron in out neural networks: the value 0 is encoded [1, 0], and 1 is encoded [0, 1].
+Since there are two different values of the datasets, 0 and 1, we have two output neurons: the value 0 is encoded [1, 0], and 1 is encoded [0, 1].
 
-Now we explain the one-hot encoding, we can go into larger a dataset.
+Now that we explained the one-hot encoding, we can proceed with a larger dataset.
 
 ## Iris Dataset
 
@@ -301,7 +303,7 @@ We provide a copy of this dataset on https://agileartificialintelligence.github.
 (ZnEasy get: 'https://agileartificialintelligence.github.io/Datasets/iris.csv') contents.
 ```
 
-The code above fetches the file `iris.csv` and returns its content. The file structure, as given by the CSV header is:
+The code above fetches the file `iris.csv` and returns its content. The file structure, as given in the CSV header is:
 ```
 sepal_length,sepal_width,petal_length,petal_width,species
 ```
@@ -310,13 +312,13 @@ However, fetching the file is just a small step toward making the file processab
 
 In order to feed a network with the iris data set, we need to perform the following steps:
 
-1. Fetch the file from the net
-2. Cut the file content, which is a big sting, into lines
-3. Ignore the first line of the line, which contains the CSV header
-4. Each row has 5 entries for which the first 4 ones are numerical values and the last one is the flower name. We need to extract subtrings of a row, each substring separated by a comma. The last column needs to be presented, which is processed in the next step
-5. We replace in the table each flower name by a numerical value, ranging from 0 to 2.
+1. Fetch the file from the net;
+2. Cut the file content, which is a big sting, into lines;
+3. Ignore the first line of the line, which contains the CSV header and is therefore not relevant for the network;
+4. Each row has 5 entries for which the first 4 ones are numerical values and the last one is the flower name. We need to extract subtrings of a row, each substring separated by a comma. The last column needs to be presented, which is processed in the next step;
+5. We replace in the table each flower name by a numerical value, which could be 0, 1, or 2.
 
-The following code snippet exactly performs these five steps.
+The following script exactly performs these five steps:
 
 ```Smalltalk
 irisCSV := (ZnEasy get: 'https://agileartificialintelligence.github.io/Datasets/iris.csv') contents.
@@ -359,7 +361,7 @@ The result of the script is the value of the `irisData` variable. In the remaini
 
 ## Training a network with irisData
 
-Training a network is actually easy. The remaining of the chapter assumes that the variable `irisData` is defined as shown in the previous section. Consider the following code:
+Training a network is actually easy since we carefully prepared the battlefield. The remaining of the chapter assumes that the variable `irisData` is defined as shown in the previous section. Consider the following code:
 
 ```Smalltalk
 n := NNetwork new.
