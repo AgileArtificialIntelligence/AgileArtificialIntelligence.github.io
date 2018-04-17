@@ -367,11 +367,24 @@ n configure: 4 hidden: 6 nbOfOutputs: 3.
 n train: irisData nbEpoch: 1000.
 ```
 
-The code above builds a network with 4 input values, one hidden layer with 6 neurons, and has an output layer of 3 neurons. The number of inputs represents the size of a iris example row minus 1 (the expected output value). We pick an arbitrary 6 as the size of the hidden layer. A general rule for the hidden layer size, is to contain 50% more neuron than the number of input. We have three neurons in the output layers since there are three different families of Iris.
+The code above builds a network with 4 input values, one hidden layer with 6 neurons, and the output layer has 3 neurons. The number of inputs represents the size of a row in the iris dataset minus 1, the expected output value which is not part of the input. We pick an arbitrary 6 as the size of the hidden layer. A general rule for the hidden layer size, is to contain 50% more neurons than the number of inputs. We have three neurons in the output layers since there are three different families of Iris.
 
 ![Learning the Iris dataset.](06-Data/figures/networkOnIris.png){#fig:networkOnIris}
 
-Figure @fig:networkOnIris 
+Figure @fig:networkOnIris represents the error curve of the network. As you can see, the curves is very close to 0, which indicates that the network is learning and the dataset does not have contradiction. 
+
+The configuration of our network has two parameters: the number of neurons in the hidden layers, and the number of epochs to consider. 
+
+There are no general rules on how to pick these parameters. For example, if we choose a hidden layer with 90 neurons, then @@@@
+
+```Smalltalk
+n := NNetwork new.
+n configure: 4 hidden: 90 nbOfOutputs: 3.
+n train: irisData nbEpoch: 1000.
+```
+
+
+
 
 
 ## Normalization
