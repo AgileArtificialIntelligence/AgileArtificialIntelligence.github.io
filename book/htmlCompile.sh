@@ -16,7 +16,7 @@ FILES=`ls \
 	05-Learning/*.markdown \
 	06-Data/*.markdown`
 
-FILES=`ls 06-Data/*.markdown`
+#FILES=`ls 06-Data/*.markdown`
 
 
 if [ ! -d "build" ]; then

@@ -375,7 +375,7 @@ Figure @fig:networkOnIris represents the error curve of the network. As you can 
 
 The configuration of our network has two parameters: the number of neurons in the hidden layers, and the number of epochs to consider. 
 
-There are no general rules on how to pick these parameters. For example, if we choose a hidden layer with 90 neurons, then @@@@
+There are no general rules on how to pick these parameters. For example, if we choose a hidden layer large of 90 neurons, then the error curve seems to reach a plateau. The network seems to not be able to learn, as the following example shows (the execution time is much longer):
 
 ```Smalltalk
 n := NNetwork new.
