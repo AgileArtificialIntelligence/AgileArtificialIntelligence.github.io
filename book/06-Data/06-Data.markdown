@@ -359,7 +359,7 @@ The result of the script is the value of the `irisData` variable. In the remaini
 
 ## Training a network with irisData
 
-Training a network is actually easy. Consider the following code:
+Training a network is actually easy. The remaining of the chapter assumes that the variable `irisData` is defined as shown in the previous section. Consider the following code:
 
 ```Smalltalk
 n := NNetwork new.
@@ -383,10 +383,281 @@ n configure: 4 hidden: 90 nbOfOutputs: 3.
 n train: irisData nbEpoch: 1000.
 ```
 
+## Training vs test dataset
 
+In the previous section we built a network trained on the whole iris dataset: we consider all the entries in the `.csv` file to train the network. The network seems to properly learn as the network does less error along the epochs (_i.e.,_ the error curve is getting very close to 0). 
 
+The error curve indicates how well the network is learning for the provided dataset. If we wish to know how well the network classifies data, it would not make much sense to test it on data it was trained with. Asking a network how well it performs in presence of the very same data used for the training is not much of a challenge. However, an important question is how well the network behaves in presence of data that it has never seen. Said in other word: _how well the network classifies unknown data?_
 
+We divide the iris dataset in two parts: 
+
+- _Training dataset_: This section of the `.csv` file is used to train the network.
+- _Test dataset_: This second section is used to see how effective the trained network is.
+
+Consider the following script:
+```
+cut := 0.8.
+cutTraining := (irisData size * cut) rounded.
+cutTest := (irisData size * (1 - cut)) rounded.
+trainingData := irisData first: cutTraining.
+testData := irisData last: cutTest.
+```
+
+The variable `cut` represents the portion of the original iris dataset used for the training: 80% of `irisData` is used for training. The variable `cutTraining` represents the number of `irisData` elements used for the training. Similarly, `cutTest` represents the number of elements for the test. The message `rounded`, when sent to a float value, returns the integer nearest to the float value (_e.g.,_ `4.6 rounded` returns `5`, `4.3 rounded` returns 4, and `4.5 rounded` returns `5`).
+
+We can train a network based on the `trainingData`:
+```
+n := NNetwork new.
+n configure: 4 hidden: 6 nbOfOutputs: 3.
+n train: trainingData nbEpoch: 1000.
+```
+
+We see that the network is able to properly learn `trainingData`, as the error curve is close to 0, similarly than in Figure @fig:networkOnIris.
+
+Consider the script (it only assumes the variable `irisData`):
+
+```Smalltalk
+cut := 0.8.
+cutTraining := (irisData size * cut) rounded.
+cutTest := (irisData size * (1 - cut)) rounded.
+trainingData := irisData first: cutTraining.
+testData := irisData last: cutTest.
+n := NNetwork new.
+n configure: 4 hidden: 6 nbOfOutputs: 3.
+n train: trainingData nbEpoch: 1000.
+
+(((testData collect: [ :d |
+	(n predict: d allButLast) = d last
+]) select: #yourself) size / testData size) round: 2 
+```
+
+Evaluating the script produces a value of 0.9, which represents the accuracy of our network: 90% of the elements contained in `testData` are correctly predicted. 
+
+Consider the last of the script:
+```
+(((testData collect: [ :d |
+	(n predict: d allButLast) = d last
+]) select: #yourself) size / testData size) round: 2 
+```
+
+For all the elements of `testData`, we predict the classification of the input (`d allButLast`) and compare the network result with the expected result (`d last`). The result of the `collect:` instruction is a list of binary values (`true` or `false`). We only select the `true` values (`select: #yourself`), count how many they are (`size`). We then compute the ratio with the size of test data (`/ testData size`). Finally, we only consider a float value with two decimal digits.
+
+*EXERCISE:* Determine the accuracy of the network when a cut of 0.6, 0.5, and 0.4.
+
+Consider a cut of 0.6, as illustrated in the script:
+
+```Smalltalk
+cut := 0.7.
+cutTraining := (irisData size * cut) rounded.
+cutTest := (irisData size * (1 - cut)) rounded.
+trainingData := irisData first: cutTraining.
+testData := irisData last: cutTest.
+n := NNetwork new.
+n configure: 4 hidden: 6 nbOfOutputs: 3.
+n train: trainingData nbEpoch: 1000.
+
+(((testData collect: [ :d |
+	(n predict: d allButLast) = d last
+]) select: #yourself) size / testData size) round: 2 
+```
+
+The result is 0.0, indicating that the network is not able to make any prediction. Why so? Reducing the size of the training data, for example, if cut equals to 0.5, increases the accuracy of the network. This is an effect due to the data organization. 
+
+If we inspect the 150 values of `irisData`, we see that they are actually ordered: the first 50 entries are Iris setosa (the expected value is 0), the subsequent 50 entries are Iris versicolor (the expected value is 1), and the last 50 entries are Iris virginica (the expected value is 2). The fact the original dataset is ordered has an impact on the accuracy of the network. Luckily, this is a problem that is easy to solve: a simple shuffling of the original data will prevent our network to suffer from the entry order.
+
+Consider this new script: 
+
+```Smalltalk
+shuffledIrisData := irisData shuffleBy: (Random seed: 42).
+cut := 0.8.
+cutTraining := (shuffledIrisData size * cut) rounded.
+cutTest := (shuffledIrisData size * (1 - cut)) rounded.
+trainingData := shuffledIrisData first: cutTraining.
+testData := shuffledIrisData last: cutTest.
+n := NNetwork new.
+n configure: 4 hidden: 6 nbOfOutputs: 3.
+n train: trainingData nbEpoch: 1000.
+
+(((testData collect: [ :d |
+	(n predict: d allButLast) = d last
+]) select: #yourself) size / testData size) round: 2 
+```
+
+The script introduces a new variable, called `shuffledIrisData`. It is initialized with `irisData shuffleBy: (Random seed: 42)`, which as the effect to create a copy of `irisData` shuffled using a random number. Not that in case we wish to not use a random number generator and therefore have slightly different result at each run, we could simply use `shuffled` instead of `shuffleBy: (Random seed: 42)`.
 
 ## Normalization
+
+When we presented the perceptron and the sigmoid neuron, we have seen that the activation function is applied to the value $z = w.x + b$. Applied to a neuron with two inputs, we have $z = x1 . w1 + x2 . w2 + b$. In the examples we have considered so far, all the $x_i$ range within a similar interval. In the logical gate example, each $x_i$ is either 0 or 1. In the Iris dataset, we can compute the min and max for each input value:
+
+```Smalltalk
+max := OrderedCollection new.
+min := OrderedCollection new.
+(1 to: 4) collect: [ :i |
+	max add: (irisData collect: [ :d | d at: i ]) max.
+	min add: (irisData collect: [ :d | d at: i ]) min.
+].
+{ max . min }
+```
+
+The script indicates that each of the four input values ranges from 
+0.1 to 7.9. Said in other words, all the input values have a range within the same magnitude.
+
+Why is this important? Consider the example we have previously seen on converting binary numbers to decimal:
+
+```Smalltalk
+n := NNetwork new.
+n configure: 3 hidden: 8 nbOfOutputs: 8.
+
+data := {
+    {0 . 0 . 0 . 0}.
+    {0 . 0 . 1 . 1}.
+    {0 . 1 . 0 . 2}.
+    {0 . 1 . 1 . 3}.
+    {1 . 0 . 0 . 4}.
+    {1 . 0 . 1 . 5}.
+    {1 . 1 . 0 . 6}.
+    {1 . 1 . 1 . 7} }.
+n train: data nbEpoch: 1000.
+```
+
+![Learning the Iris dataset.](06-Data/figures/digitConvertion.png){#fig:digitConvertion}
+
+Figure @fig:digitConvertion shows the error curve of the network. Each input values is either 0 or 1. We will produce a different, but equivalent dataset, by changing the scale of each column. In our revised example, we will make the first input either 0 or 0.1, and the second input either 0 or 1000. Consider:
+
+```Smalltalk
+n := NNetwork new.
+n configure: 3 hidden: 8 nbOfOutputs: 8.
+
+data := {
+    {0 . 0 . 0 . 0}.
+    {0 . 0 . 1 . 1}.
+    {0 . 1000 . 0 . 2}.
+    {0 . 1000 . 1 . 3}.
+    {0.1 . 0 . 0 . 4}.
+    {0.1 . 0 . 1 . 5}.
+    {0.1 . 1000 . 0 . 6}.
+    {0.1 . 1000 . 1 . 7} }.
+n train: data nbEpoch: 10000.
+```
+
+![The Iris dataset oddly scaled.](06-Data/figures/digitConvertionBiased.png){#fig:digitConvertionBiased}
+
+Figure @fig:digitConvertionBiased shows the error curve along the epochs. The evolution of the error has reached a plateau. The reasons is that by changing the scale of a particular input value, the relevance of the input values has been modified.
+
+The sigmoid function returns a value between 0 and 1. Having the same range for the input improve the learning performance. One way to avoid distortion in our data, each input should range between 0 and 1. The process of transforming data from an arbitrary range to  a restricted range is called _normalization_. 
+
+Luckily, normalizing some data is rather simple. Consider the function $f$:
+
+$$
+f(x) = \frac{(x - d_L)(n_H - n_L)}{d_H - d_L} + n_L
+$$
+
+The function $f(x)$ normalize a value x. The variables $d$ represents the high and low values of the data. The variables $n$ represents the desired high and low normalization range.
+
+We can therefore implement the following utility class: 
+
+```Smalltalk
+Object subclass: #Normalization
+	instanceVariableNames: ''
+	classVariableNames: ''
+	package: 'NeuralNetwork'
+```
+
+We then define the method `normalizeData:`, which takes as argument some training data:
+
+```Smalltalk
+Normalization>>normalizeData: aCollectionOfTrainingDataWithExpectedOutput
+	"Normalize the data provided as argument"
+	
+	| nbOfColumns min max |
+	"We exclude the expected output"
+	nbOfColumns := aCollectionOfTrainingDataWithExpectedOutput first size - 1.
+	
+	min := OrderedCollection new.
+	max := OrderedCollection new.
+	1 to: nbOfColumns do: [ :index |
+		| column |
+		column := aCollectionOfTrainingDataWithExpectedOutput collect: [ :row | row at: index ].
+		min add: column min.
+		max add: column max ].
+
+	^ self normalizeData: aCollectionOfTrainingDataWithExpectedOutput min: min max: max
+```
+
+The real work happens in this second method:
+
+```Smalltalk
+Normalization>>normalizeData: aCollectionOfTrainingDataWithExpectedOutput min: minimumValues max: maximumValues
+	| nbOfColumns result mn mx |
+	nbOfColumns := aCollectionOfTrainingDataWithExpectedOutput first size - 1.
+
+	result := OrderedCollection new.
+	aCollectionOfTrainingDataWithExpectedOutput do: [ :row |
+		| t v |
+		t := OrderedCollection new.
+		1 to: nbOfColumns do: [ :index |
+			v := row at: index.
+			mn := minimumValues at: index.
+			mx := maximumValues at: index.
+			t add: ((v - mn) / (mx - mn)) asFloat
+		].
+		t add: row last.
+		result add: t asArray ].
+	^ result asArray
+```
+
+We can test these methods. First we can create a unit test `NormalizationTest`:
+
+```Smalltalk
+TestCase subclass: #NormalizationTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	package: 'NeuralNetwork'
+```
+
+
+```Smalltalk
+NormalizationTest>>testSimpleNormalization
+	| input expectedNormalizedInput |
+	input := { { 10 . 5 . 1 } . { 2 . 6 . 0 } }.
+	expectedNormalizedInput := Normalization new normalizeData: input.
+	self assert: expectedNormalizedInput equals: #(#(1.0 0.0 1) #(0.0 1.0 0))
+```
+
+This small test method illustrates the result of a simple normalization. For example, the first column of the two entries of `input` has 10 as the highest value and 2 as the lowest. The normalization replaces the highest value by 1.0 and the lowest by 0.0. 
+
+Note that the normalization makes sense only if two or more entries are provided as input. We can test erroneous cases:
+
+```Smalltalk
+NormalizationTest>>testError
+	self should: [ Normalization new normalizeData: { { 10 . 5 . 1 } } ] raise: Error.
+	
+```
+
+```Smalltalk
+NormalizationTest>>testError02
+	self should: [ Normalization new normalizeData: { } ] raise: Error.
+```
+
+When a neural network is used for regression returned values are normalized. We therefore need to _denormalize_ them. Consider the function $g$: 
+
+$$
+g(x) = \frac{(d_L - d_H)x - (n_H d_L) + d_H n_L}{n_L - n_H}
+$$
+
+
+
+## What have we seen in this chapter
+
+This chapter was like a long road exploring different aspects of data manipulation. In particular, it explores:
+
+- A simple visualization to monitor the learning of a network
+- The one-hot encoding technique to make a network operates on non-numeric data
+- The Iris dataset as a complete example of applying network network to classify data
+- The relevance of normalizing data before processing
+
+
+
+We have gone through a long road so far. 
 
 Before 
