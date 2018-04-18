@@ -647,10 +647,6 @@ $$
 g(x) = \frac{(d_L - d_H)x - (n_H d_L) + d_H n_L}{n_L - n_H}
 $$
 
-## The complete script
-
-
-
 ## What have we seen in this chapter
 
 This chapter was like a long road exploring different aspects of data manipulation. In particular, it explores:
