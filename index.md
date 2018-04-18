@@ -1,7 +1,7 @@
 
 Agile Artificial Intelligence is a book series that covers classical algorithms commonly assimilated as artificial intelligence techniques. The book series takes a practical approach by presenting all the necessary implementation details. 
 
-# Book 1: Programming Neural Networks in Pharo
+# Book: Programming Neural Networks in Pharo
 
 1. [Introduction](./book/build/01-Introduction.html)
 1. [Perceptron](./book/build/02-Perceptron.html)
@@ -23,8 +23,8 @@ A tremendous effort has been put in these chapters. Although we put a maximum of
 
 So, provide feedback! There are several ways to do so: 
 
-- by entering issues on GitHub (https://github.com/AgileArtificialIntelligence)
-- by chatting with us on Discord, channel #IA (http://pharo.org/community offers an invitation link)
+- by entering issues on [GitHub](https://github.com/AgileArtificialIntelligence)
+- by chatting with us on [Discord, channel #IA](http://pharo.org/community)
 - by sending us an [email](mailto:alexandre.bergel@me.com)
 
 # Future books
