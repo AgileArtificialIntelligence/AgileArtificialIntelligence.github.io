@@ -435,7 +435,7 @@ n train: trainingData nbEpoch: 1000.
 
 Evaluating the script produces a value of 0.9, which represents the accuracy of our network: 90% of the elements contained in `testData` are correctly predicted. 
 
-Consider the last of the script:
+We will now detail the last of the script:
 ```
 (((testData collect: [ :d |
 	(n predict: d allButLast) = d last
@@ -446,7 +446,7 @@ For all the elements of `testData`, we predict the classification of the input (
 
 *EXERCISE:* Determine the accuracy of the network when a cut of 0.6, 0.5, and 0.4.
 
-Consider a cut of 0.6, as illustrated in the script:
+Consider a cut of 0.7, as illustrated in the script:
 
 ```Smalltalk
 cut := 0.7.
@@ -465,7 +465,7 @@ n train: trainingData nbEpoch: 1000.
 
 The result is 0.0, indicating that the network is not able to make any prediction. Why so? Reducing the size of the training data, for example, if cut equals to 0.5, increases the accuracy of the network. This is an effect due to the data organization. 
 
-If we inspect the 150 values of `irisData`, we see that they are actually ordered: the first 50 entries are Iris setosa (the expected value is 0), the subsequent 50 entries are Iris versicolor (the expected value is 1), and the last 50 entries are Iris virginica (the expected value is 2). The fact the original dataset is ordered has an impact on the accuracy of the network. Luckily, this is a problem that is easy to solve: a simple shuffling of the original data will prevent our network to suffer from the entry order.
+If we inspect the 150 values of `irisData`, we see that they are actually ordered: the first 50 entries are Iris setosa (the expected value is 0), the subsequent 50 entries are Iris versicolor (the expected value is 1), and the last 50 entries are Iris virginica (the expected value is 2). The fact that the original dataset is ordered has an impact on the accuracy of the network. Luckily, this is a problem that is easy to solve: a simple shuffling of the original data will prevent our network to suffer from the entry order.
 
 Consider this new script: 
 
@@ -489,7 +489,7 @@ The script introduces a new variable, called `shuffledIrisData`. It is initializ
 
 ## Normalization
 
-When we presented the perceptron and the sigmoid neuron, we have seen that the activation function is applied to the value $z = w.x + b$. Applied to a neuron with two inputs, we have $z = x1 . w1 + x2 . w2 + b$. In the examples we have considered so far, all the $x_i$ range within a similar interval. In the logical gate example, each $x_i$ is either 0 or 1. In the Iris dataset, we can compute the min and max for each input value:
+When we presented the perceptron and the sigmoid neuron, we have seen that the activation function is applied to the value $z = w.x + b$. Applied to a neuron with two inputs, we have $z = x_1 . w_1 + x_2 . w_2 + b$. In the examples we have considered so far, all the $x_i$ range within a similar interval. In the logical gate example, each $x_i$ is either 0 or 1. In the Iris dataset, we can compute the minimum and maximum for each input value:
 
 ```Smalltalk
 max := OrderedCollection new.
@@ -501,7 +501,7 @@ min := OrderedCollection new.
 { max . min }
 ```
 
-The script indicates that each of the four input values ranges from 
+The result of this script indicates that overall, the values ranges from 
 0.1 to 7.9. Said in other words, all the input values have a range within the same magnitude.
 
 Why is this important? Consider the example we have previously seen on converting binary numbers to decimal:
@@ -544,17 +544,17 @@ n train: data nbEpoch: 10000.
 
 ![The Iris dataset oddly scaled.](06-Data/figures/digitConvertionBiased.png){#fig:digitConvertionBiased}
 
-Figure @fig:digitConvertionBiased shows the error curve along the epochs. The evolution of the error has reached a plateau. The reasons is that by changing the scale of a particular input value, the relevance of the input values has been modified.
+Figure @fig:digitConvertionBiased shows the error curve along the epochs. The evolution of the error has reached a plateau. The reasons is that changing the scale of a particular input value affect the relevance of these values.
 
-The sigmoid function returns a value between 0 and 1. Having the same range for the input improve the learning performance. One way to avoid distortion in our data, each input should range between 0 and 1. The process of transforming data from an arbitrary range to  a restricted range is called _normalization_. 
+The sigmoid function returns a value between 0 and 1. Having the same range for the input improves the learning performance. One way to avoid distortion in our data, each input should range between 0 and 1. The process of transforming data from an arbitrary range to  a restricted range is called _normalization_. 
 
-Luckily, normalizing some data is rather simple. Consider the function $f$:
+Luckily, normalizing data is rather simple. Consider the function $f$:
 
 $$
 f(x) = \frac{(x - d_L)(n_H - n_L)}{d_H - d_L} + n_L
 $$
 
-The function $f(x)$ normalize a value x. The variables $d$ represents the high and low values of the data. The variables $n$ represents the desired high and low normalization range.
+The function $f(x)$ normalizes a value $x$. The variables $d$ represents the high and low values of the data. The variables $n$ represents the desired high and low normalization range.
 
 We can therefore implement the following utility class: 
 
@@ -647,6 +647,8 @@ $$
 g(x) = \frac{(d_L - d_H)x - (n_H d_L) + d_H n_L}{n_L - n_H}
 $$
 
+## The complete script
+
 
 
 ## What have we seen in this chapter
@@ -658,8 +660,3 @@ This chapter was like a long road exploring different aspects of data manipulati
 - The Iris dataset as a complete example of applying network network to classify data
 - The relevance of normalizing data before processing
 
-
-
-We have gone through a long road so far. 
-
-Before 

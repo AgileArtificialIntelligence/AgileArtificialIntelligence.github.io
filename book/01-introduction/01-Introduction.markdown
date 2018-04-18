@@ -1,7 +1,7 @@
 ---
-title: "Agile Artificial Intelligence"
+title: "Agile Artificial Intelligence: Programming Neural Networks in Pharo"
 author: [Alexandre Bergel]
-date: 2017-12-13
+date: 2018-04-17
 subject: "Agile Artificial Intelligence"
 tags: [AI, Neural networks, Pharo]
 titlepage: true
