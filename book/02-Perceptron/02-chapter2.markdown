@@ -27,7 +27,7 @@ More formally, for the perceptron given in Figure @fig:perceptron, we write $z =
 
 In the next section we will implement the perceptron model that is both extensible and maintainable. You may wonder what is the big deal about this. After all, the perceptron model may be implemented in a few lines of code. Yes, focusing on the functionalities is just a fraction of our job. Implementing the perceptron model that is testable, well tested, and extensible requires some more work. 
 
-## Implementing the perception
+## Implementing the perceptron
 
 In this section we put our hand to work and implement the perceptron model in the Pharo programming language. We will produce an object-oriented implementation of the model. We will implement a class `Neuron` in a package called `NeuralNetwork`. Our class will have a method called `feed` which will be used to compute the $z$ and output values of the perceptron.
 

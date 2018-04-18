@@ -29,6 +29,11 @@ So, provide feedback! There are several ways to do so:
 # Future books
 _Programming Neural Networks in Pharo_ is the first book of the Agile Artificial Intelligence series. Future book will cover the field of genetic algorithm, unsupervised learning, and reinforcement learning. Stay tuned!
 
+# Big thanks!
+Since the announcement of the book many have encouraged us, provided feedback, and improved the writting. In no particular order, we are grateful to 
+Chris Thorgrimsson, CH, Torsten Bergmann.
+
+
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117765592-1"></script>
 <script>
