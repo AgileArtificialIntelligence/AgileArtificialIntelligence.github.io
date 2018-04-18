@@ -18,8 +18,7 @@ A tremendous effort has been put in these chapters. Although we put a maximum of
 
 - be acknowledged on this website
 - receive a beer next time we meet
-- make me happy
-- make other reader happy
+- make other readers happy
 
 So, provide feedback! There are several ways to do so: 
 
