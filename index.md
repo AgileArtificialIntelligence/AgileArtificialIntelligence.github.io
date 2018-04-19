@@ -31,8 +31,20 @@ _Programming Neural Networks in Pharo_ is the first book of the Agile Artificial
 
 # Big thanks!
 Since the announcement of the book many have encouraged us, provided feedback, and improved the writting. In no particular order, we are grateful to 
-Chris Thorgrimsson, CH, Milton Mamani, Jhonny Cerezo, Oleks Zaytsev, Stéphane Ducasse, Torsten Bergmann, Serge Stinckwich.
+Chris Thorgrimsson, CH, Milton Mamani, Jhonny Cerezo, Oleks Zaytsev, Stéphane Ducasse, Torsten Bergmann, Serge Stinckwich, Alexandre Rousseau.
 
 We are also deeply grateful to 
 - Lam Research for sponsoring part of this work
 - INRIA Chile for helping us with the infrastructure
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-117765592-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-117765592-1');
+</script>
+
+
