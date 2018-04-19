@@ -33,5 +33,6 @@ _Programming Neural Networks in Pharo_ is the first book of the Agile Artificial
 Since the announcement of the book many have encouraged us, provided feedback, and improved the writting. In no particular order, we are grateful to 
 Chris Thorgrimsson, CH, Torsten Bergmann.
 
-
-
+We are also deeply grateful to 
+- Lam Research for sponsoring part of this work
+- INRIA Chile for helping us with the infrastructure
