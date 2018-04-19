@@ -164,7 +164,7 @@ The green bullet next to the method name indicates that the test passes (_i.e.,_
 
 *EXERCISE:* So far, we have only shallowly tested our perceptron. We can improve our tests in two ways:
 
-- Create a new test, called `testSmallExample`, that tests that feeding our perceptron `p` with different values (_e.g.,_ `-2` and `2` gives `0` as result)
+- Augment `testSmallExample` with feeding our perceptron `p` with different values (_e.g.,_ `-2` and `2` gives `0` as result)
 - Test our perceptron with different weights and bias
 
 In general, it is a very good practice to write a good amount of tests, even for a single component unit as for our class `Neuron`.

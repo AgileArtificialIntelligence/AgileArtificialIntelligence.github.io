@@ -37,14 +37,4 @@ We are also deeply grateful to
 - Lam Research for sponsoring part of this work
 - INRIA Chile for helping us with the infrastructure
 
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-117765592-1"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-117765592-1');
-</script>
-
 
