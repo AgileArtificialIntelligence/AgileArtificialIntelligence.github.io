@@ -346,7 +346,7 @@ The way a perceptron learns simply follows the rule: $w_i(t+1) = w_i(t) + (d - z
 
 - $i$ is the weight index
 - $w_i(t)$ is the weight $i$ at a given time $t$
-- $d$ is the difference between the desired value and the actual value
+- $d$ is the desired value
 - $z$ is the actual output of the perceptron
 - $x_i$ corresponds to the provided input at index $i$
 - $\alpha$ is the learning rate
@@ -434,6 +434,19 @@ In `testTrainingOR`, we train the perceptron 40 times on the complete set of exa
 - What is the necessary minimum number of epochs to train `p`? Try to change `25` to a lower value and run the test to see if it still passes.
 - We have shown how to train a perceptron to learn the OR logical gate. Write a method `testTrainingNOR`, `testTrainingAND`, and `testTrainingNOT` for the other gates we have seen.
 - How does the value of the `learningRate` impact the minimum number of epochs for the training?
+
+## Drawing graphs
+
+Drawing graphs is often necessary to monitor progresses made by the network. We will use the Roassal visualization engine to visualize such evolution. Roassal offers the Grapher API, dedicated to draw graphs. You can load Roassal by executing the following in a playground:
+
+```Smalltalk
+Gofer it
+	    smalltalkhubUser: 'ObjectProfile' project: 'Roassal2';
+	    configurationOf: 'Roassal2';
+	    loadStable.
+```
+
+The coming section uses Roassal. Make sure you have it loaded, else part of the code given below will not work or even compile. More information about Roassal may be found on http://AgileVisualization.com.
 
 ## Predicting side of a 2D point
 
