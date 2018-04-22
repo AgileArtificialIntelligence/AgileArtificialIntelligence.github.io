@@ -3,7 +3,7 @@
 
 A neuron, as contained in all eumetozoa brains, is a specialized cell that transmits electrochemical stimulation using an axon to other neurons. Eumetazoans are a major group of animals in the _Five Kingdoms_ classification, which includes mammals.
 
-A neuron, as contained in a mammal brain, is a specialized cell that transmits electrochemical stimulation along its *axon* to other neurons. A neuron receives this nerve impulse via a *dendrite*. Since the early age of computers scientists have tried to produce a computational model of a neuron. The perceptron was one of the first models to mimic the behavior of a neuron.
+A neuron is a specialized cell that transmits electrochemical stimulation along its *axon* to other neurons. A neuron receives this nerve impulse via a *dendrite*. Since the early age of computers scientists have tried to produce a computational model of a neuron. The perceptron was one of the first models to mimic the behavior of a neuron.
 
 This chapter plays two essential roles in this book. First, it presents the notion of perceptron, a fundamental model on which neural networks are built. Second, it provides a gentle introduction to the Pharo programming language.
 
