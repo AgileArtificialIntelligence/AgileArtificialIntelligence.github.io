@@ -109,7 +109,6 @@ NeuronLayer>>neurons
 	^ neurons
 ```
 
-
 We have now defined most of the `NeuronLayer` class. We can now begin testing the class:
 ```Smalltalk
 TestCase subclass: #NeuronLayerTest
@@ -225,7 +224,13 @@ NNetwork>>configure: nbOfInputs hidden: nbOfNeurons1 hidden: nbOfNeurons2 nbOfOu
 	self addLayer: (NeuronLayer new initializeNbOfNeurons: nbOfNeurons2 nbOfWeights: nbOfNeurons1 using: random).
 	self addLayer: (NeuronLayer new initializeNbOfNeurons: nbOfOutput nbOfWeights: nbOfNeurons2 using: random).
 ```
+We also need a way to obtain the number of outputs a neural network can have (we will need this when classifying data):
 
+```Smalltalk
+NNetwork>>numberOfOutputs
+	"Return the number of output of the network"
+	^ layers last numberOfNeurons
+```
 
 We can now tests our network implementation:
 
@@ -242,7 +247,8 @@ NNetworkTest>>testBasic
     | n |
     n := NNetwork new.
     n configure: 2 hidden: 2 nbOfOutputs: 1.
-    self assert: (n feed: { 1 . 3 }) closeTo: #(0.6745388083637035)
+    self assert: (n feed: { 1 . 3 }) closeTo: #(0.6745388083637035).
+    self assert: n numberOfOutputs equals: 1
 ```
 
 As you can see, `testBasic` is rather simplistic. It builds a simple network with two inputs, one hidden layer made of 2 neurons, and an output layer with only one neuron, and run the forward feeding. 
