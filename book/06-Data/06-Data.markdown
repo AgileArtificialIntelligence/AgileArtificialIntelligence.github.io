@@ -12,14 +12,14 @@ n := NNetwork new.
 n configure: 2 hidden: 3 nbOfOutputs: 1.
 
 10000 timesRepeat: [ 
-	n train: { 0 . 0 } desiredOutputs: { 0 }.	
-	n train: { 0 . 1 } desiredOutputs: { 1 }.
-	n train: { 1 . 0 } desiredOutputs: { 1 }.
-	n train: { 1 . 1 } desiredOutputs: { 0 }.
+	n train: #(0 0) desiredOutputs: #(0).	
+	n train: #(0 1) desiredOutputs: #(1).
+	n train: #(1 0) desiredOutputs: #(1).
+	n train: #(1 1) desiredOutputs: #(0).
 ].
 ```
 
-After evaluating this script, the expression `n feed: {1 . 0}` evaluates to `#(0.9735546630024936)`, an array having an expected float value close to 1. If we step back a bit, we see that the script is actually very verbose. For example, why should we manually handle the repetition? Why having the message `train:desiredOutputs:` called so many times? We can greatly simplify the way network are trained by providing a bit of infrastructure.
+After evaluating this script, the expression `n feed: #(1 0)` evaluates to `#(0.9735546630024936)`, an array having an expected float value close to 1. If we step back a bit, we see that the script is actually very verbose. For example, why should we manually handle the repetition? Why having the message `train:desiredOutputs:` called so many times? We can greatly simplify the way network are trained by providing a bit of infrastructure.
 
 Consider the following method:
 
@@ -50,15 +50,14 @@ The method makes the network training significantly less verbose. The script pro
 n := NNetwork new.
 n configure: 2 hidden: 3 nbOfOutputs: 2.
 
-data := {
-	#(0 0 0) .
+data := {#(0 0 0) .
 	#(0 1 1) .
 	#(1 0 1) .
 	#(1 1 0) }.
 n train: data nbEpoch: 10000
 ```
 
-The `data` variable is an array of array of numbers. Each row represents an example and it contains the input values and the output value. For example, the row `#(0 1 1)` represents the line `n train: { 0 . 1 } desiredOutputs: { 1 }` given above. Note that we have two outputs, and not only one. This is the result of using a one-hot encoding for the output. Later on in this chapter we will explain this encoding.
+The `data` variable is an array of array of numbers. Each row represents an example and it contains the input values and the output value. For example, the row `#(0 1 1)` represents the line `n train: #(0 1) desiredOutputs: #(1)` given above. Note that we have two outputs, and not only one. This is the result of using a one-hot encoding for the output. Later on in this chapter we will explain this encoding.
 
 Predicting the output for a given set of input values may be implemented using a `predict:` method:
 
@@ -77,22 +76,21 @@ Another example of using the syntax we have just introduced:
 n := NNetwork new.
 n configure: 3 hidden: 8 nbOfOutputs: 8.
 
-data := {
-	{0 . 0 . 0 . 0}.
-	{0 . 0 . 1 . 1}.
-	{0 . 1 . 0 . 2}.
-	{0 . 1 . 1 . 3}.
-	{1 . 0 . 0 . 4}.
-	{1 . 0 . 1 . 5}.
-	{1 . 1 . 0 . 6}.
-	{1 . 1 . 1 . 7} }.
+data := {#(0 0 0 0).
+	#(0 0 1 1).
+	#(0 1 0 2).
+	#(0 1 1 3).
+	#(1 0 0 4).
+	#(1 0 1 5).
+	#(1 1 0 6).
+	#(1 1 1 7) }.
 n train: data nbEpoch: 1000.
 ```
 
 The code above builds a neural network trained to convert binary numbers into a decimal number. As an example, you can evaluate the following:
 
 ```Smalltalk
-n predict: {0 . 1 . 1}
+n predict: #(0 1 1)
 "==> 3"
 ```
 
@@ -104,15 +102,14 @@ The way `train:nbEpoch:` and `predict:` are implemented enforces the training da
 Let's step back a bit. We have spent more than five chapters motivating, describing, incrementally building neural networks. But we are using a neural network pretty much the way we would use a regular hash map. Consider the following example:
 
 ```Smalltalk
-data := {
-	{0 . 0 . 0 . 0}.
-	{0 . 0 . 1 . 1}.
-	{0 . 1 . 0 . 2}.
-	{0 . 1 . 1 . 3}.
-	{1 . 0 . 0 . 4}.
-	{1 . 0 . 1 . 5}.
-	{1 . 1 . 0 . 6}.
-	{1 . 1 . 1 . 7} }.
+data := {#(0 0 0 0).
+	#(0 0 1 1).
+	#(0 1 0 2).
+	#(0 1 1 3).
+	#(1 0 0 4).
+	#(1 0 1 5).
+	#(1 1 0 6).
+	#(1 1 1 7) }.
 	
 d := Dictionary new.
 data do: [ :anExample |
@@ -125,11 +122,11 @@ The variable `d` is a dictionary filled with the example data. The values we use
 However, a hash map requires the exact same key (or at least adequately answers to the message `=`). A neural network does not requires the exact same input values. Consider the following expression:
 
 ```Smalltalk
-n predict: {0.4 . 0.7 . 0.6}
+n predict: #(0.4 0.7 0.6)
 "==> 3"
 ```
 
-The network somehow matches the input values `{0.4 . 0.7 . 0.6}` to `{0 . 1 . 1}`, which returns the value `3`. A hashmap is not able to do such a connection without the programmer to explicitly doing so.
+The network somehow matches the input values `#(0.4 0.7 0.6)` to `#(0 1 1)`, which returns the value `3`. A hashmap is not able to do such a connection without the programmer to explicitly doing so.
 
 ## Visualizing the error and the topology
 
@@ -182,8 +179,7 @@ Inspecting the following code snippet displays the error curve (Figure @fig:erro
 n := NNetwork new.
 n configure: 2 hidden: 3 nbOfOutputs: 2.
 
-data := {
-    #(0 0 0) .
+data := {#(0 0 0) .
     #(0 1 1) .
     #(1 0 1) .
     #(1 1 0) }.
@@ -222,6 +218,13 @@ NNetwork>>viewNetwork
 	^ b view
 ```
 
+Defining the helper method as:
+
+```Smalltalk
+NNetwork>>numberOfInputs
+	^ layers first neurons size
+```
+
 Similarly, we need to extend GTInspector to consider the visualization within GTInspector (Figure @fig:networkTopology):
 
 ```Smalltalk
@@ -247,8 +250,7 @@ In some case, the error curve may indicates some contradiction in the data. Cons
 n := NNetwork new.
 n configure: 2 hidden: 3 nbOfOutputs: 2.
 
-data := {
-   	#(0 0 0) .
+data := {#(0 0 0) .
 	#(0 0 1) }.
 n train: data nbEpoch: 1000.
 ```
@@ -279,8 +281,7 @@ We have defined the XOR dataset as:
 n := NNetwork new.
 n configure: 2 hidden: 3 nbOfOutputs: 2.
 
-data := {
-	#(0 0 0) .
+data := {#(0 0 0) .
 	#(0 1 1) .
 	#(1 0 1) .
 	#(1 1 0) }.
@@ -510,15 +511,14 @@ Why is this important? Consider the example we have previously seen on convertin
 n := NNetwork new.
 n configure: 3 hidden: 8 nbOfOutputs: 8.
 
-data := {
-    {0 . 0 . 0 . 0}.
-    {0 . 0 . 1 . 1}.
-    {0 . 1 . 0 . 2}.
-    {0 . 1 . 1 . 3}.
-    {1 . 0 . 0 . 4}.
-    {1 . 0 . 1 . 5}.
-    {1 . 1 . 0 . 6}.
-    {1 . 1 . 1 . 7} }.
+data := {#(0 0 0 0).
+    #(0 0 1 1).
+    #(0 1 0 2).
+    #(0 1 1 3).
+    #(1 0 0 4).
+    #(1 0 1 5).
+    #(1 1 0 6).
+    #(1 1 1 7) }.
 n train: data nbEpoch: 1000.
 ```
 
@@ -530,15 +530,14 @@ Figure @fig:digitConvertion shows the error curve of the network. Each input val
 n := NNetwork new.
 n configure: 3 hidden: 8 nbOfOutputs: 8.
 
-data := {
-    {0 . 0 . 0 . 0}.
-    {0 . 0 . 1 . 1}.
-    {0 . 1000 . 0 . 2}.
-    {0 . 1000 . 1 . 3}.
-    {0.1 . 0 . 0 . 4}.
-    {0.1 . 0 . 1 . 5}.
-    {0.1 . 1000 . 0 . 6}.
-    {0.1 . 1000 . 1 . 7} }.
+data := {#(0 0 0 0).
+    #(0 0 1 1).
+    #(0 1000 0 2).
+    #(0 1000 1 3).
+    #(0.1 0 0 4).
+    #(0.1 0 1 5).
+    #(0.1 1000 0 6).
+    #(0.1 1000 1 7) }.
 n train: data nbEpoch: 10000.
 ```
 
@@ -621,7 +620,7 @@ TestCase subclass: #NormalizationTest
 ```Smalltalk
 NormalizationTest>>testSimpleNormalization
 	| input expectedNormalizedInput |
-	input := { { 10 . 5 . 1 } . { 2 . 6 . 0 } }.
+	input := #( #(10 5 1) #(2 6 0) ).
 	expectedNormalizedInput := Normalization new normalizeData: input.
 	self assert: expectedNormalizedInput equals: #(#(1.0 0.0 1) #(0.0 1.0 0))
 ```
@@ -632,13 +631,13 @@ Note that the normalization makes sense only if two or more entries are provided
 
 ```Smalltalk
 NormalizationTest>>testError
-	self should: [ Normalization new normalizeData: { { 10 . 5 . 1 } } ] raise: Error.
+	self should: [ Normalization new normalizeData: #( #(10 5 1) ) ] raise: Error.
 	
 ```
 
 ```Smalltalk
-NormalizationTest>>testError02
-	self should: [ Normalization new normalizeData: { } ] raise: Error.
+NormalizationTest>>testEmptyError
+	self should: [ Normalization new normalizeData: #() ] raise: Error.
 ```
 
 When a neural network is used for regression returned values are normalized. We therefore need to _denormalize_ them. Consider the function $g$: 
