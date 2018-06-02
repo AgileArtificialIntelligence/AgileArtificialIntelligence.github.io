@@ -1,0 +1,4 @@
+Genetic programming
+
+
+Programming by example: identifying rules that performs some string manipulations. Look for "Neural Programming by Example"
