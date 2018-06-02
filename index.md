@@ -7,10 +7,12 @@ Agile Artificial Intelligence is a book series that covers classical algorithms 
 1. [Perceptron](./book/build/02-Perceptron.html)
 1. [Neuron](./book/build/03-Neuron.html)
 1. [Neural network](./book/build/04-NeuralNetwork.html)
-1. [Theory on Neural Networks](./book/build/05-Learning.html)
-1. [Application: Classifying data](./book/build/06-Data.html)
-1. Application: the Snake game
+1. [Theory on neural networks](./book/build/05-Learning.html)
+1. [Application: classifying data](./book/build/06-Data.html)
+1. Application: autoencoding
 1. Application: the Pong game
+1. Recurrent network
+1. Application: poem generation
 
 # Hey Reader!
 
@@ -31,7 +33,7 @@ _Programming Neural Networks in Pharo_ is the first book of the Agile Artificial
 
 # Big thanks!
 Since the announcement of the book many have encouraged us, provided feedback, and improved the writting. In no particular order, we are grateful to 
-Chris Thorgrimsson, CH, Milton Mamani, Jhonny Cerezo, Oleks Zaytsev, Stéphane Ducasse, Torsten Bergmann, Serge Stinckwich, Alexandre Rousseau, Sean P. DeNigris, Julián Grigera, Cesar Rabak, Yvan Guemkam.
+Chris Thorgrimsson, CH, Milton Mamani, Jhonny Cerezo, Oleks Zaytsev, Stéphane Ducasse, Torsten Bergmann, Serge Stinckwich, Alexandre Rousseau, Sean P. DeNigris, Julián Grigera, Cesar Rabak, Yvan Guemkam, John Borden.
 
 We are also deeply grateful to 
 - Lam Research for sponsoring part of this work
