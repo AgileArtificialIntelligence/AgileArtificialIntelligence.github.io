@@ -189,13 +189,13 @@ PerceptronTest>>testAND
     | p |
 	p := Neuron new.
 	p step. "<= new line"
-    p weights: { 1 . 1 }.
+    p weights: #(1 1).
     p bias: -1.5.
     
-    self assert: (p feed: { 0 . 0 }) equals: 0.
-    self assert: (p feed: { 0 . 1 }) equals: 0.
-    self assert: (p feed: { 1 . 0 }) equals: 0.
-    self assert: (p feed: { 1 . 1 }) equals: 1.
+    self assert: (p feed: #(0 0)) equals: 0.
+    self assert: (p feed: #(0 1)) equals: 0.
+    self assert: (p feed: #(1 0)) equals: 0.
+    self assert: (p feed: #(1 1)) equals: 1.
 ```
 
 Adding the call to `step` make the neuron behaves as a perceptron. Omitting this line would instead use a sigmoid neuron, and the tests would fail since the output would not exactly be `0` or `1`.
@@ -219,20 +219,20 @@ We can then train a neuron to learn some logical gates. The following method is 
 NeuronTest>>testTrainingAND
 	| p |
 	p := Neuron new.
-	p weights: {-1 . -1}.
+	p weights: #(-1 -1).
 	p bias: 2.
 	
 	5000
 		timesRepeat: [ 
-			p train: {0 . 0} desiredOutput: 0.
-			p train: {0 . 1} desiredOutput: 0.
-			p train: {1 . 0} desiredOutput: 0.
-			p train: {1 . 1} desiredOutput: 1 ].
+			p train: #(0 0) desiredOutput: 0.
+			p train: #(0 1) desiredOutput: 0.
+			p train: #(1 0) desiredOutput: 0.
+			p train: #(1 1) desiredOutput: 1 ].
 		
-	self assert: ((p feed: {0 . 0}) closeTo: 0 precision: 0.1).
-	self assert: ((p feed: {0 . 1}) closeTo: 0 precision: 0.1).
-	self assert: ((p feed: {1 . 0}) closeTo: 0 precision: 0.1).
-	self assert: ((p feed: {1 . 1}) closeTo: 1 precision: 0.1).
+	self assert: ((p feed: #(0 0)) closeTo: 0 precision: 0.1).
+	self assert: ((p feed: #(0 1)) closeTo: 0 precision: 0.1).
+	self assert: ((p feed: #(1 0)) closeTo: 0 precision: 0.1).
+	self assert: ((p feed: #(1 1)) closeTo: 1 precision: 0.1).
 ```
 
 There are two differences:
@@ -245,20 +245,20 @@ Similarly we can train a sigmoid neuron to learn the OR behavior:
 NeuronTest>>testTrainingOR
 	| p |
 	p := Neuron new.
-	p weights: {-1 . -1}.
+	p weights: #(-1 -1).
 	p bias: 2.
 	
 	5000
 		timesRepeat: [ 
-			p train: {0 . 0} desiredOutput: 0.
-			p train: {0 . 1} desiredOutput: 1.
-			p train: {1 . 0} desiredOutput: 1.
-			p train: {1 . 1} desiredOutput: 1 ].
+			p train: #(0 0) desiredOutput: 0.
+			p train: #(0 1) desiredOutput: 1.
+			p train: #(1 0) desiredOutput: 1.
+			p train: #(1 1) desiredOutput: 1 ].
 		
-	self assert: ((p feed: {0 . 0}) closeTo: 0 precision: 0.1).
-	self assert: ((p feed: {0 . 1}) closeTo: 1 precision: 0.1).
-	self assert: ((p feed: {1 . 0}) closeTo: 1 precision: 0.1).
-	self assert: ((p feed: {1 . 1}) closeTo: 1 precision: 0.1).
+	self assert: ((p feed: #(0 0)) closeTo: 0 precision: 0.1).
+	self assert: ((p feed: #(0 1)) closeTo: 1 precision: 0.1).
+	self assert: ((p feed: #(1 0)) closeTo: 1 precision: 0.1).
+	self assert: ((p feed: #(1 1)) closeTo: 1 precision: 0.1).
 ```
 
 As you can see, using a sigmoid neuron does not mess up our tests. We simply need (i) to increase the number of epochs to which we train the neuron, and we need (ii) to be more careful when comparing floating values.
@@ -276,19 +276,19 @@ learningCurveNeuron := OrderedCollection new.
 0 to: 1000 do: [ :nbOfTrained |
     r := Random new seed: 42.
     p := Neuron new.
-    p weights: {-1 . -1}.
+    p weights: #(-1 -1).
     p bias: 2.
 
     nbOfTrained timesRepeat: [ 
-        p train: {0 . 0} desiredOutput: 0.
-        p train: {0 . 1} desiredOutput: 0.
-        p train: {1 . 0} desiredOutput: 0.
-        p train: {1 . 1} desiredOutput: 1 ].
+        p train: #(0 0) desiredOutput: 0.
+        p train: #(0 1) desiredOutput: 0.
+        p train: #(1 0) desiredOutput: 0.
+        p train: #(1 1) desiredOutput: 1 ].
    
-    res :=  ((p feed: {0 . 0}) - 0) abs + 
-            ((p feed: {0 . 1}) - 0) abs +
-            ((p feed: {1 . 0}) - 0) abs +
-            ((p feed: {1 . 1}) - 1) abs.
+    res :=  ((p feed: #(0 0)) - 0) abs + 
+            ((p feed: #(0 1)) - 0) abs +
+            ((p feed: #(1 0)) - 0) abs +
+            ((p feed: #(1 1)) - 1) abs.
      learningCurveNeuron add: res / 4.
     
 ].
@@ -298,19 +298,19 @@ learningCurvePerceptron := OrderedCollection new.
     r := Random new seed: 42.
     p := Neuron new.
 	 p step.
-    p weights: {-1 . -1}.
+    p weights: #(-1 -1).
     p bias: 2.
 
     nbOfTrained timesRepeat: [ 
-        p train: {0 . 0} desiredOutput: 0.
-        p train: {0 . 1} desiredOutput: 0.
-        p train: {1 . 0} desiredOutput: 0.
-        p train: {1 . 1} desiredOutput: 1 ].
+        p train: #(0 0) desiredOutput: 0.
+        p train: #(0 1) desiredOutput: 0.
+        p train: #(1 0) desiredOutput: 0.
+        p train: #(1 1) desiredOutput: 1 ].
    
-    res :=  ((p feed: {0 . 0}) - 0) abs + 
-            ((p feed: {0 . 1}) - 0) abs +
-            ((p feed: {1 . 0}) - 0) abs +
-            ((p feed: {1 . 1}) - 1) abs.
+    res :=  ((p feed: #(0 0)) - 0) abs + 
+            ((p feed: #(0 1)) - 0) abs +
+            ((p feed: #(1 0)) - 0) abs +
+            ((p feed: #(1 1)) - 1) abs.
      learningCurvePerceptron add: res / 4.
     
 ].

@@ -128,9 +128,11 @@ NeuronLayerTest>>testBasic
 
 	self assert: nl isOutputLayer.
 
-	result := nl feed: { 1 . 2 . 3 . 4 }.
+	result := nl feed: $(1 2 3 4).
 	self assert: result size equals: 3.
- 	self assert: result closeTo: #(0.037000501309787576 0.9051275824569505 0.9815269659126287)
+	result
+		with: #(0.03700050130978758 0.9051275824569505 0.9815269659126287)
+		do: [ :res :test | self assert: (res closeTo: test precision: 0.0000000001) ]
 ```
 
 The method `testBasic` create a new neuron layer, composed of 3 neurons, each having 4 weights and 1 bias. The weights and biases are initialized using the random number generator `r`.
@@ -142,18 +144,17 @@ NeuronLayerTest>>testOutputLayer
 	random := Random seed: 42.
 	nl1 := NeuronLayer new.
 	nl1 initializeNbOfNeurons: 3 nbOfWeights: 4 using: random.
-
 	nl2 := NeuronLayer new.
 	nl2 initializeNbOfNeurons: 4 nbOfWeights: 3 using: random.
 	nl1 nextLayer: nl2.
-
 	self deny: nl1 isOutputLayer.
 	self assert: nl2 isOutputLayer.
-
-	result := nl1 feed: { 1 . 2 . 3 . 4 }.
+	result := nl1 feed: #(1 2 3 4).
 	"Since nl2 has 4 neurons, we will obtain 4 outputs"
 	self assert: result size equals: 4.
- 	self assert: result closeTo: #(0.030894022895187584 0.9220488835263312 0.5200462953493653 0.20276557516858304)
+	result
+		with: #(0.03089402289518759 0.9220488835263312 0.5200462953493654 0.20276557516858304)
+		do: [ :r :test | self assert: (r closeTo: test precision: 0.0000000001) ]
 ```
 
 We can now wrap a chain of layers into a neural network.
@@ -247,7 +248,7 @@ NNetworkTest>>testBasic
     | n |
     n := NNetwork new.
     n configure: 2 hidden: 2 nbOfOutputs: 1.
-    self assert: (n feed: { 1 . 3 }) closeTo: #(0.6745388083637035).
+    self assert: ((n feed: #(1 3)) anyOne closeTo: 0.6745388083637036 precision: 0.0000000001)
     self assert: n numberOfOutputs equals: 1
 ```
 
@@ -441,16 +442,16 @@ NNetworkTest>>testXOR
 	n configure: 2 hidden: 3 nbOfOutputs: 1.
 
 	10000 timesRepeat: [ 
-		n train: { 0 . 0 } desiredOutputs: { 0 }.	
-		n train: { 0 . 1 } desiredOutputs: { 1 }.
-		n train: { 1 . 0 } desiredOutputs: { 1 }.
-		n train: { 1 . 1 } desiredOutputs: { 0 }.
+		n train: #(0 0) desiredOutputs: #(0).	
+		n train: #(0 1) desiredOutputs: #(1).
+		n train: #(1 0) desiredOutputs: #(1).
+		n train: #(1 1) desiredOutputs: #(0).
 	].
 
-	self assert: (n feed: { 0 . 0 }) first < 0.1.
-	self assert: (n feed: { 0 . 1 }) first > 0.9.
-	self assert: (n feed: { 1 . 0 }) first > 0.9.
-	self assert: (n feed: { 1 . 1 }) first < 0.1.
+	self assert: (n feed: #(0 0)) first < 0.1.
+	self assert: (n feed: #(0 1)) first > 0.9.
+	self assert: (n feed: #(1 0)) first > 0.9.
+	self assert: (n feed: #(1 1)) first < 0.1.
 ```
 
 If you try to decrease the `10000` to a low value, `10` for example, the network does not receive enough training and the test ultimately fails.

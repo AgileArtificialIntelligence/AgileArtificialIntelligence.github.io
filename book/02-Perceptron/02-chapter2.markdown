@@ -411,20 +411,20 @@ We can now train a perceptron to actually learn how to express the logical gates
 PerceptronTest>>testTrainingOR
 	| p |
 	p := Neuron new.
-	p weights: { -1 . -1 }.
+	p weights: #(-1 -1).
 	p bias: 2.
 	
 	40 timesRepeat: [ 
-		p train: { 0 . 0 } desiredOutput: 0.
-		p train: { 0 . 1 } desiredOutput: 1.
-		p train: { 1 . 0 } desiredOutput: 1.
-		p train: { 1 . 1 } desiredOutput: 1.
+		p train: #(0 0) desiredOutput: 0.
+		p train: #(0 1) desiredOutput: 1.
+		p train: #(1 0) desiredOutput: 1.
+		p train: #(1 1) desiredOutput: 1.
 	].
 	
-	self assert: (p feed: { 0 . 0 }) equals: 0.
-	self assert: (p feed: { 0 . 1 }) equals: 1.
-	self assert: (p feed: { 1 . 0 }) equals: 1.
-	self assert: (p feed: { 1 . 1 }) equals: 1.
+	self assert: (p feed: #(0 0)) equals: 0.
+	self assert: (p feed: #(0 1)) equals: 1.
+	self assert: (p feed: #(1 0)) equals: 1.
+	self assert: (p feed: #(1 1)) equals: 1.
 ~~~~~~~
 
 The method `testTrainingOR` first creates a perceptron with some arbitrary weights and bias. We successfully train it with the four possible combinations of the OR logical gate. After the training, we test the perceptron to see if it has properly learned.
@@ -621,7 +621,7 @@ f := [ :x | (-2 * x) - 3 ].
 0 to: 2000 by: 10 do: [ :nbOfTrained |
 	r := Random new seed: 42.
 	p := Neuron new.
-	p weights: { 1 . 2 }.
+	p weights: #(1 2).
 	p bias: -1.
 
 	nbOfTrained timesRepeat: [ 
