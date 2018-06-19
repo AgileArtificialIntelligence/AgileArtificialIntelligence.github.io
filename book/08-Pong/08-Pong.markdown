@@ -1,5 +1,5 @@
 
-# Pong
+# Application: The Pong Game
 
 Pong game is one of the earliest video game ever produced. It represents a tennis-like game in which a ball bounces upon two adversaries rackets. Each player can move the racket horizontally. 
 
@@ -249,7 +249,7 @@ PGame>>configureGameAreaIn: v
 
 ### The PAbstractElement class
 
-The class `PAbstractElement` is the root of all the element in the game. It is a rather simple class that contains the initial position and initial color. 
+The class `PAbstractElement` is the root class of all the element abstractions in the game. It is a rather simple class that contains the initial position and an initial color. 
 
 ```Smalltalk
 Object subclass: #PAbstractElement
@@ -283,14 +283,12 @@ PAbstractElement>>element
 	^ element
 ```
 
-It also defines the `createElement` abstract methods, which means that subclasses have to implement `createElement`:
+The class `PAbstractElement` also defines the `createElement` abstract methods, which means that subclasses have to implement `createElement`:
 
 ```Smalltalk
 PAbstractElement>>createElement
 	self subclassResponsibility 
 ```
-
-
 
 ### The PBall class
 
@@ -329,7 +327,7 @@ PBall>>bounceVertically
 	speedY := speedY negated
 ```
 
-The visual representation of the ball is a circle:
+The visual representation of the ball is an ellipse, with the same `height` and `width`:
 
 ```Smalltalk
 PBall>>createElement
@@ -348,6 +346,7 @@ Reseting a ball moves it to its original position:
 PBall>>reset
 	self element translateTo: initialPosition.
 ```
+As we have previously seen, a ball is reset when it leaves the game area.
 
 The size has to be set and accessed:
 
@@ -355,6 +354,7 @@ The size has to be set and accessed:
 PBall>>size
 	^ initialSize 
 ```
+
 ```Smalltalk
 PBall>>size: anInitialSize
 	initialSize := anInitialSize  
@@ -390,7 +390,7 @@ PBall>>beat
 
 ### The PBrick class
 
-
+The `PBrick` class describes a wall, or any kind of obstacles. 
 
 ```Smalltalk
 PAbstractElement subclass: #PBrick
@@ -399,6 +399,7 @@ PAbstractElement subclass: #PBrick
 	package: 'NeuralNetwork-Pong'
 ```
 
+When built, a brick is a square-like gray obstacle:
 
 ```Smalltalk
 PBrick>>initialize
@@ -408,6 +409,8 @@ PBrick>>initialize
 	self width: 20.
 	self height: 20.
 ```
+
+Similarly as earlier, the method `createElement` has to return a Roassal visual element:
 
 ```Smalltalk
 PBrick>>createElement
@@ -420,6 +423,7 @@ PBrick>>createElement
 	^ element
 ```
 
+We also need a few methods to set the brick dimension:
 ```Smalltalk
 PBrick>>height
 	^ initialHeight
@@ -440,12 +444,18 @@ PBrick>>width: anInteger
 
 ### The PRacket class
 
+The class `PRacket` is the last class to be implemented before being able to play the pong game. To keep the code short, we make the class `PRacket` a subclass of `PBrick`. Conceptually, this may not be true (_is a racket an obstacle?_). The class is defined as follows:
+
 ```Smalltalk
 PBrick subclass: #PRacket
 	instanceVariableNames: 'isLearning game records network mouseX minimums maximums'
 	classVariableNames: ''
 	package: 'NeuralNetwork-Pong'
 ```
+
+A racket has a boolean variable `isLearning`, indicating whether the racket is controlled by a human, and therefore is gathering some data. It also has a reference to the game, with is useful to access the balls. The `records` variable is a collection containing the records. This variable contains what the neural network has to learn. The variable `records` will be used in the method `record`, `records`, and `trainNeuralNetwork`, described later on. 
+The variable `mouseX` represents the X-component of the mouse cursor. This is useful when a human steers the racket. The `minimums` and `maximums` variables are two collections containing the minimum and maximum of the records kept in `records`. This is useful to perform the data normalization of the records.
+
 ```Smalltalk
 PRacket>>initialize
 	super initialize.

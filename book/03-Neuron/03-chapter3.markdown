@@ -83,14 +83,14 @@ ActivationFunction subclass: #SigmoidAF
 We first implement the `eval:` function:
 
 ```Smalltalk
-SigmoidAF>>>eval: z
+SigmoidAF>>eval: z
 	^ 1 / (1 + z negated exp)
 ```
 
 We then implement the `derivative:` method, which represents the mathematical derivative of `eval:`:
 
 ```Smalltalk
-SigmoidAF>>>derivative: output
+SigmoidAF>>derivative: output
 	^ output * (1 - output)
 ```
 

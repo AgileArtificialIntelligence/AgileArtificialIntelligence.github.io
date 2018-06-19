@@ -1,5 +1,5 @@
 
-# Learning
+# Theory on Learning
 
 Understanding the learning algorithm of neural network involves a fair dose of mathematical notations. This chapters is by no means a complete description of how network learn. Other people have done excellent job at accurately describing what is the theoretical foundation of learning and optimization mechanisms. Instead, this chapter is meant to backup some aspects of the implementation we gave in the previous chapters. 
 

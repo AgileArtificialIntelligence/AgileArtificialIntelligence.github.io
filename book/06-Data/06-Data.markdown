@@ -1,5 +1,5 @@
 
-# Classification 
+# Application: Classifying Data
 
 This chapter covers the classification of data, which is one of the most prominent applications of neural networks.
 
@@ -11,7 +11,7 @@ In the previous chapter, we have seen that we can obtain a trained neural networ
 n := NNetwork new.
 n configure: 2 hidden: 3 nbOfOutputs: 1.
 
-10000 timesRepeat: [ 
+20000 timesRepeat: [ 
 	n train: #(0 0) desiredOutputs: #(0).	
 	n train: #(0 1) desiredOutputs: #(1).
 	n train: #(1 0) desiredOutputs: #(1).
@@ -19,7 +19,7 @@ n configure: 2 hidden: 3 nbOfOutputs: 1.
 ].
 ```
 
-After evaluating this script, the expression `n feed: #(1 0)` evaluates to `#(0.9735546630024936)`, an array having an expected float value close to 1. If we step back a bit, we see that the script is actually very verbose. For example, why should we manually handle the repetition? Why having the message `train:desiredOutputs:` called so many times? We can greatly simplify the way network are trained by providing a bit of infrastructure.
+After evaluating this script, the expression `n feed: #(1 0)` evaluates to `#(0.9530556769505442)`, an array having an expected float value close to 1. If we step back a bit, we see that the script is actually very verbose. For example, why should we manually handle the repetition? Why having the message `train:desiredOutputs:` called so many times? We can greatly simplify the way network are trained by providing a bit of infrastructure.
 
 Consider the following method:
 
@@ -54,7 +54,7 @@ data := {#(0 0 0) .
 	#(0 1 1) .
 	#(1 0 1) .
 	#(1 1 0) }.
-n train: data nbEpoch: 10000
+n train: data nbEpoch: 20000
 ```
 
 The `data` variable is an array of array of numbers. Each row represents an example and it contains the input values and the output value. For example, the row `#(0 1 1)` represents the line `n train: #(0 1) desiredOutputs: #(1)` given above. Note that we have two outputs, and not only one. This is the result of using a one-hot encoding for the output. Later on in this chapter we will explain this encoding.
@@ -126,7 +126,7 @@ n predict: #(0.4 0.7 0.6)
 "==> 3"
 ```
 
-The network somehow matches the input values `#(0.4 0.7 0.6)` to `#(0 1 1)`, which returns the value `3`. A hashmap is not able to do such a connection without the programmer to explicitly doing so.
+The network somehow matches the input values `#(0.4 0.7 0.6)` to `#(0 1 1)`, which returns the value `3`. A hashmap is not able to do such a connection without the programmer to explicitly doing so, and that is the whole point of neural networks: establishing connections between input data and identifying the most relevant data, without any intervention of the programmer.
 
 ## Visualizing the error and the topology
 
@@ -223,6 +223,13 @@ Defining the helper method as:
 ```Smalltalk
 NNetwork>>numberOfInputs
 	^ layers first neurons size
+```
+
+and the method:
+
+```Smalltalk
+NNetwork>>numberOfNeurons
+	^ (layers collect: #numberOfNeurons) sum
 ```
 
 Similarly, we need to extend GTInspector to consider the visualization within GTInspector (Figure @fig:networkTopology):
@@ -322,6 +329,8 @@ In order to feed a network with the iris data set, we need to perform the follow
 The following script exactly performs these five steps:
 
 ```Smalltalk
+"The execution of this script initializes the variable irisData.
+This variable is used in the subsequent scripts of this chapter"
 irisCSV := (ZnEasy get: 'https://agileartificialintelligence.github.io/Datasets/iris.csv') contents.
 lines := irisCSV lines. 
 lines := lines allButFirst.
@@ -376,15 +385,7 @@ The code above builds a network with 4 input values, one hidden layer with 6 neu
 
 Figure @fig:networkOnIris represents the error curve of the network. As you can see, the curves is very close to 0, which indicates that the network is learning and the dataset does not have contradiction. 
 
-The configuration of our network has two parameters: the number of neurons in the hidden layers, and the number of epochs to consider. 
-
-There are no general rules on how to pick these parameters. For example, if we choose a hidden layer large of 90 neurons, then the error curve seems to reach a plateau. The network seems to not be able to learn, as the following example shows (the execution time is much longer):
-
-```Smalltalk
-n := NNetwork new.
-n configure: 4 hidden: 90 nbOfOutputs: 3.
-n train: irisData nbEpoch: 1000.
-```
+The configuration of our network has two parameters: the number of neurons in the hidden layers, and the number of epochs to consider. There are no general rules on how to pick these parameters. Experiments and ad-hoc tries remain the easiest approach to configure a network.
 
 ## Training vs test dataset
 
@@ -431,7 +432,7 @@ n train: trainingData nbEpoch: 1000.
 
 (((testData collect: [ :d |
 	(n predict: d allButLast) = d last
-]) select: #yourself) size / testData size) round: 2 
+]) select: #yourself) size / testData size) asFloat round: 2 
 ```
 
 Evaluating the script produces a value of 0.9, which represents the accuracy of our network: 90% of the elements contained in `testData` are correctly predicted. 
@@ -440,7 +441,7 @@ We will now detail the last of the script:
 ```
 (((testData collect: [ :d |
 	(n predict: d allButLast) = d last
-]) select: #yourself) size / testData size) round: 2 
+]) select: #yourself) size / testData size) asFloat round: 2 
 ```
 
 For all the elements of `testData`, we predict the classification of the input (`d allButLast`) and compare the network result with the expected result (`d last`). The result of the `collect:` instruction is a list of binary values (`true` or `false`). We only select the `true` values (`select: #yourself`), count how many they are (`size`). We then compute the ratio with the size of test data (`/ testData size`). Finally, we only consider a float value with two decimal digits.
@@ -461,7 +462,7 @@ n train: trainingData nbEpoch: 1000.
 
 (((testData collect: [ :d |
 	(n predict: d allButLast) = d last
-]) select: #yourself) size / testData size) round: 2 
+]) select: #yourself) size / testData size) asFloat round: 2 
 ```
 
 The result is 0.0, indicating that the network is not able to make any prediction. Why so? Reducing the size of the training data, for example, if cut equals to 0.5, increases the accuracy of the network. This is an effect due to the data organization. 
@@ -483,7 +484,7 @@ n train: trainingData nbEpoch: 1000.
 
 (((testData collect: [ :d |
 	(n predict: d allButLast) = d last
-]) select: #yourself) size / testData size) round: 2 
+]) select: #yourself) size / testData size) asFloat round: 2 
 ```
 
 The script introduces a new variable, called `shuffledIrisData`. It is initialized with `irisData shuffleBy: (Random seed: 42)`, which as the effect to create a copy of `irisData` shuffled using a random number. Not that in case we wish to not use a random number generator and therefore have slightly different result at each run, we could simply use `shuffled` instead of `shuffleBy: (Random seed: 42)`.

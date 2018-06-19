@@ -109,6 +109,13 @@ NeuronLayer>>neurons
 	^ neurons
 ```
 
+We also need the size of the layer to be accessible:
+```Smalltalk
+NeuronLayer>>numberOfNeurons
+	"Return the number of neurons in the layer"
+	^ neurons size
+```
+
 We have now defined most of the `NeuronLayer` class. We can now begin testing the class:
 ```Smalltalk
 TestCase subclass: #NeuronLayerTest
@@ -128,7 +135,7 @@ NeuronLayerTest>>testBasic
 
 	self assert: nl isOutputLayer.
 
-	result := nl feed: $(1 2 3 4).
+	result := nl feed: #(1 2 3 4).
 	self assert: result size equals: 3.
 	result
 		with: #(0.03700050130978758 0.9051275824569505 0.9815269659126287)
@@ -241,14 +248,14 @@ TestCase subclass: #NNetworkTest
 	classVariableNames: ''
 	package: 'NeuralNetwork'
 ```
-
+Our first test could be:
 
 ```Smalltalk
 NNetworkTest>>testBasic
     | n |
     n := NNetwork new.
     n configure: 2 hidden: 2 nbOfOutputs: 1.
-    self assert: ((n feed: #(1 3)) anyOne closeTo: 0.6745388083637036 precision: 0.0000000001)
+    self assert: ((n feed: #(1 3)) anyOne closeTo: 0.6745388083637036 precision: 0.0000000001).
     self assert: n numberOfOutputs equals: 1
 ```
 
@@ -441,7 +448,7 @@ NNetworkTest>>testXOR
 	n := NNetwork new.
 	n configure: 2 hidden: 3 nbOfOutputs: 1.
 
-	10000 timesRepeat: [ 
+	20000 timesRepeat: [ 
 		n train: #(0 0) desiredOutputs: #(0).	
 		n train: #(0 1) desiredOutputs: #(1).
 		n train: #(1 0) desiredOutputs: #(1).
@@ -454,7 +461,7 @@ NNetworkTest>>testXOR
 	self assert: (n feed: #(1 1)) first < 0.1.
 ```
 
-If you try to decrease the `10000` to a low value, `10` for example, the network does not receive enough training and the test ultimately fails.
+If you try to decrease the `20000` to a low value, `1000` for example, the network does not receive enough training and the test ultimately fails.
 
 ## What have we seen in this chapter
 
