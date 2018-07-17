@@ -456,6 +456,9 @@ PBrick subclass: #PRacket
 A racket has a boolean variable `isLearning`, indicating whether the racket is controlled by a human, and therefore is gathering some data. It also has a reference to the game, with is useful to access the balls. The `records` variable is a collection containing the records. This variable contains what the neural network has to learn. The variable `records` will be used in the method `record`, `records`, and `trainNeuralNetwork`, described later on. 
 The variable `mouseX` represents the X-component of the mouse cursor. This is useful when a human steers the racket. The `minimums` and `maximums` variables are two collections containing the minimum and maximum of the records kept in `records`. This is useful to perform the data normalization of the records.
 
+
+A racket is created in a learning mode and with no records:
+
 ```Smalltalk
 PRacket>>initialize
 	super initialize.
@@ -463,6 +466,8 @@ PRacket>>initialize
 	records := OrderedCollection new.
 	mouseX := 0.
 ```
+
+We need accessing methods to let know the racket about the game containing it:
 ```Smalltalk
 PRacket>>game: aGame
 	game := aGame
@@ -472,19 +477,15 @@ PRacket>>game
 	^ game
 ```
 
-```Smalltalk
-PRacket>>isLearning
-	^ isLearning 
-```
-```Smalltalk
-PRacket>>mouseX: aValue
-	mouseX := aValue 
-```
+At each beat of the game, the mouse cursor position is obtained by Roassal and provided to the racket:
+
 ```Smalltalk
 PRacket>>receiveMouseEvent: anEvent
 	isLearning ifFalse: [ ^ self ].
 	mouseX := (anEvent position x / 3) asInteger * 3
 ```
+
+Game data recording is performed by the method `record`:
 
 ```Smalltalk
 PRacket>>record
@@ -503,10 +504,15 @@ PRacket>>record
 	element position x = mouseX ifTrue: [ record add: 0 ].
 	records add: record
 ```
+
+The method records the position and speed of each ball in the game, and it keeps the action taken by the user. We use the convention: `0` means the racket is still, `1` the racket goes to the right, and `2` to the left.
+
 ```Smalltalk
 PRacket>>records
 	^ records
 ```
+
+
 ```Smalltalk
 PRacket>>step
 	"If it is learning, then there is nothing to do"
@@ -593,7 +599,7 @@ PGame>>run2
 
 ```Smalltalk
 PGame>>run4
-	<script: 'PGame new run4. true'>
+	<script: 'PGame new run4.'>
 
 	| g gameSize |
 	g := PGame new.

@@ -30,7 +30,7 @@ g
 
 Figure @fig:plottingSomePoints shows the plot of these four points. Solving the problem means that we need to find the best value of `a` and `b` to have the function `y = f(x) = a*x + b` that is the closest to these points. 
 
-Let pick some arbitrary `a` and `b` and draw a line for two arbitrary `a` and `b`:
+Let's pick some arbitrary `a` and `b` and draw a line:
 
 ~~~~~~
 points :={(1@3.0). (3@5.2). (2@4.1). (4@7.5)}.
@@ -59,7 +59,11 @@ g
 
 ![Points and a line.](05-Learning/figures/pointsAndLine.png){#fig:pointsAndLine width=400px}
 
-Figure @fig:pointsAndLine shows the result. As you can see, the value we picked for `a` and `b` are not really good since the blue line is rather far away from the first and the fourth points. If we want to look for better `a` and `b`, then we need to translate in some way how far the blue lines is from the points. And we need a _loss function_ for this. 
+Figure @fig:pointsAndLine shows the result. As you can see, the value we picked for `a` and `b` are not really good since the blue line is rather far away from the first and the fourth points. If we want to look for better `a` and `b`, then we need to translate in some way how far the blue lines is from the points. 
+
+A _loss function_ is a mathematical function that maps an event, described as a set of values of one ore more variables, into a real number. This number intuitively represent the _cost_ associated with the event. In our case, the loss function approximate the distance between the straight blue line with the four points. 
+
+The loss function is also commonly called the _error function_ or the _cost function_.
 
 A common loss function is the _mean squared error_ (MSE), which we define as the $J$ function as follows:
 $$J(a,b) = \frac{1}{n} \sum_{i}(y_i - f(x_i))^2$$
