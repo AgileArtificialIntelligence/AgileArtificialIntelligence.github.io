@@ -66,10 +66,10 @@ A _loss function_ is a mathematical function that maps an event, described as a 
 The loss function is also commonly called the _error function_ or the _cost function_.
 
 A common loss function is the _mean squared error_ (MSE), which we define as the $J$ function as follows:
-$$J(a,b) = \frac{1}{n} \sum_{i}(y_i - f(x_i))^2$$
+$$J(a,b) = \frac{1}{n} \sum_{i=1}^{n}(y_i - f(x_i))^2$$
 
-$J$ which is always positive, indicates how close the $f$ function is to the points $(x_i, y_i)$. Note that the variables $x_1, ..., x_n, y_1, ..., y_n$ represent the data for which we would like to tune our model for. 
-We can compute it as follows:
+Note that $J$ is always positive. The $J$ function indicates how close the $f$ function is to the points $(x_i, y_i)$, for two given values of $a$ and $b$. Note that the variables $x_1, ..., x_n, y_1, ..., y_n$ represent the data for which we would like to tune our model for. 
+We can compute the value of $J$ as follows:
 
 ~~~~~~
 points :={(1@3.0) . (3@5.2) . (2@4.1) . (4@7.5)}.
