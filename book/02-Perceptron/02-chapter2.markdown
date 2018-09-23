@@ -1,41 +1,46 @@
 
 # Perceptron
 
-A neuron, as contained in all eumetozoa brains, is a specialized cell that transmits electrochemical stimulation using an axon to other neurons. Eumetazoans are a major group of animals in the _Five Kingdoms_ classification, which includes mammals.
+All major animal groups have brains made of neurons. 
+A neuron is a specialized cell that transmits electrochemical stimulation using an axon to other neurons. A neuron receives this nerve impulse via a *dendrite*. Since the early age of computers, scientists have tried to produce a computational model of a neuron. The perceptron was one of the first models to mimic the behavior of a neuron.
 
-A neuron is a specialized cell that transmits electrochemical stimulation along its *axon* to other neurons. A neuron receives this nerve impulse via a *dendrite*. Since the early age of computers scientists have tried to produce a computational model of a neuron. The perceptron was one of the first models to mimic the behavior of a neuron.
-
-This chapter plays two essential roles in this book. First, it presents the notion of perceptron, a fundamental model on which neural networks are built. Second, it provides a gentle introduction to the Pharo programming language.
+This chapter plays two essential roles in this book. First, it presents the perceptron, a fundamental model on which neural networks are built. Second, it also provides a gentle introduction to the Pharo programming language. The chapter build a simple perceptron model in Pharo.
 
 ## Perceptron
 
 A perceptron is a kind of artificial neuron that models the behavior of a real neuron.
-A perceptron is a machine that produces an output for a provided input (Figure @fig:perceptron). 
+A perceptron is a machine that produces an output for a provided input. Figure @fig:perceptron gives an example of a perceptron.
 
-A perceptron may accept 0, 1, or more numerical values as inputs, and produces a numerical value as output, resulting in a simple equation. A perceptron operates on numbers, which means that the inputs and the output are numerical values (_e.g.,_ integers or floating point values).
+A perceptron may accept 0, 1, or more numerical values as inputs, and produces a numerical value as output (result of a simple equation that we will shortly see). A perceptron operates on numbers, which means that the inputs and the output are numerical values (_e.g.,_ integers or floating point values).
 
 ![Representing the perceptron.](02-Perceptron/figures/perceptron.png){#fig:perceptron width=200px}
 
+Figure @fig:perceptron depicts a perceptron. A perceptron is usually represented as a circle with some inputs and one output. Inputs are represented as incoming arrows located on the left of the central circle and the output as an outgoing arrow on the right of it. In the figure, our perceptron has three inputs, noted _x1_, _x2_, and _x3_.
 
-Figure @fig:perceptron depicts a perceptron with three inputs, noted _x1_, _x2_, and _x3_. Each input is indicated with an incoming arrow and the output with an outgoing arrow. 
-
-Not all inputs have the same importance for the perceptron. For example, an input may be more important than the other inputs. Relevance of an input is expressed using a weight (also a numerical value) associated to that input. In our figure, the input _x1_ is associated to the weight _w1_, _x2_ to the weight _w2_, and _x3_ to _w3_. 
+Not all inputs have the same importance for the perceptron. For example, an input may be more important than other inputs. Relevance of an input is expressed using a weight (also a numerical value) associated to that input. In our figure, the input _x1_ is associated to the weight _w1_, _x2_ to the weight _w2_, and _x3_ to _w3_. Different relevances of some inputs allows the network to model a specialized behavior. For example, for an image recognition task, pixels located at the border of the picture have usually less relevance than the pixels located in the middle. Weights associated to the inputs corresponding to the border pixels will therefore be rather close to zero.
 
 In addition to the weighted input value, a perceptron requires a _bias_, a numerical value acting as a threshold. We denote the bias as _b_.
 
-A perceptron receives a stimulus as input and responds to that stimulus by producing an output value. The output obeys a very simple rule. First, we compute the sum of the weighted inputs and the bias. If this sum is above 0, then the perceptron produce 1, else it produces 0.
+A perceptron receives a stimulus as input and responds to that stimulus by producing an output value. The output obeys a very simple rule: if the sum of the weighted inputs is above a value, then the perceptron fires 1, else it fires 0. Programmatically, we first compute the sum of the weighted inputs and the bias. If this sum is strictly above 0, then the perceptron produces 1, else it produces 0.
 
-More formally, for the perceptron given in Figure @fig:perceptron, we write $z = x1 * w1 + x2 * w2 + x3 * w3 + b$. In the general case, we write $z = \sum_i{x_i * w_i}~ + b$. If $z$ is greater then 0, then the perceptron produces 1, else it produces 0.
+Formally, based on the perceptron given in Figure @fig:perceptron, we write $z = x1 * w1 + x2 * w2 + x3 * w3 + b$. In the general case, we write $z = \sum_i{x_i * w_i}~ + b$. The variable $i$ ranges over all the inputs of the perceptron. If $z \gt 0$, then the perceptron produces 1, else if $z \leq 0$ it produces 0.
 
-In the next section, we will implement a perceptron model that is both extensible and maintainable. You may wonder, "What is the big deal about this?" After all, the perceptron model may be implemented in a few lines of code. However, implementation is just a fraction of our job. Creating a perceptron model that is testable, well tested, and extensible is where the value will be shown. 
+In the next section, we will implement a perceptron model that is both extensible and maintainable. You may wonder, "What is the big deal about this?" After all, the perceptron model may be implemented in a few lines of code. However, implementing the perceptron functionality is just a fraction of the job. Creating a perceptron model that is testable, well tested, and extensible is the real value of this chapter.
 
 ## Implementing the perceptron
 
-In this section, we put our hands to work and implement the perceptron model in Pharo. We will produce an object-oriented implementation of the model. We will implement a class `Neuron` in a package called `NeuralNetwork`. Our class will have a method called `feed` which will be used to compute the $z$ and output values of the perceptron.
+In this section, we will put our hands to work and implement the perceptron model in Pharo. We will produce an object-oriented implementation of the model. We will implement a class `Neuron` in a package called `NeuralNetwork`. Our class will have a method called `feed` which will be used to compute two values, $z$ and the perceptron output.
 
-To create a new package, we first need to open a _system browser_ by selecting the corresponding entry in the Pharo menu. The system browser is where you read and write source code. Most of the programming activity typically happens in a system browser. 
+To create a new package, we first need to open a _system browser_ by selecting the corresponding entry in the Pharo menu. The system browser is an essential tool in Pharo. It allows one to read and write code. Most of the programming activity in Pharo typically happens in a system browser. 
 
-Figure @fig:systemBrowser shows a system browser, which is composed of five different parts. The top part is composed of four lists. The left-most list gives the available and ready-to-be-used packages. The second list gives the classes that belong to the selected package. The third list shows the method categories of the selected class. Method categories sort methods into logical groups to clarify their purpose and make them easier to find. Think of them as for methods what a package is for classes. The right-most list shows the methods of the selected class, filtered by the selected method category if any. The bottom part of a system browser displays source code, which is one of the following:
+Figure @fig:systemBrowser shows a system browser, which is composed of five different parts. The top part is composed of four lists. The left-most list gives the available and ready-to-be-used packages. In the figure, the names `Announcement`, `AST-Core` and `Alien` are examples of packages. The `Announcement` package is selected. 
+
+The second list gives the classes that belong to the selected package. Many classes composes the `Announcement` package, including the classes called `Announcement`, `AnnouncementSet`, and `Announcer`.
+
+The third list shows the method categories of the selected class. Method categories sort methods into logical groups to clarify their purpose and make them easier to find. Think of them as a kind of package for methods. Since no class is selected, no method category is listed.
+
+The right-most list shows the methods of the selected class, filtered by the selected method category if any. Since no class is selected, no methods are listed.
+The bottom part of a system browser displays source code, which is one of the following:
 
 |Selection|Code Displayed|
 |---------|--------------|
@@ -45,30 +50,31 @@ Figure @fig:systemBrowser shows a system browser, which is composed of five diff
 
 ![The Pharo system browser.](02-Perceptron/figures/systemBrowser.png){#fig:systemBrowser}
 
-Right-click on the left-most top list to create a new package, let's call it `NeuralNetwork`. This package will contain most of the code we will write in this book. 
+Right-click on the left-most top list to create a new package, named `NeuralNetwork`. This package will contain most of the code we will write in this book. 
 
 Select the package `NeuralNetwork` you have just created and modify the template in the bottom pane as follows:
 
-~~~~~~~
+```Smalltalk
 Object subclass: #Neuron
 	instanceVariableNames: 'weights bias'
 	classVariableNames: ''
 	package: 'NeuralNetwork'
-~~~~~~~
+```
 
-You then need to compile the code by accepting the source code. Right click on the text pane and select the `Accept` option. The class we have defined contains two instance variables, `weights` and `bias`. We need to add some methods to give meaning to our class.
-In particular, we need a few methods that manipulate these variables in addition to the logic, which is to compute the $z$ and output values. Let's first focus on the `weights` variable. We will define two methods to write a value to that variable and another to read from it.
+You then need to compile the code by "accepting" the source code. Right click on the text pane and select the `Accept` option. The class `Neuron` defines two instance variables, `weights` and `bias`. Note that we do not need to have variables for the inputs and output values. These values will be provided as message arguments and returned values. 
+We need to add some methods to define the logic of our perceptron.
+In particular, we need to compute the $z$ and the output values. Let's first focus on the `weights` variable. We will define two methods to write a value to that variable and another one to read from it.
 
-You may wonder why we define a class `Neuron` and not `Perceptron`. In the next chapter we will extend our class `Neuron` by turning it into an open abstraction for an artificial neuron. Our `Neuron` class is therefore a placeholder for improvements we will make in the subsequent chapters.
+You may wonder why we define a class `Neuron` and not `Perceptron`. In the next chapter we will extend our class `Neuron` by turning it into an open abstraction for an artificial neuron. Our `Neuron` class is therefore a placeholder for improvements we will make in the subsequent chapters. In this chapter we consider a perceptron, but in the coming chapter we will move toward an abstract neuron implementation.
 
 Here is the code of the `weights:` method defined in the class `Neuron`:
 
-~~~~~~~
+```Smalltalk
 Neuron>>weights: someWeightsAsNumbers
 	weights := someWeightsAsNumbers
-~~~~~~~
+```
 
-To define this method, you need to select the `Neuron` class in the class panel (second top list panel). Then, write the code given above *without* `Neuron>>`, which is often prepended in documentation to provide context, but is not needed in the browser because the class visibly is selected in the top pane. Next, you should accept the code (again by right clicking on the `Accept` menu item). In  Pharo jargon, accepting a method means to compile it. Once compiled, it may be invoked. The code defines the method named `weights:` which accepts one argument, provided as a variable named `someWeightsAsNumbers`. 
+To define this method, you need to select the `Neuron` class in the class panel (second top list panel). Then, write the code given above *without* `Neuron>>`, which is often prepended in documentation to provide context, but is not needed in the browser because the class visibly is selected in the top pane. Figure @fig:systemBrowserAndMethodWeight illustrates this. Next, you should accept the code (again by right clicking on the `Accept` menu item). In  Pharo jargon, accepting a method has the effect to actually compile it (_i.e.,_ using the Pharo compiler to translate the Pharo source code into some bytecodes understandable by the Pharo virtual machine). Once compiled, a method may be executed. The code defines the method named `weights:` which accepts one argument, provided as a variable named `someWeightsAsNumbers`. 
 
 The expression `weights := someWeightsAsNumbers` assigns the value `someWeightsAsNumbers` to the variable `weights`.
 
@@ -84,21 +90,21 @@ Neuron>>weights
 
 The character `^` returns the value of an expression, in this case the value of the variable `weights`.
 
-Similarly, we need to define methods to assign a value to the `bias` variable and to read its content. The method `bias:` can be defined as:
+Similarly, we need to define methods to assign a value to the `bias` variable and to read its content. The method `bias:` is defined as follow:
 
 ~~~~~~~
 Neuron>>bias: aNumber
 	bias := aNumber
 ~~~~~~~
 
-And read access to the variable `bias` is provided by:
+And reading the variable `bias` is provided by:
 
 ~~~~~~~
 Neuron>>bias
 	^ bias
 ~~~~~~~
 
-So far, we have defined the class `Neuron` which contains two variables (`weights` and `bias`), and 4 methods (`weights:`, `weights`, `bias:`, and `bias`). We now need to define the logic of our perceptron by applying a set of input values and obtaining the output value. Let's add a `feed:` method to do just that:
+So far, we have defined the class `Neuron` which contains two variables (`weights` and `bias`), and 4 methods (`weights:`, `weights`, `bias:`, and `bias`). We now need to define the logic of our perceptron by applying a set of input values and obtaining the output value. Let's add a `feed:` method that does exactly this computation:
 
 ~~~~~~~
 Neuron>>feed: inputs
@@ -107,15 +113,15 @@ Neuron>>feed: inputs
 	^ z > 0 ifTrue: [ 1 ] ifFalse: [ 0 ].
 ~~~~~~~
 
-This `feed:` method simply translates the mathematical perceptron activation formula previously discussed into the Pharo programming language.
-The expression `inputs with: weights collect: [ :x :w | x * w ]` matches and transforms the `inputs` and `weights` collections using the supplied function. Consider the following example:
+The `feed:` method simply translates the mathematical perceptron activation formula previously discussed into the Pharo programming language.
+The expression `inputs with: weights collect: [ :x :w | x * w ]` transforms the `inputs` and `weights` collections using the supplied function. Consider the following example:
 
 ~~~~~~~
 #(1 2 3) with: #(10 20 30) collect: [ :a :b | a + b ]
 ~~~~~~~
 
-The above expression evaluates to `#(11 22 33)`. Syntactically, it means that the literal value `#(1 2 3)` receives a message called `with:collect:`, with two arguments, the literal `#(10 20 30)` and the block `[ :a :b | a + b ]`.
-You can verify the value of that expression by opening a playground (accessible from the main Pharo menu). A playground is a kind of command terminal (_e.g.,_ xterm in the Unix World). Figure @fig:playground illustrates the evaluation of the expression given above (evaluated either by choosing "Print It" from the right click menu, or shortcut which varies by OS).
+The above expression evaluates to `#(11 22 33)`. Syntactically, the expression means that the literal value `#(1 2 3)` receives a message called `with:collect:`, with two arguments, the literal `#(10 20 30)` and the block `[ :a :b | a + b ]`.
+You can verify the value of that expression by opening a playground (accessible from the main Pharo menu). A playground is a kind of command terminal (_e.g.,_ xterm in the Unix World). Figure @fig:playground illustrates the evaluation of the expression given above (evaluated either by choosing "Print It" from the right click menu, or using the adequate shortcut (Cmd + p on OSX or Alt + p on other operating systems).
 
 ![The Playground.](02-Perceptron/figures/playground.png){#fig:playground width=400px}
 
@@ -128,7 +134,7 @@ p bias: -2.
 p feed: #(5 2)
 ~~~~~~~
 
-This piece of code evaluates to `1` (since `(5*1 + 2*2) - 2` equals to `7`, which is greater than `0`).
+This piece of code evaluates to `1` (since `(5*1 + 2*2)-2` equals to `7`, which is greater than `0`).
 
 ![Evaluating the perceptron.](02-Perceptron/figures/playgroundAndPerceptron.png){#fig:playgroundAndPerceptron width=400px}
 
@@ -136,7 +142,7 @@ This piece of code evaluates to `1` (since `(5*1 + 2*2) - 2` equals to `7`, whic
 
 Now it's time to talk about testing. Testing is an essential activity whenever we write code using agile methodologies and is about raising the confidence that the code we write does what it is supposed to do.
 
-Testing is a central concept in the field of Software Engineering. Although this book is not about writing large software artifacts, we _do_ write source code. And making sure that this code can be tested in an automatic fashion significantly improves the quality of our work. More importantly, most code is read far more often than it is written. Testing helps us produce maintainable and adaptable code. Throughout this book, we will improve our codebase. It is therefore very important to make sure that our improvements do not break existing functionality. 
+Testing is a central concept in the field of Software Engineering. Although this book is not about writing large software artifacts, we _do_ write source code. And making sure that this code can be tested in an automatic fashion significantly improves the quality of our work. More importantly, most code is read far more often than it is written. Testing helps us produce maintainable and adaptable code. Throughout this book, we will improve our codebase. It is therefore very important to make sure that our improvements do not break existing functionalities. 
 
 For example, above we defined a perceptron, and we informally tested it in a playground. This informal test cost us a few keystrokes and a little bit of time. What if we can automatically repeat this test each time we modify our definition of perceptron? This is exactly what _unit testing_ is all about. 
 
@@ -163,15 +169,15 @@ PerceptronTest>>testSmallExample
 ~~~~~~~
 
 The method `testSmallExample` tests that the code snippet we previously gave returns the value `1`. 
-The test can be run by clicking on the gray circle located next to the method name (Figure @fig:testingPerceptron01).
+The test can be run by clicking on the gray circle located next to the method name. The gray circle turns green to indicate the test passes (Figure @fig:testingPerceptron01).
 
 ![Testing the perceptron.](02-Perceptron/figures/testingPerceptron01.png){#fig:testingPerceptron01}
 
-The green bullet next to the method name indicates that the test is passing (_i.e.,_ no assertion failed and no error was raised). The method `testSmallExample` sends the message `assert:equals:` which tests whether the first argument equals the second argument. 
+A green test means that no assertion failed and no error was raised during the test execution. The method `testSmallExample` sends the message `assert:equals:` which tests whether the first argument equals the second argument. 
 
 *EXERCISE:* So far, we have only shallowly tested our perceptron. We can improve our tests in two ways:
 
-- Augment `testSmallExample` by feeding our perceptron `p` with different values (_e.g.,_ `-2` and `2` gives `0` as result)
+- Expand `testSmallExample` by feeding our perceptron `p` with different values (_e.g.,_ `-2` and `2` gives `0` as result)
 - Test our perceptron with different weights and biases
 
 In general, it is a very good practice to write a thorough suite of tests, even for a small component such as our `Neuron` class.
@@ -179,11 +185,11 @@ In general, it is a very good practice to write a thorough suite of tests, even 
 
 ## Formulating logical expressions
 
-A canonical example of using a perceptron (or any other artificial neuron) is to express boolean logical gates. The idea is to have a perceptron with two inputs (each being a boolean value), and the result of a logical gate as output. 
+A canonical example of using a perceptron is to express boolean logical gates. The idea is to have a perceptron with two inputs (each being a boolean value), and the result of a logical gate as output. 
 
 A little bit of arithmetic indicates that a perceptron with the weights `#(1 1)` and the bias `-1.5` formulates the AND logical gate. The AND gate may be represented as the following table:
 
-A | B | A AND B 
+A | B | A  AND  B 
 --- | --- | :---:
 0 | 0 | 0
 0 | 1 | 0
@@ -281,7 +287,7 @@ Until now, we have defined the class `Neuron` with five methods, and the unit te
 
 ## Combining perceptrons
 
-So far, we have defined the AND, NOR, NOT, and OR logical gates. Logical gates become interesting when combined. A digital comparator circuit is such a combination. It is useful to compare two values, A and B. We have three possible outcomes:
+Until now, we have defined the AND, NOR, NOT, and OR logical gates. Logical gates become interesting when combined. A digital comparator circuit is a combination of two NOT gates with two AND gates and one NOR gate. The overall combination is useful to compare two values, A and B. We have three possible outcomes:
 
 - A is greater than B
 - A is equal to B
@@ -304,9 +310,9 @@ Figure @fig:digitalComparator illustrates the circuit. Three different logical g
 ~~~~~~~
 PerceptronTest>>digitalComparator: inputs
 	"Return an array of three elements"
-	| not and nor A B AgB AeB AlB notA notB |
-	A := inputs first.
-	B := inputs second.
+	| not and nor a b aGb aEb aLb notA notB |
+	a := inputs first.
+	b := inputs second.
 
 	and := Neuron new weights: #(1 1); bias: -1.5.
 	not := Neuron new weights: #(-1); bias: 0.5.
@@ -315,15 +321,15 @@ PerceptronTest>>digitalComparator: inputs
 	notA := not feed: { A }. 
 	notB := not feed: { B }.
 	
-	AlB := and feed: { notA . B }.
-	AgB := and feed: { A . notB }.
-	AeB := nor feed: { AgB . AlB }.
-	^ { AgB . AeB . AlB }
+	aLb := and feed: { notA . B }.
+	aGb := and feed: { A . notB }.
+	aEb := nor feed: { AgB . AlB }.
+	^ { aGb . aEb . aLb }
 ~~~~~~~
 
-The method accepts a set of inputs as its argument. We first extract the first and second elements of these inputs and assign them to the temporary variables `A` and `B`. 
+The method accepts a set of inputs as its argument. We first extract the first and second elements of these inputs and assign them to the temporary variables `a` and `b`. 
 
-Next we create our three logical gates as perceptrons. Then we wire them together using the variables `notA`, `notB`, `AgB` (standing for `A` greater than `B`), `AlB` (`A` less than `B`), and `AeB` (`A` equals `B`). 
+Next we create our three logical gates as perceptrons. Then we wire them together using the variables `notA`, `notB`, `aGb` (standing for `a` greater than `b`), `aLb` (`a` less than `b`), and `aEb` (`a` equals `b`).
 
 We then compute `notA` and `notB`. Here, we use an alternative syntax to define an array. The expression `{ A }` creates an array with the object referenced by `A`. The elements of this array syntax will be evaluated at run time, unlike the `#(...)` notation, which is evaluated at compile time. Therefore, for "literal" objects like numbers always use `#(...)` (_e.g.,_ `#(1 -1)`). To pass expressions as elements, always use `{...}`. Note that technically we can also write numbers using the `{...}` syntax (_e.g.,_ `{1 . -1}`), but this is rarely done due to the performance penalty of runtime evaluation without any advantage. It is important to keep these two notations in mind as we will use them heavily throughout the book.
 
@@ -353,6 +359,8 @@ The way a perceptron learns simply follows the rule: $w_i(t+1) = w_i(t) + (d - z
 - $x_i$ corresponds to the provided input at index $i$
 - $\alpha$ is the learning rate
 
+We have $w_i(0)$ equals to a random number, usually within a narrow range centered on 0.
+
 A way to make a perceptron learn is given by the method `train:desiredOutput:`, as follows:
 
 ~~~~~~~
@@ -368,10 +376,10 @@ Neuron>>train: inputs desiredOutput: desiredOutput
 	bias := bias + (learningRate * theError)
 ~~~~~~~
 
-Before doing any adjustment of the weights and bias, we need to know how well the perceptron evaluates the set of inputs. We therefore need to evaluate the perceptron with the argument `inputs`. The result is assigned to the variable `output`. The variable `theError` represents the difference between the desired output and the actual output. We also need to decide how fast the perceptron is supposed to learn. The `learningRate` value is a value between `0.0` and `1.0`. We arbitrarily picked the value `0.1`. 
+Before doing any adjustment of the weights and bias, we need to know how well the perceptron evaluates the set of inputs. We therefore need to evaluate the perceptron with the argument `inputs`. The result is assigned to the variable `output`. The variable `theError` represents the difference between the desired output and the actual output. We also need to decide how fast the perceptron is supposed to learn. The `learningRate` value ranges between`0.0` and `1.0`. We arbitrarily picked the value `0.1`. 
 
 
-Let's see how to use the training in practice. Consider the perceptron `p` in the following example (try evaluating the code in a playground):
+Let's see how to use the training in practice. Consider the perceptron `p` in the following example (evaluate the code in a playground):
 
 ~~~~~~~
 p := Neuron new.
@@ -433,7 +441,7 @@ In `testTrainingOR`, we train the perceptron 40 times on the complete set of exa
 
 *EXERCISE:*
 
-- What is the necessary minimum number of epochs to train `p`? Try to change `25` to a lower value and run the test to see if it still passes.
+- What is the necessary minimum number of epochs to train `p`? Try to reduce the number of epochs run the test to see if it still passes.
 - We have shown how to train a perceptron to learn the OR logical gate. Write a method `testTrainingNOR`, `testTrainingAND`, and `testTrainingNOT` for the other gates we have seen.
 - How does the value of the `learningRate` impact the minimum number of epochs for the training?
 
@@ -442,20 +450,22 @@ In `testTrainingOR`, we train the perceptron 40 times on the complete set of exa
 Drawing graphs is often necessary to monitor progresses made by the network. We will use the Roassal visualization engine to visualize such evolution. Roassal offers the Grapher API, dedicated to draw graphs. You can load Roassal by executing the following in a playground:
 
 ```Smalltalk
-Gofer it
-	    smalltalkhubUser: 'ObjectProfile' project: 'Roassal2';
-	    configurationOf: 'Roassal2';
-	    loadStable.
+Metacello new
+    baseline: 'Roassal2';
+    repository: 'github://ObjectProfile/Roassal2/src';
+    load.
 ```
 
-The coming section uses Roassal. Make sure you have it loaded, else part of the code given below will not work or even compile. More information about Roassal may be found on http://AgileVisualization.com.
+The coming section uses Roassal. Make sure you have it loaded, else part of the code given below will not work or even compile. More information about Roassal may be found on http://AgileVisualization.com and detailled loading instruction may be found on https://github.com/ObjectProfile/Roassal2.
 
 ## Predicting side of a 2D point
 
-A perceptron can be used to classify data and make some predictions. We will pick a simple classification problem. Consider the following:
+We will now see a second application of the perceptron. A perceptron can be used to classify data and make some predictions. We will pick a simple classification problem. Consider the following:
 
 - A space composed of red and blue points
 - A straight line divides the red points from the blue points
+
+Consider the following interaction between two (real) people, a teacher and a student. The goal of the teacher is to let the student infer where is the straight separation line between the blue and the red points. First, the teacher can gives an arbitrary number of examples. Each example is given to the student as a location and a color. After a few examples, the students is able to guess the color of a random location. Intuitively, more examples the teacher will give to the student, more the student will be more likely to correctly predict the color.
 
 Some questions arise:
 
@@ -472,7 +482,7 @@ somePoints := OrderedCollection new.
 
 f := [ :x | (-2 * x) - 3 ].
 
-"We use the Grapher engine to plots our points"
+"We use the Roassal Grapher engine to plots our points"
 g := RTGrapher new.
 d := RTData new.
 d dotShape 
@@ -494,7 +504,7 @@ The script begins by defining a set of 500 points, ranging within a squared area
 
 We assign to the variable `f` a block representing our function $f(x)$, written in the Pharo syntax. A block may be evaluated with the message `value:`. For example, we have `f value: 3` that returns `-9` and `f value: -2` that returns `1`.
 
-The remainder of the script uses Grapher to plot the points. A point `p` is red if `p y` is greater than `f value: p x`, else it is blue. The expression `Color red trans` produces a transparent red color. 
+The remainder of the script uses Grapher to plot the points. A point `p` is red if `p y` is greater than `f value: p x`, else it is blue. The expression `Color red trans` evaluates to a transparent red color. 
 
 We can add the actual line defined by `f` to our graph. Consider the small revision (Figure @fig:simpleLine2):
 
@@ -601,9 +611,9 @@ Evaluating this small script several times always produces the same sequence. Th
 
 Our script then trains a perceptron with 500 points. Next, we create 2,000 test points, which will be displayed on the screen using Grapher. We wrote the condition `(p feed: point) > 0.5` to color a point as red. We could instead have `(p feed: point) = 1`, however in an upcoming chapter we will replace the perceptron with another kind of artificial neuron, which will not exactly produce the value 1.
 
-We see that the area of red points goes very close to the red line. This means that our perceptron is able to classify points with a good accuracy. 
+We see that the area of blue and red points goes very close to the straight line. This means that our perceptron is able to classify points with a relatively good accuracy. 
 
-What if we reduce the rounds of training of our perceptron? You can try this by changing the value `500` by, let's say, `100`. What is the result? The perceptron does not classify points as accurately as with 500 trainings. This follows the intuition we elaborated when we first discussed training. In general, the more training a perceptron has, the more accurate it will be (however, this is not always true with neural networks, as we will see later on).
+What if we reduce the number of training of our perceptron? You can try this by changing the value `500` by, let's say, `100`. What is the result? The perceptron does not classify points as accurately as with 500 trainings. This follows the intuition we elaborated when we first discussed training. In general, the more training a perceptron has, the more accurate it will be (however, this is not always true with neural networks, as we will see later on).
 
 *EXERCISE:* Reduce the number of times the perceptron is trained. Verify that varying the value `500` to lower values leads to some errors by the perceptron, illustrated as a mismatch between the red line and the area of colored points. 
 
@@ -657,7 +667,7 @@ g
 
 ![Precision of the dot classification task.](02-Perceptron/figures/perceptronPrecision.png){#fig:perceptronPrecision width=400px}
 
-The script produces a curve with the precision on the Y-axis and the number of trainings on the X-axis (Figure @fig:perceptronPrecision). We see that the perceptron started with a rather poor performance, around 0.25. However, it quickly steps up to reach a precision close to 1.0.
+The script produces a curve with the precision on the Y-axis and the number of trainings on the X-axis (Figure @fig:perceptronPrecision). We see that the perceptron started with a rather poor performance, around 0.25. However, it quickly steps up to reach a precision close to 1.0. After a few epochs, our perceptron is able to guess the color of a dot with a good precision.
 
 
 ## Historical perspective
