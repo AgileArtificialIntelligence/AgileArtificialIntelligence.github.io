@@ -33,7 +33,7 @@ This book is meant to detail some easy-to-use recipes to solve actual problems a
 
 This book provides relevant material to practitioners having an interest in learning, implementing, and applying neural networks to solve classification and regression problems. 
 
-This book is designed to be read by a large audience. In particular, there is no need to have knowledge of neural networks. There is even no need to have a strong mathematical background. We made sure that there is no such prerequisite in reading most of the chapters.
+This book is designed to be read by a large audience. In particular, there is no need to have prior knowledge on neural networks. There is even no need to have a strong mathematical background. We made sure that there is no such prerequisite in reading most of the chapters.
 Some chapters require a mild mathematical background. However, these chapters are self-contain and skipping them will not hamper the overall understanding.
 
 ## What if I am not a Pharo programmer?
@@ -46,13 +46,7 @@ Why Pharo? The cornerstone of Pharo is its programming environment. Pharo syntax
 
 ## Additional Readings
 
-If you want to know more about some of the techniques presented here, we recommend the following books:
-
-- http://www.gp-field-guide.org.uk by Riccardo Poli, Bill Langdon, and Nic McPhee.
-- http://natureofcode.com by Daniel Shiffman.
-- http://neuralnetworksanddeeplearning.com by Michael Nielsen.
-
-Some good reading about Pharo:
+Here are some good readings about Pharo:
 
 - http://pharo.org is the official website about Pharo.
 - http://books.pharo.org contains many books and booklets about Pharo.

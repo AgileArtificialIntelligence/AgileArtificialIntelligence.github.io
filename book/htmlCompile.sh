@@ -14,8 +14,7 @@ FILES=`ls \
 	03-Neuron/*.markdown \
 	04-NeuralNetwork/*.markdown \
 	05-Learning/*.markdown \
-	06-Data/*.markdown \
-	08-Pong/*.markdown`
+	06-Data/*.markdown`
 
 #FILES=`ls 06-Data/*.markdown`
 
