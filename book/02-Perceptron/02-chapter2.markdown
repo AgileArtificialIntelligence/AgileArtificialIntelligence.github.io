@@ -4,14 +4,14 @@
 All major animal groups have brains made of neurons. 
 A neuron is a specialized cell that transmits electrochemical stimulation using an axon to other neurons. A neuron receives this nerve impulse via a *dendrite*. Since the early age of computers, scientists have tried to produce a computational model of a neuron. The perceptron was one of the first models to mimic the behavior of a neuron.
 
-This chapter plays two essential roles in this book. First, it presents the perceptron, a fundamental model on which neural networks are built. Second, it also provides a gentle introduction to the Pharo programming language. The chapter build a simple perceptron model in Pharo.
+This chapter plays two essential roles in this book. First, it presents the perceptron, a fundamental model on which neural networks are built. Second, it also provides a gentle introduction to the Pharo programming language. The chapter builds a simple perceptron model in Pharo.
 
 ## Perceptron
 
 A perceptron is a kind of artificial neuron that models the behavior of a real neuron.
 A perceptron is a machine that produces an output for a provided input. Figure @fig:perceptron gives an example of a perceptron.
 
-A perceptron may accept 0, 1, or more numerical values as inputs, and produces a numerical value as output (result of a simple equation that we will shortly see). A perceptron operates on numbers, which means that the inputs and the output are numerical values (_e.g.,_ integers or floating point values).
+A perceptron accepts 1, 2, or more numerical values as inputs. It produces a numerical value as output (result of a simple equation that we will shortly see). A perceptron operates on numbers, which means that the inputs and the output are numerical values (_e.g.,_ integers or floating point values).
 
 ![Representing the perceptron.](02-Perceptron/figures/perceptron.png){#fig:perceptron width=200px}
 
@@ -33,7 +33,7 @@ In this section, we will put our hands to work and implement the perceptron mode
 
 To create a new package, we first need to open a _system browser_ by selecting the corresponding entry in the Pharo menu. The system browser is an essential tool in Pharo. It allows one to read and write code. Most of the programming activity in Pharo typically happens in a system browser. 
 
-Figure @fig:systemBrowser shows a system browser, which is composed of five different parts. The top part is composed of four lists. The left-most list gives the available and ready-to-be-used packages. In the figure, the names `Announcement`, `AST-Core` and `Alien` are examples of packages. The `Announcement` package is selected. 
+Figure @fig:systemBrowser shows a system browser, which is composed of five different parts. The top part is composed of four lists. The left-most list gives the available and ready-to-be-used packages. In the figure, the names `Announcement`, `AST-Core` and `Alien` are examples of packages. The `Announcement` package is selected in the figure. 
 
 The second list gives the classes that belong to the selected package. Many classes composes the `Announcement` package, including the classes called `Announcement`, `AnnouncementSet`, and `Announcer`.
 
@@ -44,8 +44,8 @@ The bottom part of a system browser displays source code, which is one of the fo
 
 |Selection|Code Displayed|
 |---------|--------------|
-|Method|Method source code|
-|Class|Current class definition|
+|Method|Selected method source code|
+|Class|Selected class definition|
 |None|New class Template|
 
 ![The Pharo system browser.](02-Perceptron/figures/systemBrowser.png){#fig:systemBrowser}
@@ -74,7 +74,7 @@ Neuron>>weights: someWeightsAsNumbers
 	weights := someWeightsAsNumbers
 ```
 
-To define this method, you need to select the `Neuron` class in the class panel (second top list panel). Then, write the code given above *without* `Neuron>>`, which is often prepended in documentation to provide context, but is not needed in the browser because the class visibly is selected in the top pane. Figure @fig:systemBrowserAndMethodWeight illustrates this. Next, you should accept the code (again by right clicking on the `Accept` menu item). In  Pharo jargon, accepting a method has the effect to actually compile it (_i.e.,_ using the Pharo compiler to translate the Pharo source code into some bytecodes understandable by the Pharo virtual machine). Once compiled, a method may be executed. The code defines the method named `weights:` which accepts one argument, provided as a variable named `someWeightsAsNumbers`. 
+To define this method, you need to select the `Neuron` class in the class panel (second top list panel). Then, write the code given above *without* `Neuron>>`, which is often prepended in documentation to indicate the class that should host the method, but it is not needed in the browser because the class is selected in the top pane. Figure @fig:systemBrowserAndMethodWeight illustrates this. Next, you should accept the code (again by right clicking on the `Accept` menu item). In  Pharo jargon, accepting a method has the effect to actually compile it (_i.e.,_ using the Pharo compiler to translate the Pharo source code into some bytecodes understandable by the Pharo virtual machine). Once compiled, a method may be executed. The code defines the method named `weights:` which accepts one argument, provided as a variable named `someWeightsAsNumbers`. 
 
 The expression `weights := someWeightsAsNumbers` assigns the value `someWeightsAsNumbers` to the variable `weights`.
 
@@ -104,7 +104,7 @@ Neuron>>bias
 	^ bias
 ~~~~~~~
 
-So far, we have defined the class `Neuron` which contains two variables (`weights` and `bias`), and 4 methods (`weights:`, `weights`, `bias:`, and `bias`). We now need to define the logic of our perceptron by applying a set of input values and obtaining the output value. Let's add a `feed:` method that does exactly this computation:
+So far, we have defined the class `Neuron` which contains two variables (`weights` and `bias`), and 4 methods (`weights:`, `weights`, `bias:`, and `bias`). We now need to define the logic of our perceptron by applying a set of input values and obtaining the output value. Let's add a `feed:` method that does exactly this small computation:
 
 ~~~~~~~
 Neuron>>feed: inputs
@@ -121,7 +121,7 @@ The expression `inputs with: weights collect: [ :x :w | x * w ]` transforms the 
 ~~~~~~~
 
 The above expression evaluates to `#(11 22 33)`. Syntactically, the expression means that the literal value `#(1 2 3)` receives a message called `with:collect:`, with two arguments, the literal `#(10 20 30)` and the block `[ :a :b | a + b ]`.
-You can verify the value of that expression by opening a playground (accessible from the main Pharo menu). A playground is a kind of command terminal (_e.g.,_ xterm in the Unix World). Figure @fig:playground illustrates the evaluation of the expression given above (evaluated either by choosing "Print It" from the right click menu, or using the adequate shortcut (Cmd + p on OSX or Alt + p on other operating systems).
+You can verify the value of that expression by opening a playground (accessible from the main Pharo menu). A playground is a kind of command terminal for Pharo (_e.g.,_ xterm in the Unix World). Figure @fig:playground illustrates the evaluation of the expression given above (evaluated either by choosing "Print It" from the right click menu, or using the adequate shortcut (Cmd + p on OSX or Alt + p on other operating systems).
 
 ![The Playground.](02-Perceptron/figures/playground.png){#fig:playground width=400px}
 
@@ -142,9 +142,9 @@ This piece of code evaluates to `1` (since `(5*1 + 2*2)-2` equals to `7`, which 
 
 Now it's time to talk about testing. Testing is an essential activity whenever we write code using agile methodologies and is about raising the confidence that the code we write does what it is supposed to do.
 
-Testing is a central concept in the field of Software Engineering. Although this book is not about writing large software artifacts, we _do_ write source code. And making sure that this code can be tested in an automatic fashion significantly improves the quality of our work. More importantly, most code is read far more often than it is written. Testing helps us produce maintainable and adaptable code. Throughout this book, we will improve our codebase. It is therefore very important to make sure that our improvements do not break existing functionalities. 
+Although this book is not about writing large software artifacts, we _do_ write source code. And making sure that this code can be tested in an automatic fashion significantly improves the quality of our work. More importantly, most code is read far more often than it is written. Testing helps us produce maintainable and adaptable code. Throughout this book, we will improve our codebase. It is therefore very important to make sure that our improvements do not break existing functionalities. 
 
-For example, above we defined a perceptron, and we informally tested it in a playground. This informal test cost us a few keystrokes and a little bit of time. What if we can automatically repeat this test each time we modify our definition of perceptron? This is exactly what _unit testing_ is all about. 
+For example, above we defined a perceptron, and we informally tested it in a playground. This informal test costs us a few keystrokes and a little bit of time. What if we can repeat this test each time we modify our definition of perceptron? This is exactly what _unit testing_ is all about. 
 
 We now define a class called `PerceptronTest`:
 
@@ -177,8 +177,8 @@ A green test means that no assertion failed and no error was raised during the t
 
 *EXERCISE:* So far, we have only shallowly tested our perceptron. We can improve our tests in two ways:
 
-- Expand `testSmallExample` by feeding our perceptron `p` with different values (_e.g.,_ `-2` and `2` gives `0` as result)
-- Test our perceptron with different weights and biases
+- Expand `testSmallExample` by feeding our perceptron `p` with different values (_e.g.,_ `-2` and `2` gives `0` as result).
+- Test our perceptron with different weights and biases.
 
 In general, it is a very good practice to write a thorough suite of tests, even for a small component such as our `Neuron` class.
 
@@ -250,7 +250,7 @@ PerceptronTest>>testNOR
 	self assert: (p feed: #(1 1)) equals: 0.
 ~~~~~~~
 
-So far we have built perceptrons with two inputs. A perceptron accepts the same number of inputs as it has weights. Therefore, if only one weight is provided, only one input is required. Consider the NOT logical gate:
+So far we have built perceptrons with two inputs. The number of inputs has to be the same than the number of weights. Therefore, if only one weight is provided, only one input is required. Consider the NOT logical gate:
 
 ~~~~~~~
 PerceptronTest>>testNOT
@@ -265,7 +265,7 @@ PerceptronTest>>testNOT
 
 ## Handling error
 
-In the `testNOT` test, we have defined a perceptron with only one weight. The array provided when calling `feed:` _must_ have only one entry. But what would happen if we had two entries instead of one? An error should occur as we are wrongly using the (small) API we have defined.
+In `testNOT`, we have defined a perceptron with only one weight. The array provided when calling `feed:` _must_ have only one entry. But what would happen if we had two entries instead of one? An error should occur as we are wrongly using the (small) API we have defined.
 
 We should also test this behavior to make sure errors are properly generated. Define the following test:
 
@@ -284,6 +284,8 @@ The test `testWrongFeeding` passes only if the expression `p feed: #(1 1)` raise
 ![Running our tests.](02-Perceptron/figures/runningTests.png){#fig:runningTests}
 
 Until now, we have defined the class `Neuron` with five methods, and the unit test `PerceptronTest` with six test methods. All the tests can be run by pressing the circle next to the unit test name (Figure @fig:runningTests).
+
+It is important to emphasize that rigorously testing our code, which also involve verifying that errors are properly handled, is important when implementing a neural network from scratch. Facing errors due to mismatched size of inputs and weights is unfortunately too frequent to be lax on that front. 
 
 ## Combining perceptrons
 
