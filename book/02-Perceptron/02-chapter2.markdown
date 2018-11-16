@@ -311,22 +311,22 @@ Figure @fig:digitalComparator illustrates the circuit. Three different logical g
 
 ~~~~~~~
 PerceptronTest>>digitalComparator: inputs
-	"Return an array of three elements"
-	| not and nor a b aGb aEb aLb notA notB |
-	a := inputs first.
-	b := inputs second.
+    "Return an array of three elements"
+    | not and nor a b aGb aEb aLb notA notB |
+    a := inputs first.
+    b := inputs second.
 
-	and := Neuron new weights: #(1 1); bias: -1.5.
-	not := Neuron new weights: #(-1); bias: 0.5.
-	nor := Neuron new weights: #(-1 -1); bias: 0.5.	
+    and := Neuron new weights: #(1 1); bias: -1.5.
+    not := Neuron new weights: #(-1); bias: 0.5.
+    nor := Neuron new weights: #(-1 -1); bias: 0.5. 
 
-	notA := not feed: { A }. 
-	notB := not feed: { B }.
-	
-	aLb := and feed: { notA . B }.
-	aGb := and feed: { A . notB }.
-	aEb := nor feed: { AgB . AlB }.
-	^ { aGb . aEb . aLb }
+    notA := not feed: { a }. 
+    notB := not feed: { b }.
+    
+    aLb := and feed: { notA . b }.
+    aGb := and feed: { a . notB }.
+    aEb := nor feed: { aGb . aLb }.
+    ^ { aGb . aEb . aLb }
 ~~~~~~~
 
 The method accepts a set of inputs as its argument. We first extract the first and second elements of these inputs and assign them to the temporary variables `a` and `b`. 
@@ -350,20 +350,69 @@ The overall behavior is divided into parts, each referenced with a variable. The
 
 ## Training a Perceptron
 
-Neurons have the ability to learn from examples. This _training_ is essential to actually do something useful. Learning typically involves a set of input examples with some known outputs. The learning process assesses how good the artificial neuron is against the desired output. In particular, as defined by Frank Rosenblatt in the late 1950s, each weight of the perceptron is modified by an amount that is proportional to (i) the product of the input and (ii) the difference between the real output and the desired output. Learning in neural networks means adjusting the weights and the bias in order to make the output close to the set of training examples. 
+So far, we have used perceptron with a particular set of weights and bias. For example, we have defined the AND logical gate with the value 1 for its two weights and a bias of -1.5. Consider the following exercise: manually compute the weights and bias to model the NAND logical gate (_e.g.,_ we recall that table for NAND is `#( #(0 0 1) #(0 1 1) #(1 0 1) #(1 1 0))`. Doing so require a moment to compute some simple arithmetics. Imagine a perceptron taking thousands of inputs. Identifying some adequate values for the weights and bias cannot be realistically done by hand. Well... this is exactly what training a perceptron is about: finding adequate weights and bias to make the perceptron behave to solve a particular problem.
 
-The way a perceptron learns simply follows the rule: $w_i(t+1) = w_i(t) + (d - z) * x_i * \alpha$, in which:
+Learning typically involves a set of input examples with some known outputs. The learning process assesses how good the artificial neuron is against the desired output. In particular, as defined by Frank Rosenblatt in the late 1950s, each weight of the perceptron is modified by an amount that is proportional to (i) the product of the input and (ii) the difference between the real output and the desired output. Learning in neural networks means adjusting the weights and the bias in order to make the output close to the set of training examples. 
+
+The way a perceptron learns simply follows the rules: 
+
+$$w_i(t+1) = w_i(t) + (d - z) * x_i * \alpha$$
+$$b(t+1) = b(t) + (d - z) * \alpha$$
+
+in which:
 
 - $i$ is the weight index
 - $w_i(t)$ is the weight $i$ at a given time $t$
+- $b(t)$ is the bias at a given time $t$
 - $d$ is the desired value
 - $z$ is the actual output of the perceptron
 - $x_i$ corresponds to the provided input at index $i$
 - $\alpha$ is the learning rate
 
-We have $w_i(0)$ equals to a random number, usually within a narrow range centered on 0.
+We have $w_i(0)$ equals to a random number, usually within a narrow range centered on 0. The two equations given above can be translated into the following pseudocode:
 
-A way to make a perceptron learn is given by the method `train:desiredOutput:`, as follows:
+~~~~~~~
+diff = desiredOutput - realOutput
+alpha = 0.1
+For all N:
+   weightN = weightN + (alpha * inputN * diff)
+bias = bias + (alpha * diff)
+~~~~~~~
+
+This pseudocode can be written in Pharo with the method `train:desiredOutput:`. But before that, we need to slightly adjust the definition of the class `Neuron` by adding the instance variable `learningRate`. The definition is:
+
+~~~~~~~
+Object subclass: #Neuron
+	instanceVariableNames: 'weights bias learningRate'
+	classVariableNames: ''
+	package: 'NeuralNetwork'
+~~~~~~~
+
+We can also provide the necessary methods to modify the variable `learningRate`:
+
+~~~~~~~
+Neuron>>learningRate: aNumber
+	"Set the learning rate of the neuron"
+	learningRate := aNumber
+~~~~~~~
+
+To obtain the value of the variable:
+
+~~~~~~~
+Neuron>>learningRate
+	"Return the learning rate of the neuron"
+	^ learningRate
+~~~~~~~
+
+The variable can be initialized in the constructor
+
+~~~~~~~
+Neuron>>initialize
+	super initialize.
+	learningRate := 0.1
+~~~~~~~
+
+We can now define the method `train:desiredOutput:` to make a perceptron learn.
 
 ~~~~~~~
 Neuron>>train: inputs desiredOutput: desiredOutput
@@ -381,7 +430,7 @@ Neuron>>train: inputs desiredOutput: desiredOutput
 Before doing any adjustment of the weights and bias, we need to know how well the perceptron evaluates the set of inputs. We therefore need to evaluate the perceptron with the argument `inputs`. The result is assigned to the variable `output`. The variable `theError` represents the difference between the desired output and the actual output. We also need to decide how fast the perceptron is supposed to learn. The `learningRate` value ranges between`0.0` and `1.0`. We arbitrarily picked the value `0.1`. 
 
 
-Let's see how to use the training in practice. Consider the perceptron `p` in the following example (evaluate the code in a playground):
+Let's see how to use the training in practice. Consider the perceptron `p` in the following example:
 
 ~~~~~~~
 p := Neuron new.
@@ -390,8 +439,7 @@ p bias: 2.
 p feed: #(0 1).
 ~~~~~~~
 
-
-We have `p feed: #(0 1)` is equal to `1`. What if we wish the perceptron to actually output `0` for the input `#(0 1)`? We would need to train `p`. As we said, this training will adjust the weights and the bias. Let's try the following:
+You can evaluate the code above in a playground. We have `p feed: #(0 1)` is equal to `1`. What if we wish the perceptron to actually output `0` for the input `#(0 1)`? We would need to train `p`. As we said, this training will adjust the weights and the bias. Let's try the following:
 
 ~~~~~~~
 p := Neuron new.
@@ -437,14 +485,33 @@ PerceptronTest>>testTrainingOR
 	self assert: (p feed: #(1 1)) equals: 1.
 ~~~~~~~
 
-The method `testTrainingOR` first creates a perceptron with some arbitrary weights and bias. We successfully train it with the four possible combinations of the OR logical gate. After the training, we test the perceptron to see if it has properly learned.
+The method `testTrainingOR` first creates a perceptron with some arbitrary weights and bias. We successfully train it with the four possible combinations of the OR logical gate. After the training, we verify whether the perceptron has properly learned.
 
 In `testTrainingOR`, we train the perceptron 40 times on the complete set of examples. Training a perceptron (or a large neural network) with the complete set of examples is called an _epoch_. So, in our example, we train `p` with 40 epochs. The epoch is the unit of training.
+
+Similarly, we can define a test that train a perceptron to model the NOT logical gate:
+
+~~~~~~~
+PerceptronTest>>testTrainingNOT
+	| p |
+	p := Neuron new.
+	p weights: #(-1).
+	p bias: 2.
+	
+	40 timesRepeat: [ 
+		p train: #(0) desiredOutput: 1.
+		p train: #(1) desiredOutput: 0.
+	].
+	
+	self assert: (p feed: #(0)) equals: 1.
+	self assert: (p feed: #(1)) equals: 0.
+~~~~~~~
+
 
 *EXERCISE:*
 
 - What is the necessary minimum number of epochs to train `p`? Try to reduce the number of epochs run the test to see if it still passes.
-- We have shown how to train a perceptron to learn the OR logical gate. Write a method `testTrainingNOR`, `testTrainingAND`, and `testTrainingNOT` for the other gates we have seen.
+- We have shown how to train a perceptron to learn the OR logical gate. Write a method `testTrainingNOR` and `testTrainingAND` for the other gates we have seen.
 - How does the value of the `learningRate` impact the minimum number of epochs for the training?
 
 ## Drawing graphs
@@ -458,7 +525,25 @@ Metacello new
     load.
 ```
 
-The coming section uses Roassal. Make sure you have it loaded, else part of the code given below will not work or even compile. More information about Roassal may be found on http://AgileVisualization.com and detailled loading instruction may be found on https://github.com/ObjectProfile/Roassal2.
+The coming section uses Roassal. Make sure you have it loaded, else part of the code given below will not work or even compile. More information about Roassal may be found on [http://AgileVisualization.com](http://AgileVisualization.com) and detailed loading instruction may be found on [https://github.com/ObjectProfile/Roassal2](https://github.com/ObjectProfile/Roassal2).
+
+
+Here is an example of drawing a simple graph (Figure @fig:exampleGraph):
+
+~~~~~~~
+g := RTGrapher new.
+d := RTData new.
+d connectColor: Color blue.
+d points: (1 to: 100).
+d y: [ :x | (x / 3.14) sin  ].
+g add: d.
+g
+~~~~~~~
+
+![Example of a graph.](02-Perceptron/figures/exampleGraph.png){#fig:exampleGraph}
+
+We will make an intense use of graphs along the book. More information about drawing graph can be found in the [http://AgileVisualization.com](Agile Visualization book), Chapter II.3. 
+
 
 ## Predicting side of a 2D point
 
@@ -467,7 +552,7 @@ We will now see a second application of the perceptron. A perceptron can be used
 - A space composed of red and blue points
 - A straight line divides the red points from the blue points
 
-Consider the following interaction between two (real) people, a teacher and a student. The goal of the teacher is to let the student infer where is the straight separation line between the blue and the red points. First, the teacher can gives an arbitrary number of examples. Each example is given to the student as a location and a color. After a few examples, the students is able to guess the color of a random location. Intuitively, more examples the teacher will give to the student, more the student will be more likely to correctly predict the color.
+Consider the following interaction between two (real) people, a teacher and a student. The goal of the teacher is to let the student infer where is the straight separation line between the blue and the red points. First, the teacher can gives an arbitrary number of examples. Each example is given to the student as a location and a color. After a few examples, the students is able to guess the color of a random location. Intuitively, more examples the teacher will give to the student, more the student will be likely to correctly predict the color.
 
 Some questions arise:
 
@@ -544,7 +629,7 @@ g
 
 
 
-We will now add a perceptron to our script and see how well it guesses on which side of the line a point falls. Consider the following script:
+We will now add a perceptron to our script and see how well it guesses on which side of the line a point falls. Consider the following script (Figure @fig:dotColorPrediction):
 
 ~~~~~~~
 f := [ :x | (-2 * x) - 3 ].
@@ -589,14 +674,18 @@ g add: d2.
 g
 ~~~~~~~
 
-As earlier, the script begins with the definition of the block function `f`. It then creates a perceptron with some arbitrary weights and bias. Subsequently, a random number generator is created. In our previous scripts, to obtain a random value between 1 and 50, we simply wrote `50 atRandom`. Using a random number generator, we need to write:
+![Predicting the color of the dot.](02-Perceptron/figures/runningThePerceptron.png){#fig:dotColorPrediction}
+
+Figure @fig:dotColorPrediction gives the result of the prediction. We can see that some red dots are not properly classified: some red dots at located on the right of the line. However, in general, the precision is good since most of the dots have the right color.
+
+As in a previous script, the script begins with the definition of the block function `f`. It then creates a perceptron with some arbitrary weights and bias. Subsequently, a random number generator is created. In our previous scripts, to obtain a random value between 1 and 50, we simply wrote `50 atRandom`. Using a random number generator, we need to write:
 
 ~~~~~~~
 r := Random new seed: 42.
 r nextInt: 50.
 ~~~~~~~
 
-Why is this? First of all, being able to generate random numbers is necessary in all stochastic approaches, which includes neural networks. Although randomness is very important, we usually do not want to let such a random value create situations that cannot be reproduced. Imagine that our code behaves erratically, likely due to a random value. How can we track down the anomaly in our code? If we have truly random numbers, it means that executing the same piece of code twice may produce (even slightly) different behaviors. It may therefore be complicated to properly test. Instead, we will use a random generator with a known seed to produce a known sequence of random numbers. Consider the expression:
+Why is this? First of all, being able to generate random numbers is necessary in all stochastic approaches, including neural networks. Although randomness is very important, we usually do not want to let such a random value create situations that cannot be reproduced. Imagine that our code behaves erratically, likely due to a random value. How can we track down the anomaly in our code? If we have truly random numbers, it means that executing the same piece of code twice may produce (even slightly) different behaviors. It may therefore be complicated to properly test. Instead, we will use a random generator with a known seed to produce a known sequence of random numbers. Consider the expression:
 
 ~~~~~~~
 (1 to: 5) collect: [ :i | 50 atRandom ]
