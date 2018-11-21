@@ -1,14 +1,14 @@
 
 # Artificial Neuron
 
-In the previous chapter we have seen how a perceptron operates and how a simple learning algorithm can be implemented. However, the perceptron, as we have seen it, has some serious limitations, which will motivate us to formulate a more robust artificial neuron, called the sigmoid neuron.
+In the previous chapter we have seen how a perceptron operates and how a simple learning algorithm can be implemented. However, the perceptron has some serious limitations, which will motivate us to formulate a more robust artificial neuron, called the sigmoid neuron.
 
 ## Limit of the Perceptron
 
 A perceptron works well as an independent small machine. We have seen that we can compose a few perceptrons to express a complex behavior such as the digital comparator. We have also seen that a single perceptron can learn a behavior that is not too complex. However, there are two main restrictions with combining perceptrons:
 
 - _Only 0 or 1 as output_: The fact that a perceptron can have only two different output values, 0 or 1, seriously limits the kind of problem it can solve. In particular, when some perceptrons are chained, using binary values significantly reduce the space we live in. Not everything can be reduced as a set of 0 and 1 without leading to an explosion of perceptrons.
-- _A chain of perceptrons cannot learn_: We have seen how to combine perceptrons, and we have seen how a single perceptron can learn. But, can a combination of perceptrons also learn? The answer is no. This is another consequence of having only two output values. An essential property of most common learning algorithm is to be able to express a learning curve, which cannot be expressing using two different values. How can we tell if a perceptron is learning well, poorly, or not at all with only two different output values?
+- _A chain of perceptrons cannot learn_: We have seen how to combine perceptrons, and we have seen how a single perceptron can learn. But, can a combination of perceptrons also learn? The answer is no. This is another consequence of having only two output values. An essential property of most common learning algorithms is to be able to express a smooth learning curve, which cannot be expressing using two different values. How can we tell if a perceptron is learning well, poorly, or not at all with only two different output values?
 
 We have written that $z = w.x + b$, for which $w$ is a vector of weights, $b$ a vector of bias, and $x$ the input vector. We said that the output of perceptron is 1 if $z > 0$, else the output is 0. One important problem with the formulation of the perceptron is that a small variation of $z$ can produce a large variation of the output: the output can goes from 0 to 1, or from 1 to 0.
 
@@ -24,20 +24,51 @@ The activation function used by the perceptron is called the _step function_ and
 
 ![The step function](03-Neuron/figures/stepFunction.png){#fig:stepFunction width=400px}
 
+Figure @fig:stepFunction is the result of executing the script:
+
+```Smalltalk
+g := RTGrapher new.
+d := RTData new.
+d connectColor: Color blue.
+d noDot.
+d points: (-7.0 to: 7.0 by: 0.01).
+d x: #yourself.
+d y: [ :x | x > 0 ifTrue: [ 1 ] ifFalse: [ 0 ] ].
+g add: d.
+g
+```
+
+You can recognize the step function provided to the `y:` instruction. Note that the function provided to `y:` refers to the input as $x$ while $z$ is provided to $\sigma$. This is an inoffensive renaming.
+
+Consider a value $z = 0$. We therefore have $\sigma(z) = 0$. If we add $0.00001$, a small value, to $z$ then we have $\sigma(z) = 1$. A small value added to $z$ produces a large change in $\sigma(z)$. As we previously said, a chain of perceptron is not able to learn.
+
 The step function is characterized with having a vertical step, which produces two angles in its curve. These angles are problematic as we will shortly see.
 
 ## The Sigmoid Neuron
 
-We will expression a new kind of artificial neuron, called the _sigmoid neuron_. The increment we are here making is to use a new activation function, called the _sigmoid function_. Consider the function $\sigma(z)=\frac{1}{1+e^{-z}}$, plotted in Figure @fig:sigmoidFunction.
+We will express a new kind of artificial neuron, called the _sigmoid neuron_. The increment we are here making is to use a new activation function, called the _sigmoid function_. Consider the function $\sigma(z)=\frac{1}{1+e^{-z}}$, plotted in Figure @fig:sigmoidFunction.
 
 ![The sigmoid function](03-Neuron/figures/sigmoid.png){#fig:sigmoidFunction width=400px}
 
+Figure @fig:sigmoidFunction is the result of executing the script:
+
+```Smalltalk
+g := RTGrapher new.
+d := RTData new.
+d connectColor: Color blue.
+d noDot.
+d points: (-7.0 to: 7.0 by: 0.01).
+d x: #yourself.
+d y: [ :x | 1 / (1 + (x negated exp)) ].
+g add: d.
+g
+```
 
 This sigmoid function has several advantages:
 
 - It is differentiable everywhere on the curve, or said in other words, it has no vertical lines, and even better, no angle. We can easily draw a straight line for any value $z$ that indicates the slope of $\sigma(z)$. When plotted, $\sigma(z)$ is very smooth by having no angle, which is a very good property.
 - Its derivative has some interesting properties, as we will see later.
-- The sigmoid function behave similarly than the step function for very small and very large $z$ values. 
+- The sigmoid function behaves similarly than the step function for very small and very large $z$ values. 
 - A small increment in $z$ produces a small variation of $\sigma(z)$, and as we have previously said, this is important for learning. 
 
 We define a sigmoid neuron as a neuron having the sigmoid function as activation function. The sigmoid neuron is widely accepted as a mathematical representation of a biological neuron behavior. 
@@ -117,17 +148,48 @@ StepAF>>derivative: output
 	^ 1
 ```
 
-The formulation of the `derivative:` of the step function does not match the mathematical truth, which is 0 with an undefined value for $z = 0$. However, returning $z$ instead eases the implementation of the revised `Neuron` as we will see in the next section.
+The formulation of the `derivative:` of the step function does not match the mathematical truth, which is 0 with an undefined value for $z = 0$. However, returning $1$ instead eases the implementation of the revised `Neuron` as we will see in the next section.
 
 
 ## Extending the neuron with the activation functions
+
+We can now generalize the way an artificial neuron can learn with the following rules:
+@@HERE
+
+$$\delta = (d - z) * \sigma'(z)$$
+$$w_i(t+1) = w_i(t) + \delta * x_i * \alpha$$
+$$b(t+1) = b(t) + \delta * \alpha$$
+
+
+in which:
+- $\sigma$ is the activation function. Either the step or sigmoid function 
+- $\sigma'$ is the derivative function of $\sigma$
+- $\delta$ is the difference between the desired output and the actual output of the neuron
+- $i$ is the weight index, which ranges from 1 to the number of weights contained in the neuron.
+- $w_i(t)$ is the weight $i$ at a given time $t$
+- $b(t)$ is the bias at a given time $t$
+- $d$ is the desired value
+- $z$ is the actual output of the perceptron
+- $x_i$ corresponds to the provided input at index $i$
+- $\alpha$ is the learning rate
+
+These equations can be translated into the following pseudocode:
+
+~~~~~~~
+diff = desiredOutput - realOutput
+delta = diff * derivative(realOutput)
+alpha = 0.1
+For all N:
+   weightN = weightN + (alpha * inputN * delta)
+bias = bias + (alpha * diff)
+~~~~~~~
 
 We can now extend our definition of neuron to use an activation function. We can do so by adding a new instance variable `activationFunction` to the`Neuron` class:
 
 
 ```Smalltalk
 Object subclass: #Neuron
-	instanceVariableNames: 'weights bias activationFunction'
+	instanceVariableNames: 'weights bias learningRate activationFunction'
 	classVariableNames: ''
 	package: 'NeuralNetwork'
 ```
@@ -144,17 +206,15 @@ We are now ready to implement the algorithm to train a sigmoid neuron. Here is t
 
 ```Smalltalk
 Neuron>>train: inputs desiredOutput: desiredOutput
-	| learningRate theError output delta |
-	output := self feed: inputs.
-	learningRate := 0.1.
+    | theError output delta |
+    output := self feed: inputs.
+    theError := desiredOutput - output.
+    delta := theError * (activationFunction derivative: output).    
 
-	theError := desiredOutput - output.
-	delta := theError * (activationFunction derivative: output).	
+    inputs withIndexDo: [ :anInput :index | 
+        weights at: index put: ((weights at: index) + (learningRate * delta * anInput)) ].
 
-	inputs withIndexDo: [ :anInput :index | 
-		weights at: index put: ((weights at: index) + (learningRate * delta * anInput)) ].
-
-	bias := bias + (learningRate * delta)
+    bias := bias + (learningRate * delta)
 ```
 
 The method `train:desiredOutput:` is very similar to what we have seen with the perceptron. We have introduced a `delta` local variable is represents the error multiplied by the transfer derivative. We use the transfer derivative to formulate a _gradient descent_. We will explore that topic in detail in a future chapter. 
@@ -164,6 +224,7 @@ We now need to initialize a neuron as being a sigmoid:
 ```Smalltalk
 Neuron>>initialize
 	super initialize.
+	learningRate := 0.1.
 	self sigmoid
 ```
 
@@ -182,7 +243,7 @@ Neuron>>step
 
 ## Adapting the existing tests
 
-If you run `PerceptronTest` you will see that several of the test fail. The reason is that a neuron is initialized with a sigmoid activation function. We therefore need to adapt each test method, by adding a call to `step`. For example, the method `testAND` has to be rewritten:
+If you run `PerceptronTest` you will see that several test methods fail. The reason is that a neuron is initialized with a sigmoid activation function. We therefore need to adapt each test method, by adding a call to `step`. For example, the method `testAND` has to be rewritten:
 
 ```Smalltalk
 PerceptronTest>>testAND
@@ -237,8 +298,8 @@ NeuronTest>>testTrainingAND
 
 There are two differences:
 
-- The number of epochs is significantly increased. The reason is that the sigmoid neuron learns slower than the perceptron. 
-- The result of feeding the neuron is compared using the call `closeTo:precision:`. Since the result of the `feed:` method is now a floating value and not an integer, we need to adapt our way of comparing these values. If you are still unsure what's wrong in `==` between floats, evaluate the expression `0.1 + 0.2 - 0.3`. It returns `5.551115123125783e-17` and not `0` as one would expect. The way that float values are encoded causes this behavior.
+- The number of epochs has significantly increased. The reason is that the sigmoid neuron learns slower than the perceptron. 
+- The result of feeding the neuron is compared using the call `closeTo:precision:`. Since the result of the `feed:` method is now a floating value and not an integer, we need to adapt our way of comparing these values. If you are still unsure what's wrong in using `==` between floats, evaluate the expression `0.1 + 0.2 - 0.3`. It returns `5.551115123125783e-17` and not `0` as one would expect. The way that float values are encoded causes this behavior.
 
 Similarly we can train a sigmoid neuron to learn the OR behavior:
 ```Smalltalk
@@ -263,11 +324,11 @@ NeuronTest>>testTrainingOR
 
 As you can see, using a sigmoid neuron does not mess up our tests. We simply need (i) to increase the number of epochs to which we train the neuron, and we need (ii) to be more careful when comparing floating values.
 
-*EXERCISE:* We wrote an adapted version of the OR and AND logical gates for the sigmoid neuron. Adapt the other logical gates.
+*EXERCISE:* We wrote an adapted version of the OR and AND logical gates for the sigmoid neuron. Adapt the other logical gates to use the Sigmoid neuron.
 
 ## Slower to learn
 
-This chapter started by bashing the perceptron for its limitations. This has motivated us to formulate the sigmoid neuron. We see one drawback of the sigmoid neuron: it is slower to learn than the perceptron. We are here making a bet, which is trading efficiency for flexibility: as we will see in the next chapter, sigmoid neuron can be combined and still can learn.
+This chapter started by pointing out a strong limitation of the perceptron. This has motivated us to formulate the sigmoid neuron. We see one drawback of the sigmoid neuron: it is slower to learn than the perceptron. We are here making a bet, which is trading efficiency for flexibility: as we will see in the next chapter, sigmoid neuron can be nicely combined.
 
 We can easily make the comparison between the sigmoid neuron and perceptron. Consider the following script:
 
@@ -297,7 +358,7 @@ learningCurvePerceptron := OrderedCollection new.
 0 to: 1000 do: [ :nbOfTrained |
     r := Random new seed: 42.
     p := Neuron new.
-	 p step.
+	p step.
     p weights: #(-1 -1).
     p bias: 2.
 
@@ -339,7 +400,7 @@ g
 
 ![Perceptron vs Sigmoid neuron](03-Neuron/figures/perceptronVsSigmoid.png){#fig:perceptronVsSigmoid width=400px}
 
-The script produces Figure @fig:perceptronVsSigmoid. No matter the learning rate defined in the method `train:desiredOutput:`, the perceptron is indeed much faster to learn then the sigmoid neuron. 
+The script produces Figure @fig:perceptronVsSigmoid. No matter the learning rate defined, the perceptron is indeed much faster to learn than the sigmoid neuron. 
 
 The next chapter will reveals the true power of sigmoid neuron, which will shadow the fact it is slower to learn.
 

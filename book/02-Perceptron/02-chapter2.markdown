@@ -416,9 +416,8 @@ We can now define the method `train:desiredOutput:` to make a perceptron learn.
 
 ~~~~~~~
 Neuron>>train: inputs desiredOutput: desiredOutput
-	| learningRate theError output newWeight |
+	| theError output newWeight |
 	output := self feed: inputs.
-	learningRate := 0.1.
 	theError := desiredOutput - output.
 	inputs
 		withIndexDo: [ :anInput :index | 
