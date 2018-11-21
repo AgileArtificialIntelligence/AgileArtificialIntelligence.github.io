@@ -23,7 +23,7 @@ In addition to the weighted input value, a perceptron requires a _bias_, a numer
 
 A perceptron receives a stimulus as input and responds to that stimulus by producing an output value. The output obeys a very simple rule: if the sum of the weighted inputs is above a value, then the perceptron fires 1, else it fires 0. Programmatically, we first compute the sum of the weighted inputs and the bias. If this sum is strictly above 0, then the perceptron produces 1, else it produces 0.
 
-Formally, based on the perceptron given in Figure @fig:perceptron, we write $z = x1 * w1 + x2 * w2 + x3 * w3 + b$. In the general case, we write $z = \sum_i{x_i * w_i}~ + b$. The variable $i$ ranges over all the inputs of the perceptron. If $z \gt 0$, then the perceptron produces 1, else if $z \leq 0$ it produces 0.
+Formally, based on the perceptron given in Figure @fig:perceptron, we write $z = x1 * w1 + x2 * w2 + x3 * w3 + b$. In the general case, we write $z = \sum_i{x_i * w_i}~ + b$. The variable $i$ ranges over all the inputs of the perceptron. If $z > 0$, then the perceptron produces 1, else if $z \leq 0$ it produces 0.
 
 In the next section, we will implement a perceptron model that is both extensible and maintainable. You may wonder, "What is the big deal about this?" After all, the perceptron model may be implemented in a few lines of code. However, implementing the perceptron functionality is just a fraction of the job. Creating a perceptron model that is testable, well tested, and extensible is the real value of this chapter.
 
