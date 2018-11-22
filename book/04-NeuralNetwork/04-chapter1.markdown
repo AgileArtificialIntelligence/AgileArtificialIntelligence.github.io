@@ -11,15 +11,19 @@ An artificial neural network is a collection of connected artificial neurons. Ea
 ![Example of a neural network](04-NeuralNetwork/figures/generalStructure.png){#fig:generalStructure width=300}
 
 
-Figure @fig:generalStructure shows a simple neural network made of five neurons, three inputs, and two outputs. The left-most column is called the input layer. The input layers simply transmits some values to the hidden layer, without doing anything in particular. In the figure, the input layer is made of three inputs, `x1`, `x2`, and `x3`. The middle of the network contains the hidden layers. The network above contains only one hidden layer, made of three neurons. However, a network may contains several hidden layers. The right-most column of the network is called output layer, and contains of two neurons. 
+Figure @fig:generalStructure shows a simple neural network made of five neurons, three inputs, and two outputs. The left-most column is called the input layer. The input layers simply transmits some values to the hidden layer, without doing anything in particular. In the figure, the input layer is made of three inputs, `x1`, `x2`, and `x3`. The middle of the network contains the hidden layers. The network above contains only one hidden layer, made of three neurons. However, a network may contains several hidden layers. The right-most column of the network is called output layer, and contains two neurons. 
 
-All values transmitted between neurons are numerical values. The output values, `o1` and `o2` are number ranging between 0 and 1.
+All values transmitted between neurons are numerical values. The output values, `o1` and `o2` are number ranging between 0 and 1. Since all the neurons we will consider have a sigmoid activation function, only values ranging between 0 and 1 are transmitted between neuron layers.
 
-The depicted neural network is qualified as _fully-connected_ since each neuron of the hidden layer is connected with _all_ the neurons of the input layer and _all_ the neurons of the output layer. The next sections provide an implementation of abstraction we informally presented.
+The depicted neural network is qualified as _fully-connected_ since each neuron of the hidden layer is connected with _all_ the neurons of the input layer and _all_ the neurons of the output layer. Such a network corresponds to the simplest architecture. More sophisticated architecture may be recurrent neural network and convolutional neural networks.
+
+This chapter provides an implementation of abstraction we informally presented. The next chapter will uncover some theoretical aspects of the fully-connected network.
 
 ## Neural layer
 
-We define a layer as a set of neurons. Each layer knows about the preceding layer using the variable `previousLayer` and the following layer using `nextLayer`. The `learningRate` variable refers to the learning rate of the layer. We define the class `NeuronLayer` as follows:
+We define a layer as a set of neurons. Layers are connected between them, and a set of layers form a neural network. We will represent a layer with the `NeuronLayer` class.
+
+Each layer knows about the preceding layer using the variable `previousLayer` and the following layer using `nextLayer`. The `learningRate` variable refers to the learning rate of the layer. We define the class `NeuronLayer` as follows:
 
 ```Smalltalk
 Object subclass: #NeuronLayer
