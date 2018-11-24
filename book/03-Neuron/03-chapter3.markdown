@@ -154,7 +154,6 @@ The formulation of the `derivative:` of the step function does not match the mat
 ## Extending the neuron with the activation functions
 
 We can now generalize the way an artificial neuron can learn with the following rules:
-@@HERE
 
 $$\delta = (d - z) * \sigma'(z)$$
 $$w_i(t+1) = w_i(t) + \delta * x_i * \alpha$$
@@ -175,14 +174,14 @@ in which:
 
 These equations can be translated into the following pseudocode:
 
-~~~~~~~
+```
 diff = desiredOutput - realOutput
 delta = diff * derivative(realOutput)
 alpha = 0.1
 For all N:
    weightN = weightN + (alpha * inputN * delta)
 bias = bias + (alpha * diff)
-~~~~~~~
+```
 
 We can now extend our definition of neuron to use an activation function. We can do so by adding a new instance variable `activationFunction` to the`Neuron` class:
 

@@ -8,7 +8,7 @@ Agile Artificial Intelligence is a book series that covers classical algorithms 
 1. [Artificial Neuron](./book/build/03-Neuron.html)
 1. [Neural Network](./book/build/04-NeuralNetwork.html)
 1. [Theory on Learning](./book/build/05-Learning.html)
-1. [Application: Classifying Data](./book/build/06-Data.html)
+1. [Application: Data Classification](./book/build/06-Data.html)
 
 # Hey Reader!
 
