@@ -161,6 +161,7 @@ $$b(t+1) = b(t) + \delta * \alpha$$
 
 
 in which:
+
 - $\sigma$ is the activation function. Either the step or sigmoid function 
 - $\sigma'$ is the derivative function of $\sigma$
 - $\delta$ is the difference between the desired output and the actual output of the neuron

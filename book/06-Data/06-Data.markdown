@@ -1,7 +1,7 @@
 
 # Application: Data Classification
 
-This chapter covers the classification of data, which is one of the most prominent applications of neural networks.
+Neural networks have an incredibly large range of applications. Classifying data is a prominent one, and is the topic of this chapter.
 
 ## Support to easily train network
 
@@ -19,32 +19,46 @@ n configure: 2 hidden: 3 nbOfOutputs: 1.
 ].
 ```
 
-After evaluating this script, the expression `n feed: #(1 0)` evaluates to `#(0.9530556769505442)`, an array having an expected float value close to 1. If we step back a bit, we see that the script is actually very verbose. For example, why should we manually handle the repetition? Why having the message `train:desiredOutputs:` called so many times? We can greatly simplify the way network are trained by providing a bit of infrastructure.
+After evaluating this script, the expression `n feed: #(1 0)` evaluates to `#(0.9530556769505442)`, an array having an expected float value close to 1. If we step back a bit, we see that the script is actually very verbose. For example, why should we manually handle the repetition? Why having the message `train:desiredOutputs:` sent so many times? We can greatly simplify the way network are trained by providing a bit of infrastructure.
 
 Consider the following method:
 
 ```Smalltalk
 NNetwork>>train: train nbEpoch: nbEpoch
-	"Train the network using the train data set."
-	| sumError outputs expectedOutput t |
-	1 to: nbEpoch do: [ :epoch |
-		sumError := 0.
-		train do: [ :row |
-			outputs := self feed: row allButLast.
-			expectedOutput := (1 to: self numberOfOutputs) collect: [ :notUsed | 0 ].
-			expectedOutput at: (row last) + 1 put: 1.
-			 
-			t := (1 to: expectedOutput size) 
-					collect: [ :i | ((expectedOutput at: i) - (outputs at: i)) raisedTo: 2 ].
-			sumError := sumError + t sum.
-			self backwardPropagateError: expectedOutput.
-			self updateWeight: row allButLast.
-		].
-		errors add: sumError
-	] 
+    "Train the network using the train data set."
+    | sumError outputs expectedOutput epochPrecision t |
+    1 to: nbEpoch do: [ :epoch |
+        sumError := 0.
+		  epochPrecision := 0.
+        train do: [ :row |
+            outputs := self feed: row allButLast.
+            expectedOutput := (1 to: self numberOfOutputs) collect: [ :notUsed | 0 ].
+            expectedOutput at: (row last) + 1 put: 1.
+            (row last = (self predict: row allButLast)) ifTrue: [ epochPrecision := epochPrecision + 1 ].
+            t := (1 to: expectedOutput size) 
+                    collect: [ :i | ((expectedOutput at: i) - (outputs at: i)) raisedTo: 2 ].
+            sumError := sumError + t sum.
+            self backwardPropagateError: expectedOutput.
+            self updateWeight: row allButLast.
+        ].
+        errors add: sumError.
+		  precisions add: (epochPrecision / train size) asFloat.
+    ] 
 ```
 
-The method makes the network training significantly less verbose. The script provided above can now be written:
+Predicting the output for a given set of input values may be implemented using a `predict:` method:
+
+```Smalltalk
+NNetwork>>predict: inputs
+	"Make a prediction. This method assumes that the number of outputs is the same than the number of different values the network can output"
+	"The index of a collection begins at 1 in Pharo"
+	| outputs |
+	outputs := self feed: inputs.
+	^ (outputs indexOf: (outputs max)) - 1
+```
+
+
+These two methods make the network training significantly less verbose. The script that trains a network with XOR logical gate can now be written:
 
 ```Smalltalk
 n := NNetwork new.
@@ -57,18 +71,7 @@ data := {#(0 0 0) .
 n train: data nbEpoch: 20000
 ```
 
-The `data` variable is an array of array of numbers. Each row represents an example and it contains the input values and the output value. For example, the row `#(0 1 1)` represents the line `n train: #(0 1) desiredOutputs: #(1)` given above. Note that we have two outputs, and not only one. This is the result of using a one-hot encoding for the output. Later on in this chapter we will explain this encoding.
-
-Predicting the output for a given set of input values may be implemented using a `predict:` method:
-
-```Smalltalk
-NNetwork>>predict: inputs
-	"Make a prediction. This method assume that the number of outputs is the same than the number of different values the network can output"
-	"The index of a collection begins at 1 in Pharo"
-	| outputs |
-	outputs := self feed: inputs.
-	^ (outputs indexOf: (outputs max)) - 1
-```
+The `data` variable is an array of arrays of numbers. Each row represents an example and it contains the input values and the output value. For example, the row `#(0 1 1)` represents the line `n train: #(0 1) desiredOutputs: #(1)` given above. Note that the neural network has two output neurons. This is the result of using a one-hot encoding for the output. The examples have two different output values, either `0` or `1`, therefore using the one-hot encoding we have two output neurons, each neuron for a particular value. Later on in this chapter we will detail this encoding.
 
 Another example of using the syntax we have just introduced:
 
@@ -87,19 +90,19 @@ data := {#(0 0 0 0).
 n train: data nbEpoch: 1000.
 ```
 
-The code above builds a neural network trained to convert binary numbers into a decimal number. As an example, you can evaluate the following:
+The code above builds a neural network trained to convert binary numbers into a decimal number. The binary number is encoded using 3 bits, we therefore need a neural network with 3 inputs. Since the decimal value ranges from 0 to 7, we need 8 output neurons of the network. As an example, the conversion of the binary number you can evaluate the following:
 
 ```Smalltalk
 n predict: #(0 1 1)
 "==> 3"
 ```
 
-The way `train:nbEpoch:` and `predict:` are implemented enforces the training data to follow some rules. Each element contained in `data` must be a collection of numbers. All but the last numbers represents the inputs values. The last value of an example is a number representing the expected output. The expected output is a positive value ranging from 0 and the number of outputs of the neural network minus one. In the script above, the expected output ranges from 0 to 7, and the neural network has 8 outputs.
+The way `train:nbEpoch:` and `predict:` are implemented enforces the training data to follow some rules. Each element contained in `data` must be a collection of numbers. All but the last numbers represents the inputs values. The last value of an example is a number representing the expected output. The expected output is a positive value ranging from 0 and the number of outputs of the neural network minus one.
 
 
 ## Neural network as a Hashmap
 
-Let's step back a bit. We have spent more than five chapters motivating, describing, incrementally building neural networks. But we are using a neural network pretty much the way we would use a regular hash map. Consider the following example:
+Let's step back a bit. We have spent six chapters motivating, describing, incrementally building neural networks. But we are using a neural network pretty much the way we would use a regular hash map. Consider the following example:
 
 ```Smalltalk
 data := {#(0 0 0 0).
@@ -114,7 +117,8 @@ data := {#(0 0 0 0).
 d := Dictionary new.
 data do: [ :anExample |
 	d at: anExample allButLast put: anExample last ].
-d at: #(1 0 1)
+d at: #(0 1 1)
+"==> 3"
 ```
 
 The variable `d` is a dictionary filled with the example data. The values we used as input in the neural network are used as keys in the dictionary. Indeed, using a dictionary has many benefits here: filling a dictionary is significantly faster than training a neural network (by several order of magnitude!), and getting a value for a particular key is also significantly faster then feed forwarding a network.
@@ -132,48 +136,62 @@ The network somehow matches the input values `#(0.4 0.7 0.6)` to `#(0 1 1)`, whi
 
 We have seen that the first step of the backpropagation is to actually evaluate the network with the provided inputs. The output values are then compared with the expected output values. The difference between the actual output and the expected output is then used to adjust the weights and biases by back-propagating this difference to the network. 
 
-The method `NNetwork>>train:nbEpoch:` contains the statement `errors add: sumError`. This line of code has the effect to record the value of `sumError`, indicating how well the network has performed for the provided example. This list of errors can be visualized as a helper to characterize the overall network learning.
+The method `NNetwork>>train:nbEpoch:` contains the statements `errors add: sumError` and `precisions add: (epochPrecision / train size) asFloat`. These two lines of code have the effect to record the value of `sumError`, indicating how well the network has performed for the provided example, and the value of precision per epoch. These two collections of numbers can be visualized as a helper to characterize the overall learning process for a given network and example set.
 
-We define the method `viewErrorCurve` on the class `NNetwork`:
+We define the method `viewLearningCurve` on the class `NNetwork`:
 
 ```Smalltalk
-NNetwork>>viewErrorCurve
+NNetwork>>viewLearningCurve
 	| b ds |
-	errors ifEmpty: [ 
-		^ RTView new 
-			add: (RTLabel elementOn: 'Should first run the network'); 
-			yourself ].
-	
-	b := RTGrapher new.
-	
+	errors
+		ifEmpty: [ ^ RTView new
+				add: (RTLabel elementOn: 'Should first run the network');
+				yourself ].
+	b := RTDoubleGrapher new.
+
 	"We define the size of the charting area"
 	b extent: 500 @ 300.
-	
 	ds := RTData new.
-	ds noDot. 
+	ds samplingIfMoreThan: 2000.
+	ds noDot.
 	ds connectColor: Color blue.
-	ds points: errors.
+	ds points: (errors collectWithIndex: [ :y :i | i -> y ]).
+	ds x: #key.
+	ds y: #value.
 	ds dotShape rectangle color: Color blue.
 	b add: ds.
-	
-	b axisX noDecimal; title: 'Epoch'.
+	ds := RTData new.
+	ds samplingIfMoreThan: 2000.
+	ds noDot.
+	ds connectColor: Color red.
+	ds points: (precisions collectWithIndex: [ :y :i | i -> y ]).
+	ds x: #key.
+	ds y: #value.
+	ds dotShape rectangle color: Color blue.
+	b addRight: ds.
+	b axisX
+		noDecimal;
+		title: 'Epoch'.
 	b axisY title: 'Error'.
+	b axisYRight
+		title: 'Precision';
+		color: Color red.
 	^ b
 ```
 
-The following method makes the visualization of the `errors` variable always shown:
+The following method defines a visualization of the `errors` and `precisions` variables:
 ```Smalltalk
-NNetwork>>viewErrorCurveIn: composite
+NNetwork>>viewLearningCurveIn: composite
 	<gtInspectorPresentationOrder: -10>
 	composite roassal2
-		title: 'Error';
+		title: 'Learning';
 		initializeView: [
-			self viewErrorCurve ]
+			self viewLearningCurve ]
 ```
 
-The method `NNetwork>>viewErrorCurveIn:` uses the GTInspector framework to add particularized tab in the inspector.
+The method `NNetwork>>viewLearningCurveIn:` uses the GTInspector framework to add particularized tab in the inspector.
 
-Inspecting the following code snippet displays the error curve (Figure @fig:errorCurve):
+Inspecting the following code snippet displays the error curve (Figure @fig:learningCurve):
 
 ```Smalltalk
 n := NNetwork new.
@@ -186,10 +204,9 @@ data := {#(0 0 0) .
 n train: data nbEpoch: 10000.
 ```
 
-![Visualizing the error curve.](06-Data/figures/errorCurve.png){#fig:errorCurve}
+![Visualizing the learning.](06-Data/figures/errorCurve.png){#fig:learningCurve}
 
-The error curve indicates the effect of the number of epochs on making the neural network learn. Being that close to 0 is a strong indicator that the neural network is properly learning. 
-
+The learning curves indicate the effect of the number of epochs on making the neural network learn. The fact that the blue lines is close to 0 is a strong indicator that the neural network is properly learning. And the fact that the red line reaches 1.0 means that the network is accurate.
 
 Similarly, we can visualize the topology of the network using the following method:
 
@@ -222,13 +239,15 @@ Defining the helper method as:
 
 ```Smalltalk
 NNetwork>>numberOfInputs
-	^ layers first neurons size
+	"Return the number of inputs the network has"
+    ^ layers first neurons size
 ```
 
 and the method:
 
 ```Smalltalk
 NNetwork>>numberOfNeurons
+	"Return the total number of neurons the network has"
 	^ (layers collect: #numberOfNeurons) sum
 ```
 
@@ -236,9 +255,9 @@ Similarly, we need to extend GTInspector to consider the visualization within GT
 
 ```Smalltalk
 NNetwork>>viewNetworkIn: composite
-	<gtInspectorPresentationOrder: -10>
+	<gtInspectorPresentationOrder: -5>
 	composite roassal2
-		title: 'network';
+		title: 'Network';
 		initializeView: [
 			self viewNetwork ]
 ```
@@ -249,9 +268,9 @@ Note that by clicking on a neural reveals its weights and bias.
 
 ## Contradictory data
 
-The error curve quantifies the error made by the network during the learning phase. It may happens that the error has some plateaus. In such a case, increasing the number of epochs may have the effect to lower the error curve. 
+The blue error curve quantifies the error made by the network during the learning phase. It may happens that the error has some plateaus. In such a case, increasing the number of epochs may have the effect to lower the error curve. 
 
-In some case, the error curve may indicates some contradiction in the data. Consider the following example:
+In some case, the error curve may indicates a contradiction in the data. Consider the following example:
 
 ```Smalltalk
 n := NNetwork new.
@@ -262,11 +281,13 @@ data := {#(0 0 0) .
 n train: data nbEpoch: 1000.
 ```
 
+The script trains a neural network with two contradictory examples. The first example trains the network to output `0` with the inputs `0` and `0`. The second example trains the network to output `1` for the same input values. 
+
 ![Data contradiction.](06-Data/figures/contradictionInData.png){#fig:contradictionInData}
 
-Figure @fig:contradictionInData illustrates the error curve in presence of contradicting data. The script given above makes the neural network learn two different outputs for exactly the same input values. As a consequence, the network will have to make mistake during the learning phase. 
+Figure @fig:contradictionInData illustrates the error and precision curves in presence of contradicting data. The script given above makes the neural network learn two different outputs for exactly the same input values. As a consequence, the network will have to make mistake during the learning phase. 
 
-Using a real and non-trivial dataset it is likely that this situation will happens. In case that the occurrence of the contradiction is low, then the network will handle the dataset properly.
+Using a real and non-trivial dataset it is likely that this situation will happens. In case that the contradictory occurrences is low, then the network will handle the dataset properly.
 
 ## Classifying data & one hot encoding
 
