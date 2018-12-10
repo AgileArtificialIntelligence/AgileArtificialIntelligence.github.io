@@ -4,3 +4,43 @@ Genetic programming
 Programming by example: identifying rules that performs some string manipulations. Look for "Neural Programming by Example"
 
 Many links: https://github.com/fcampelo/EC-Bestiary
+
+
+
+
+list := #(8 4 6 2 10 12 14 16 18).
+sums := { 
+	#(1 2 3).
+	#(4 5 6).
+	#(7 8 9).
+	
+	#(1 5 9).
+	#(7 5 3).
+	
+	#(1 4 7).
+	#(2 5 8).
+	#(3 6 9).
+	}.
+g := GAEngine new.
+g populationSize: 300.
+g endIfFitnessIsAbove: 8.
+g mutationRate: 0.01.
+g numberOfGenes: 9.
+g createGeneBlock: [ :rand :index | list atRandom: rand. ].
+g fitnessBlock: [ :genes |
+	genes asSet size = genes size ifTrue: [ 
+		(sums collect: [ :arr |
+			(arr collect: [:index | genes at: index]) sum ]) 
+			inject: 0 into: [ :a :b | a + (b = 30 
+				ifTrue: [ 1 ]
+				ifFalse: [ 0 ]) ] 
+	] ifFalse: [ 1.1 ].
+	].
+g run.
+v := RTView new.
+label := RTLabel new.
+elements := label 
+	elementsOn: g result. 
+v addAll: elements.
+RTGridLayout on: elements.
+v 

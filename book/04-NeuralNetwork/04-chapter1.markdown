@@ -56,8 +56,10 @@ Lastly, the method set the learning rate of each neuron at `0.1`. The method `le
 
 ```Smalltalk
 NeuronLayer>>learningRate: aLearningRate
-	"Set the learning rate for the neurons"
-	neurons do: [ :n | n learningRate: aLearningRate ]
+	"Set the learning rate for all the layers
+	Note that this method should be called after configuring the network, and _not_ before"
+	self assert: [ layers notEmpty ] description: 'learningRate: should be invoked after configuring the network'.
+	layers do: [ :l | l learningRate: aLearningRate ] 
 ```
 
 Forward feeding the layer is an essential operation. It consists in feeding each neuron and forwarding the values to the next layer. We define the method `feed:` as:

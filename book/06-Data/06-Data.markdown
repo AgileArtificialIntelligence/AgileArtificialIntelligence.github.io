@@ -301,7 +301,7 @@ One hot encoding is a simple mechanism that converts a categorical variable into
 - _"bonjour"_ = [0, 1, 0] 
 - _"Buenos dias"_ = [0, 0, 1]
 
-If the variable $v$ has to be provided to a neural network, then 3 input values can be used for that purpose. 
+If the variable $v$ has to be provided to a neural network, then 3 neurons can be used for that purpose. 
 
 We have defined the XOR dataset as:
 
@@ -337,13 +337,13 @@ The code above fetches the file `iris.csv` and returns its content. The file str
 sepal_length,sepal_width,petal_length,petal_width,species
 ```
 
-However, fetching the file is just a small step toward making the file processable by a neural networks. For example, we need to convert each row of the file into a set of numerical values. 
+However, fetching the file is just the first small step toward making the file processable by a neural networks. For example, we need to convert each row of the file into a set of numerical values. 
 
 In order to feed a network with the iris data set, we need to perform the following steps:
 
 1. Fetch the file from the net;
-2. Cut the file content, which is a big sting, into lines;
-3. Ignore the first line of the line, which contains the CSV header and is therefore not relevant for the network;
+2. Cut the file content, represented as a very long string, into lines;
+3. Ignore the first line of the file, since it contains the CSV header, which is not relevant for the network;
 4. Each row has 5 entries for which the first 4 ones are numerical values and the last one is the flower name. We need to extract subtrings of a row, each substring separated by a comma. The last column needs to be presented, which is processed in the next step;
 5. We replace in the table each flower name by a numerical value, which could be 0, 1, or 2.
 
@@ -358,7 +358,7 @@ lines := lines allButFirst.
 tLines := lines collect: [ :l | 
 		| ss |
 		ss := l substrings: ','.
-		(ss allButLast collect: [ :w | Float readFrom: w ]), (Array with: ss last) ].
+		(ss allButLast collect: [ :w | w asNumber ]), (Array with: ss last) ].
 
 
 irisData := tLines collect: [ :row | 
@@ -371,7 +371,7 @@ irisData := tLines collect: [ :row |
 irisData.
 ```
 
-To summarize, the script convert a string similar to:
+To summarize, the script convert a very long string similar to:
 
 ```
 'sepal_length,sepal_width,petal_length,petal_width,species
@@ -404,11 +404,55 @@ The code above builds a network with 4 input values, one hidden layer with 6 neu
 
 ![Learning the Iris dataset.](06-Data/figures/networkOnIris.png){#fig:networkOnIris}
 
-Figure @fig:networkOnIris represents the error curve of the network. As you can see, the curves is very close to 0, which indicates that the network is learning and the dataset does not have contradiction. 
+Figure @fig:networkOnIris represents the error curve of the network. The blue curve is very close to 0, which indicates that the network is learning and the dataset does not have contradiction. The red curve is very close to 1.0, which means that the network has an excellent precision. The network is able to learn and achieve a good precision during that learning process.
 
 The configuration of our network has two parameters: the number of neurons in the hidden layers, and the number of epochs to consider. There are no general rules on how to pick these parameters. Experiments and ad-hoc tries remain the easiest approach to configure a network.
 
-## Training vs test dataset
+## Effect of the learning curve
+
+When we defined the `Neuron` class, in Chapter 2, we introduce the method `learningRate:` to set the learning rate of the neuron. In general, for a single neuron, higher the learning rate, quicker it will be to learn. 
+
+Consider the following example:
+
+```Smalltalk
+	g := RTGrapher new.
+	#(0.001 0.01 0.1 0.2 0.3)
+		doWithIndex: [ :lr :index | 
+			learningCurveNeuron := OrderedCollection new.
+			0 to: 1000 do: [ :nbOfTrained | 
+				r := Random new seed: 42.
+				p := Neuron new.
+				p weights: #(-1 -1).
+				p bias: 2.
+				p learningRate: lr.
+				nbOfTrained
+					timesRepeat: [ p train: #(0 0) desiredOutput: 0.
+						p train: #(0 1) desiredOutput: 0.
+						p train: #(1 0) desiredOutput: 0.
+						p train: #(1 1) desiredOutput: 1 ].
+				res := ((p feed: #(0 0)) - 0) abs + ((p feed: #(0 1)) - 0) abs
+					+ ((p feed: #(1 0)) - 0) abs + ((p feed: #(1 1)) - 1) abs.
+				learningCurveNeuron add: res / 4 ].
+			d := RTData new.
+			d label: 'Sigmoid neuron lr = ' , lr asString.
+			d noDot.
+			d connectColor: (RTPalette c1 at: index).
+			d points: learningCurveNeuron.
+			d y: #yourself.
+			g add: d ].
+	g legend addText: 'Learning rate effect'.
+	g
+```
+
+![Effect of the learning rate for a single neuron.](06-Data/figures/learningRateSingleNeuron.png){#fig:learningRateSingleNeuron}
+
+Figure @fig:learningRateSingleNeuron represent the error curve during the training for five different values of the learning rate (0.001, 0.01, 0.1, 0.2, and 0.3). The graphs indicates that higher the learning rate, quicker it learns. We can verify this on the network.
+
+![Effect of the learning rate for a single neuron.](06-Data/figures/learningRateNetwork.png){#fig:learningRateNetwork}
+
+@@HERE
+
+## Test and Validation
 
 In the previous section we built a network trained on the whole iris dataset: we consider all the entries in the `.csv` file to train the network. The network seems to properly learn as the network does less error along the epochs (_i.e.,_ the error curve is getting very close to 0). 
 
