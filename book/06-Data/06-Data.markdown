@@ -410,9 +410,7 @@ The configuration of our network has two parameters: the number of neurons in th
 
 ## Effect of the learning curve
 
-When we defined the `Neuron` class, in Chapter 2, we introduce the method `learningRate:` to set the learning rate of the neuron. In general, for a single neuron, higher the learning rate, quicker it will be to learn. 
-
-Consider the following example:
+When we defined the `Neuron` class, in Chapter 2, we defined the method `learningRate:` to set the learning rate of the neuron. In general, for a single neuron, higher the learning rate, quicker it will be to learn. This effect can be easily illustrated. Consider the following example (Figure @fig:learningRateSingleNeuron):
 
 ```Smalltalk
 	g := RTGrapher new.
@@ -446,22 +444,35 @@ Consider the following example:
 
 ![Effect of the learning rate for a single neuron.](06-Data/figures/learningRateSingleNeuron.png){#fig:learningRateSingleNeuron}
 
-Figure @fig:learningRateSingleNeuron represent the error curve during the training for five different values of the learning rate (0.001, 0.01, 0.1, 0.2, and 0.3). The graphs indicates that higher the learning rate, quicker it learns. We can verify this on the network.
+Figure @fig:learningRateSingleNeuron represents the error curves during the training for five different values of the learning rate (0.001, 0.01, 0.1, 0.2, and 0.3). The graphs indicates that higher the learning rate, quicker it learns. 
 
-![Effect of the learning rate for a single neuron.](06-Data/figures/learningRateNetwork.png){#fig:learningRateNetwork}
+The effect observed on a single sigmoid neuron _cannot_ be observed on a whole network. We can train a network for the Iris dataset for different values of the learning rate. Consider the script:
 
-@@HERE
+```Smalltalk
+n := NNetwork new.
+n configure: 4 hidden: 6 nbOfOutputs: 3.
+n learningRate: 0.3. " Repeat the script with a different value"
+n train: irisData nbEpoch: 1000.
+```
+
+We run the script for each of the value 0.001, 0.01, 0.1, and 0.3. Results are presented in Figure @fig:learningRateNetwork.
+
+![Effect of the learning rate for neural network on the Iris dataset.](06-Data/figures/learningRateNetwork.png){#fig:learningRateNetwork}
+
+We clearly see that for a low learning rate, the precision and error curves are rather stable. While for a high learning rate, we experience very frequent peaks. 
+
+Unfortunately, there is no general methodology to identify the adequate learning rate or the architecture of the network. Manual tuning is the norm so far.
 
 ## Test and Validation
 
-In the previous section we built a network trained on the whole iris dataset: we consider all the entries in the `.csv` file to train the network. The network seems to properly learn as the network does less error along the epochs (_i.e.,_ the error curve is getting very close to 0). 
+So far, we built a network trained on the whole iris dataset: we consider all the entries in the `.csv` file to train the network. The network seems to properly learn as the network does less error and the precision is increasing along the epochs (_i.e.,_ the error curve is getting very close to 0). 
 
 The error curve indicates how well the network is learning for the provided dataset. If we wish to know how well the network classifies data, it would not make much sense to test it on data it was trained with. Asking a network how well it performs in presence of the very same data used for the training is not much of a challenge. However, an important question is how well the network behaves in presence of data that it has never seen. Said in other word: _how well the network classifies unknown data?_
 
-We divide the iris dataset in two parts: 
+One way to answer this question, is to divide the iris dataset in two distinct parts: 
 
-- _Training dataset_: This section of the `.csv` file is used to train the network.
-- _Test dataset_: This second section is used to see how effective the trained network is.
+- _Training dataset_: a portion of the `.csv` file used to train the network.
+- _Test dataset_: a second portion used to see how effective the trained network is.
 
 Consider the following script:
 ```
@@ -502,7 +513,7 @@ n train: trainingData nbEpoch: 1000.
 
 Evaluating the script produces a value of 0.9, which represents the accuracy of our network: 90% of the elements contained in `testData` are correctly predicted. 
 
-We will now detail the last of the script:
+We will now detail the last part of the script:
 ```
 (((testData collect: [ :d |
 	(n predict: d allButLast) = d last
@@ -552,11 +563,11 @@ n train: trainingData nbEpoch: 1000.
 ]) select: #yourself) size / testData size) asFloat round: 2 
 ```
 
-The script introduces a new variable, called `shuffledIrisData`. It is initialized with `irisData shuffleBy: (Random seed: 42)`, which as the effect to create a copy of `irisData` shuffled using a random number. Not that in case we wish to not use a random number generator and therefore have slightly different result at each run, we could simply use `shuffled` instead of `shuffleBy: (Random seed: 42)`.
+The script introduces a new variable, called `shuffledIrisData`. It is initialized with `irisData shuffleBy: (Random seed: 42)`, which as the effect to create a copy of `irisData` shuffled using a random number. In case we wish to not use a random number generator and therefore have slightly different result at each run, we could simply use `shuffled` instead of `shuffleBy: (Random seed: 42)`.
 
 ## Normalization
 
-When we presented the perceptron and the sigmoid neuron, we have seen that the activation function is applied to the value $z = w.x + b$. Applied to a neuron with two inputs, we have $z = x_1 . w_1 + x_2 . w_2 + b$. In the examples we have considered so far, all the $x_i$ range within a similar interval. In the logical gate example, each $x_i$ is either 0 or 1. In the Iris dataset, we can compute the minimum and maximum for each input value:
+When we presented the perceptron and the sigmoid neuron, we have seen that the activation function is applied to the value $z = w.x + b$. Applied to a neuron with two inputs, we have $z = x_1 . w_1 + x_2 . w_2 + b$. In the examples we have considered so far, all the $x_i$ and output values ranges in the same interval, from 0 to 1. In the logical gate example, each $x_i$ is either 0 or 1. In the Iris dataset, we can compute the minimum and maximum for each input value:
 
 ```Smalltalk
 max := OrderedCollection new.
@@ -609,7 +620,7 @@ n train: data nbEpoch: 10000.
 
 ![The Iris dataset oddly scaled.](06-Data/figures/digitConvertionBiased.png){#fig:digitConvertionBiased}
 
-Figure @fig:digitConvertionBiased shows the error curve along the epochs. The evolution of the error has reached a plateau. The reasons is that changing the scale of a particular input value affect the relevance of these values.
+Figure @fig:digitConvertionBiased shows the error curve and the precision along the epochs. The evolution of the error has reached a plateau and the precision does not go above 0.5. The reasons is that changing the scale of a particular input value affects the relevance of these values.
 
 The sigmoid function returns a value between 0 and 1. Having the same range for the input improves the learning performance. One way to avoid distortion in our data, each input should range between 0 and 1. The process of transforming data from an arbitrary range to  a restricted range is called _normalization_. 
 
@@ -619,7 +630,7 @@ $$
 f(x) = \frac{(x - d_L)(n_H - n_L)}{d_H - d_L} + n_L
 $$
 
-The function $f(x)$ normalizes a value $x$. The variables $d$ represents the high and low values of the data. The variables $n$ represents the desired high and low normalization range.
+The function $f(x)$ normalizes a value $x$. The variables $d$ represents the high and low values of the data. The variables $n$ represents the desired high and low normalization range. In most of our cases, we will have $n_L = 0$ and $n_H = 1$.
 
 We can therefore implement the following utility class: 
 
@@ -712,6 +723,8 @@ $$
 g(x) = \frac{(d_L - d_H)x - (n_H d_L) + d_H n_L}{n_L - n_H}
 $$
 
+We give the denormalization function for sake of completeness. We will not use it since we excluded data regression from this chapter.
+
 ## What have we seen in this chapter
 
 This chapter was like a long road exploring different aspects of data manipulation. In particular, it explores:
@@ -721,3 +734,4 @@ This chapter was like a long road exploring different aspects of data manipulati
 - The Iris dataset as a complete example of applying network network to classify data
 - The relevance of normalizing data before processing
 
+We invite the reader to explore different dataset. The website [https://archive.ics.uci.edu/ml/datasets.html](https://archive.ics.uci.edu/ml/datasets.html) gives many relevant dataset to be employed with a neural network or any other machine learning algorithm.
