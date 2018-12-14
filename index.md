@@ -42,10 +42,18 @@ So, provide feedback! There are several ways to do so:
 
 # Big thanks!
 Since the announcement of the book many have encouraged us, provided feedback, and improved the writing. In no particular order, we are grateful to 
-CH Huang, Chris Thorgrimsson, Milton Mamani, Jhonny Cerezo, Oleks Zaytsev, Stéphane Ducasse, Torsten Bergmann, Serge Stinckwich, Alexandre Rousseau, Sean P. DeNigris, Julián Grigera, Cesar Rabak, Yvan Guemkam, John Borden.
+CH Huang, Chris Thorgrimsson, Milton Mamani, Jhonny Cerezo, Oleks Zaytsev, Stéphane Ducasse, Torsten Bergmann, Serge Stinckwich, Alexandre Rousseau, Sean P. DeNigris, Julián Grigera, Cesar Rabak, Yvan Guemkam, John Borden, Sudhakar Krishnamachari, Leandro Caniglia.
 
 We are also deeply grateful to 
 - Lam Research for sponsoring part of this work
 - INRIA Chile for helping us with the infrastructure
+
+# What do our readers think about the book?
+
+_"One of the best technical books I have read. Even in its current evolving form it is the simplest presentation of a complex subject. Words or review cannot do justice to the way it is presented. I would be recommending this to everyone, I can to read and download Pharo specially the interface with Keras, which I followed on in another thread.  The concepts of perceptron, neuron and neural networks cannot be simplified any further in words or code. It is the combination of the presentation of the material and Pharo Smalltalk, that will resonate for the artists in programming world._
+
+_It will kick off my journey for AI on Pharo, now onwards. Hope I pick up enough and am able to contribute in any manner to completion of the book and sooner we see the additional chapters coming through the better it is._
+
+_Thanks for the book, the code framework, the contribution is immense for Smalltalkers for sure, probably for many students too, if they pick up AI on this foundation first and move on if they have to on other platforms for career reasons."_ Sudhakar Krishnamachari, 2018
 
 
