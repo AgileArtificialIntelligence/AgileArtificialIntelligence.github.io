@@ -54,6 +54,6 @@ _"One of the best technical books I have read. Even in its current evolving form
 
 _It will kick off my journey for AI on Pharo, now onwards. Hope I pick up enough and am able to contribute in any manner to completion of the book and sooner we see the additional chapters coming through the better it is._
 
-_Thanks for the book, the code framework, the contribution is immense for Smalltalkers for sure, probably for many students too, if they pick up AI on this foundation first and move on if they have to on other platforms for career reasons."_ Sudhakar Krishnamachari, 2018
+_Thanks for the book, the code framework, the contribution is immense for Smalltalkers for sure, probably for many students too, if they pick up AI on this foundation first and move on if they have to on other platforms for career reasons."_ *Sudhakar Krishnamachari*, 2018
 
 
