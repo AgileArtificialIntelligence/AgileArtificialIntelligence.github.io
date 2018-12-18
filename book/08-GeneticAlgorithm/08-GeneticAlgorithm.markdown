@@ -377,6 +377,7 @@ GACrossoverOperationTest>>testCrossover2
 ```
 
 In this third scenario, the midpoint is 0, which means that the resulting individual has all the letters of `i2`:
+
 ```Smalltalk
 GACrossoverOperationTest>>testCrossover3
 	| i3 |
@@ -384,7 +385,686 @@ GACrossoverOperationTest>>testCrossover3
 	self assert: i3 genes equals: 'defg'
 ```
 
+We can also test the method `crossover:with:` using the following test:
+
+```Smalltalk
+GACrossoverOperationTest>>testCrossover4
+	| i3 |
+	op random: (Random seed: 42).
+	i3 := op crossover: i1 with: i2.
+	self assert: i3 genes equals: 'aefg'
+```
+
 ## Mutation Genetic Operation
 
+Numerous mutations operations may be defined. Having a dedicated hierarchy in which each subclass express variation in the mutation operations is a natural strategy using an object-oriented programming language.
 
+Consider the abstract class:
+
+```Smalltalk
+GAOperation subclass: #GAAbstractMutationOperation
+	instanceVariableNames: 'mutationRate'
+	classVariableNames: ''
+	package: 'GeneticAlgo-Core'
+```
+
+The commonalities among all future mutation operation is to have a mutation rate. Typically, the value of that variable is a small positive number, close to 0.0 and significantly less than 1.0. We set it per default:
+
+```Smalltalk
+GAAbstractMutationOperation>>initialize
+	super initialize.
+	self mutationRate: 0.01
+```
+
+The variable `mutationRate` may be accessed using:
+
+```Smalltalk
+GAAbstractMutationOperation>>mutationRate
+	"Return the used mutation rate. Typically, a small positive number, close to 0.0 and significantly less than 1.0"
+	^ mutationRate
+```
+
+The variable `mutationRate` may be set using:
+
+```Smalltalk
+GAAbstractMutationOperation>>mutationRate: aFloat
+	"Set the mutation rate. Typically, a small positive number, close to 0.0 and significantly less than 1.0"
+	mutationRate := aFloat
+```
+
+The key method of the mutation operation class is `mutate:`, which takes as argument an individual and _produce a new individual_, result of mutating the argument:
+
+```Smalltalk
+GAAbstractMutationOperation>>mutate: individual
+	"Return a new individual (different object than the argument), result of a mutation from the individual provided as argument."
+	| newIndividual |
+	newIndividual := GAIndividual new.
+	newIndividual attributes: individual attributes.
+	newIndividual random: random.
+	newIndividual genes: individual genes copy.
+	self doMutate: newIndividual.
+	^ newIndividual
+```
+
+We can now define the standard mutation operation. Consider the class:
+
+```Smalltalk
+GAAbstractMutationOperation subclass: #GAMutationOperation
+	instanceVariableNames: 'geneFactoryBlock'
+	classVariableNames: ''
+	package: 'GeneticAlgo-Core'
+```
+
+The mutation operator object requires a way to define a new gene. We will use the same requirement expressed using the class `GAIndividual`. The variable `geneFactoryBlock` will refers to a one-argument block to create a gene. The block receives a random number as argument. The method `geneFactoryBlock:` sets the block to the operation:
+
+```Smalltalk
+GAMutationOperation>>geneFactoryBlock: oneArgBlock
+	"The block receive a random number as argument"
+	geneFactoryBlock := oneArgBlock
+```
+
+The block may be accessed using:
+
+```Smalltalk
+GAMutationOperation>>geneFactoryBlock
+	"Return the one-arg block used to create a gene"
+	^ geneFactoryBlock
+```
+
+As a help when using the mutation operation, we can provide some indication in case of improper configuration:
+
+```Smalltalk
+GAMutationOperation>>checkForGeneFactory
+	self
+		assert: [ geneFactoryBlock notNil ]
+		description: 'Need to provide a block to create gene'
+```
+
+The core method of `GAMutationOperation` is `doMutate:`. Consider the method: 
+
+```Smalltalk
+GAMutationOperation>>doMutate: individual
+	"Mutate genes of the argument"
+	self checkForRandomNumber.
+	self checkForGeneFactory.
+	1 to: individual genes size do: [ :index | 
+		self randomNumber <= mutationRate
+			ifTrue: [ individual genes at: index put: (geneFactoryBlock cull: random cull: index cull: individual) ] ]	
+```
+
+The class `GAMutationOperation` can be properly tested. Consider the class:
+
+```Smalltalk
+TestCase subclass: #GAMutationOperationTest
+	instanceVariableNames: 'i op'
+	classVariableNames: ''
+	package: 'GeneticAlgo-Tests'
+```
+
+The `setUp` method:
+
+```Smalltalk
+GAMutationOperationTest>>setUp
+	super setUp.
+	i := GAIndividual new genes: 'abcd'.
+	op := GAMutationOperation new.
+```
+
+We can test the mutation with:
+
+```Smalltalk
+GAMutationOperationTest>>testMutation
+	| i2 |	
+	op random: (Random seed: 7).
+	op geneFactoryBlock: [ :r | ($a to: $z) atRandom: r ].
+	op mutationRate: 0.5.
+	
+	i2 := op mutate: i.
+	self assert: i2 genes equals: 'xfcd'.
+	
+	i2 := op mutate: i2.
+	self assert: i2 genes equals: 'tfcd'.
+	
+	i2 := op mutate: i2.
+	self assert: i2 genes equals: 'tfjd'.
+```
+
+The erroneous case can be tested using:
+
+```Smalltalk
+GAMutationOperationTest>>testRandomAndGeneFactoryMustBeSet
+	self should: [ op mutate: i ] raise: AssertionFailure.
+	
+	op random: Random new.
+	self should: [ op mutate: i ] raise: AssertionFailure.
+	
+	op geneFactoryBlock: [ :r | 42 ].
+	self shouldnt: [ op mutate: i ] raise: AssertionFailure.
+```
+
+## Parent Selection
+
+We will define a hierarchy of selection mechanism. The class `GASelection` is a relatively large and complex class. This class is closely tied to the class `GAEngine` that we will subsequently present.
+
+The class `GASelection` may be defined as follow:
+
+```Smalltalk
+Object subclass: #GASelection
+	instanceVariableNames: 'population fittest initialPopulation fitnessBlock populationSize compareFitness engine'
+	classVariableNames: ''
+	package: 'GeneticAlgo-Core'
+```
+
+`GASelection` references a `population` of `GAIndividual`s. The selection is meant to pick the `fittest` individual based on a strategy, implemented by a subclass of `GASelection`. The selection also is aware of the `initialPopulation`, necessary to deduce a new `population`, of a size `populationSize`. The `fitnessBlock` gives to the selection the way the fitness of each individual is computed. The variable `compareFitness` references to a two-arg block useful to indicates which of two fitness values is the best. In some situations, a high fitness indicates a good individual, in some other situations, it may indicates a bad individual. At last, the variable `engine` reference to the genetic algorithm engine. 
+
+First, we provide a simple constructor for `GASelection`:
+
+```Smalltalk
+GASelection>>initialize
+	super initialize.
+	population := OrderedCollection new.
+```
+We provide some accessors and mutator methods. Consider the method `engine`:
+
+```Smalltalk
+GASelection>>engine
+	"Return the GAEngine to which I am associated to"
+	^ engine
+```
+
+The mutator of `engine` may be:
+
+```Smalltalk
+GASelection>>engine: theEngine
+	"Set the GAEntine to which I have to be associated with"
+	engine := theEngine.
+	self checkIfEngineSet
+```
+
+The population may be accessed using:
+
+```Smalltalk
+GASelection>>population
+	"Return the new population"
+	^ population
+```
+
+The fitness block may be accessed using `fitnessBlock:`:
+
+```Smalltalk
+GASelection>>fitnessBlock: aOneArgBlock
+	"The argument is evaluated on the genes of each individual.
+	The block argument has to compute the fitness. 
+	Higher fitness means to be closer to the solution"
+	fitnessBlock := aOneArgBlock
+```
+
+The fitness block may be accessed using `fitnessBlock`:
+
+```Smalltalk
+GASelection>>fitnessBlock
+	^ fitnessBlock
+```
+
+The fittest element is accessible using the method `fittest`:
+
+
+```Smalltalk
+GASelection>>fittest
+	"Return the fittest individual new of the population"
+	^ fittest
+```
+
+The initial population may be set using a dedicated method:
+
+```Smalltalk
+GASelection>>initialPopulation: aPopulationAsIndividuals
+	"Set the initial population. This is used to create the new population"
+	initialPopulation := aPopulationAsIndividuals.
+	self checkIfInitialPopulationSet
+```
+
+The way fitness are compared may be set:
+
+```Smalltalk
+GASelection>>compareFitness: aTwoArgBlock
+	"Take as argument a two argument block that compare the fitness of two individuals"
+	compareFitness := aTwoArgBlock
+```
+
+The population size may be read using:
+```Smalltalk
+GASelection>>populationSize
+	"Return the population size"
+	^ initialPopulation size
+```
+
+And set using:
+
+```Smalltalk
+GASelection>>populationSize: anInteger
+	"Set the population size"
+	populationSize := anInteger
+```
+
+Subsequently, we will define a number of essential methods that describes the logic of the selection. The abstract method `createNewPopulation` has to be overridden in subclasses. Its purpose is to create a new population:
+
+```Smalltalk
+GASelection>>createNewPopulation
+	"Create a new population"
+	self subclassResponsibility 
+```
+
+
+```Smalltalk
+GASelection>>doSelection
+	self checkIfEngineSet.
+	self checkIfInitialPopulationSet.
+	populationSize := initialPopulation size.
+	fittest := initialPopulation first.
+	fitnessSum := 0.
+	initialPopulation
+		do: [ :ind | 
+			ind computeFitnessUsing: fitnessBlock.
+			fitnessSum := fitnessSum + ind fitness.
+			(self isIndividual: ind betterThan: fittest)
+				ifTrue: [ fittest := ind ] ].
+	self createNewPopulation.
+	initialPopulation := population.
+```
+
+Some check may be done using:
+
+```Smalltalk
+GASelection>>dcheckIfEngineSet
+	self assert: [ engine notNil ] description: 'Should set the engine'.
+```
+
+```Smalltalk
+GASelection>>dcheckIfInitialPopulationSet
+	self assert: [ initialPopulation notNil ] description: 'Should set the initial population'.
+	self assert: [ initialPopulation isCollection ] description: 'Has to be a collection'.
+	self assert: [ initialPopulation notEmpty ] description: 'Cannot be empty'
+```
+
+Some utility method may be written to use the use of a selection. For example, the crossover operation may be delegated using:
+
+```Smalltalk
+GASelection>>crossover: partnerA with: partnerB
+	"Return one child"
+	^ engine crossover: partnerA with: partnerB
+```
+
+The difference using:
+
+```Smalltalk
+GASelection>>isIndividual: ind betterThan: fittestIndividual
+	^ engine isIndividual: ind betterThan: fittestIndividual
+```
+
+The mutation operation may be invoked using:
+
+```Smalltalk
+GASelection>>mutate: child
+	^ engine mutate: child
+```
+
+```Smalltalk
+GASelection>>randomNumber: value
+	"Return a number between 1 and value"
+	^ engine randomNumber: value
+```
+
+Several selections strategies are available. We will focus here on the tournament selection, one of the most efficient selection mechanism. 
+
+```Smalltalk
+GASelection subclass: #GATournamentSelection
+	instanceVariableNames: 'tournamentSize'
+	classVariableNames: ''
+	package: 'GeneticAlgo-Core'
+```
+
+The `GATournamentSelection` class contains the variable `tournamentSize` that represents how large a tournament is. The default value may be set to 5:
+
+```Smalltalk
+GATournamentSelection>>initialize
+	super initialize.
+	tournamentSize := 5
+```
+
+Obtain a good individual using the tournament algorithm:
+
+```Smalltalk
+GATournamentSelection>>getGoodIndividual
+	| best ind |
+	best := nil.
+	tournamentSize timesRepeat: [ 
+		ind := initialPopulation at: (self randomNumber: initialPopulation size).
+		(best isNil or: [ compareFitness value: ind fitness value: best fitness ]) ifTrue: [ best := ind ]
+	].
+	^ best
+```
+
+Finally, a new population may be created using: 
+
+```Smalltalk
+GATournamentSelection>>createNewPopulation
+	| partnerA partnerB child |
+	population := OrderedCollection new.
+	[ population size < self populationSize ]
+		whileTrue: [ 
+			partnerA := self getGoodIndividual.
+			partnerB := self getGoodIndividual.
+			child := self mutate: (self crossover: partnerA with: partnerB).
+			child computeFitnessUsing: engine fitnessBlock.
+			population add: child ]
+```
+
+## Engine
+
+The engine is a central class to use the genetic algorithm. It offers methods to configure and run a genetic algorithm. We can define the class:
+
+```Smalltalk
+Object subclass: #GAEngine
+	instanceVariableNames: 'fitnessBlock createGeneBlock numberOfGenes numberOfGenerations populationSize logs beginTime endTime population terminationBlock random compareFitness mutationOperator crossoverOperator callbackBeforeCreatingIndividual selection'
+	classVariableNames: ''
+	package: 'GeneticAlgo-Core'
+```
+
+```Smalltalk
+GAEngine>>beforeRun
+	"Method executed at the very begining of the algorithm"
+	self checkIfReadyToRun.
+	beginTime := Time now.
+	
+	selection fitnessBlock: fitnessBlock.
+	selection populationSize: populationSize 
+```
+
+```Smalltalk
+GAEngine>>afterRun
+	"Run after the completion of the algorithm"
+	endTime := Time now
+```
+
+```Smalltalk
+GAEngine>>createGeneBlock: threeArgBlock
+	"Three arguments must be provided rand, index, and the individual being filled"
+"	self assert: [ threeArgBlock argumentCount = 3 ] description: 'Wrong number of arguments. Three arguments must be provided rand, index, and the individual being filled'."
+	createGeneBlock := threeArgBlock.
+	mutationOperator geneFactoryBlock: threeArgBlock
+```
+
+```Smalltalk
+GAEngine>>createGeneBlock
+	"Return the GeneBlockFactory"
+	^ createGeneBlock
+```
+
+
+```Smalltalk
+GAEngine>>crossover: partnerA with: partnerB
+	^ crossoverOperator crossover: partnerA with: partnerB
+```
+
+```Smalltalk
+GAEngine>>crossoverOperator
+	"Return the crossover operator used by the algorithm"
+	^ crossoverOperator
+```
+
+```Smalltalk
+GAEngine>>crossoverOperator: aCrossoverOperator
+	"Set the crossover operator used in the algorithm"
+	crossoverOperator := aCrossoverOperator.
+	crossoverOperator random: random
+```
+
+```Smalltalk
+GAEngine>>fitnessBlock: aOneArgBlock
+	"The argument is evaluated on the genes of each individual.
+	The block argument has to compute the fitness. 
+	Higher fitness means to be closer to the solution"
+	fitnessBlock := aOneArgBlock
+```
+
+```Smalltalk
+GAEngine>>fitnessBlock
+	"Return the fitness block used by the engine"
+	^ fitnessBlock
+```
+
+The constructor of the engine is:
+```Smalltalk
+GAEngine>>initialize
+	super initialize.
+	logs := OrderedCollection new.
+	random := Random seed: 42.
+	self endForMaxNumberOfGeneration: 10.
+	populationSize := 10.
+	self maximizeComparator.
+	mutationOperator := GAMutationOperation new.
+	mutationOperator mutationRate: 0.01.
+	mutationOperator random: random.
+	
+	crossoverOperator := GACrossoverOperation new.
+	crossoverOperator random: random.
+	
+	self selection: GATournamentSelection new.
+	
+	callbackBeforeCreatingIndividual := [ :rand :ind | "do nothing" ]
+```
+
+The initial population is set using:
+
+```Smalltalk
+GAEngine>>initializePopulation
+	self
+		assert: [ random notNil ]
+		description: 'Need a random number generator set'.
+	population := OrderedCollection new.
+	populationSize
+		timesRepeat: [ 
+			| ind |
+			ind := GAIndividual new.
+			callbackBeforeCreatingIndividual value: random value: ind.
+			population
+				add:
+					(ind
+						random: random;
+						set: numberOfGenes genesUsing: createGeneBlock) ]
+```
+
+```Smalltalk
+GAEngine>>isIndividual: anIndividual betterThan: aFittestIndividual
+	"Compare an individual against the fittest individual of the population"
+	^ compareFitness value: anIndividual fitness value: aFittestIndividual fitness
+```
+
+```Smalltalk
+GAEngine>>logs
+	"Return the logs of the run"
+	^ logs copy
+```
+
+```Smalltalk
+GAEngine>>maximizeComparator
+	compareFitness := [ :f1 :f2 | f1 > f2 ]
+```
+
+```Smalltalk
+GAEngine>>minimizeComparator
+	compareFitness := [ :f1 :f2 | f1 < f2 ]
+```
+
+```Smalltalk
+GAEngine>>microPause
+	"Useful when you wish to log in the Transcript and see progresses"
+	(Delay forMilliseconds: 1) wait.
+	World doOneCycleNow.
+```
+
+
+
+
+```Smalltalk
+GAEngine>>mutate: child
+	"Mutate the child provided as argument"
+	^ mutationOperator mutate: child
+```
+
+```Smalltalk
+GAEngine>>mutationOperator: aMutationOperator
+	mutationOperator := aMutationOperator.
+	aMutationOperator random: random
+```
+
+```Smalltalk
+GAEngine>>mutationRate
+	^ mutationOperator mutationRate
+```
+```Smalltalk
+GAEngine>>mutationRate: aFloat
+	"Set the mutation rate used by the engine. The default value is 0.01"
+	mutationOperator mutationRate: aFloat.
+```
+```Smalltalk
+GAEngine>>numberOfGenes: anInteger
+	"Set the number of genes each individual will have"
+	numberOfGenes := anInteger
+```
+```Smalltalk
+GAEngine>>populationSize
+	"Return the population size"
+	^ populationSize
+```
+
+```Smalltalk
+GAEngine>>populationSize: anInteger
+	"Set the population size"
+	populationSize := anInteger
+```
+```Smalltalk
+GAEngine>>produceNewPopulation
+	"This method has 
+		- produce a new population, put in the variable 'population'
+		- to return the fittest element of the population"
+	selection doSelection.
+	population := selection population.
+	
+```
+
+@@ Maybe move it in `GAObject`
+```Smalltalk
+GAEngine>>randomNumber: maxNumber
+	^ random nextInt: maxNumber
+```
+```Smalltalk
+GAEngine>>result
+	"Return the genes of the fittest individual. This method is expected to be executed after #run has completed"
+	^ self logs last fittestIndividual genes
+```
+```Smalltalk
+GAEngine>>run
+	"Public method -- Run the genetic algorithm"
+
+	| t log |
+	self beforeRun.
+	self initializePopulation.
+	selection initialPopulation: population.
+	selection compareFitness: compareFitness.
+	UIManager default
+		informUserDuring: [ :bar | 
+			| gen |
+			gen := 0.
+			[ self shouldTerminate ]
+				whileFalse: [ gen := gen + 1.
+					bar label: gen asString.
+					self microPause.
+					t := Time now asSeconds.
+					self produceNewPopulation.
+					
+					log := GALog new.
+					log generationNumber: gen.
+					log fittestIndividual: selection fittest.
+					log timeToRunGeneration: Time now asSeconds - t.
+					logs add: log ] ].
+	self afterRun
+```
+
+```Smalltalk
+GAEngine>>selection
+	"Return the selection operator"
+	^ selection
+```
+
+```Smalltalk
+GAEngine>>selection: aSelection
+	"Set the selection method to be used to create a new population"
+	selection := aSelection.
+	aSelection engine: self.
+```
+
+```Smalltalk
+GAEngine>>checkIfReadyToRun
+	"Raise an exception if the configuration is not ready to be run"
+	self assert: [ fitnessBlock notNil ] description: 'Need to set a fitnessBlock'.
+	self assert: [ createGeneBlock notNil ] description: 'Need to set a createGeneBlock'.
+	self assert: [ numberOfGenes notNil ] description: 'Need to set how many genes you wish to have, using numberOfGenes:'.
+	self assert: [ logs isEmpty ] description: 'Already been run'.
+	
+```
+
+## Terminating the Genetic Algorithm
+
+```Smalltalk
+GAEngine>>shouldTerminate
+	logs ifEmpty: [ ^ false ].
+	^ terminationBlock value
+```
+
+```Smalltalk
+GAEngine>>endForMaxNumberOfGeneration: nbOfGenerations
+	"End the algorithm after a fixed number of generations"
+	terminationBlock := [ logs last generationNumber >= nbOfGenerations ]
+```
+
+```Smalltalk
+GAEngine>>endIfFitnessIsAbove: aFitnessValueThreshold
+	"End the algorithm if the best fitness value is above a particular threashold"
+	terminationBlock := [ logs last fittestIndividual fitness >= aFitnessValueThreshold ]
+```
+
+```Smalltalk
+GAEngine>>endIfNoImprovementFor: nbOfGenerations
+	"End if no improvement occurred within a given number of generations"
+	^ self endIfNoImprovementFor: nbOfGenerations withinRangeOf: 0
+```
+
+```Smalltalk
+GAEngine>>endIfNoImprovementFor: nbOfGenerations withinRangeOf: delta
+	"End if no improvement occurred (within a delta value) within a given number of generations"
+	terminationBlock := [ 
+		(logs last generationNumber >= nbOfGenerations) and: [ 
+			| fs |
+			fs := (logs last: nbOfGenerations) collect: [ :aLog | aLog fittestIndividual fitness ].
+			(fs max - fs min) <= delta
+			 ] ]
+```
+
+```Smalltalk
+GAEngine>>
+```
+
+```Smalltalk
+GAEngine>>
+```
+
+
+## Monitoring the Evolution
+
+
+
+## What have we seen in this chapter
+This chapter covers the following topics:
 

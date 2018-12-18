@@ -31,8 +31,8 @@
         <li><a href="#example-of-a-genetic-algorithm"><span class="toc-section-number">1.2</span> Example of a Genetic Algorithm</a></li>
         <li><a href="#vocabulary"><span class="toc-section-number">1.3</span> Vocabulary</a></li>
         <li><a href="#individual"><span class="toc-section-number">1.4</span> Individual</a></li>
-        <li><a href="#genetic-operations"><span class="toc-section-number">1.5</span> Genetic Operations</a></li>
-        <li><a href="#mutation"><span class="toc-section-number">1.6</span> Mutation</a></li>
+        <li><a href="#crossover-genetic-operation"><span class="toc-section-number">1.5</span> Crossover Genetic Operation</a></li>
+        <li><a href="#mutation-genetic-operation"><span class="toc-section-number">1.6</span> Mutation Genetic Operation</a></li>
         </ul></li>
         </ul>
         </div>
@@ -202,7 +202,7 @@ g</code></pre>
 <p class="caption"><span>Figure 2:</span> Visualizing the fitness distribution of 100 000 individuals.</p>
 </div>
 <p>Locating the mouse above the bar 3 reveals that 4 individuals with the secret words have been created.</p>
-<h2 id="genetic-operations"><span class="header-section-number">1.5</span> Genetic Operations</h2>
+<h2 id="crossover-genetic-operation"><span class="header-section-number">1.5</span> Crossover Genetic Operation</h2>
 <p>Genetic algorithm uses genetic operations to produce new individuals. Biology recognizes two operations: <em>crossover</em> that combines two individual to form a new one, and <em>mutation</em> to produce a new individual with sporadic gene variations.</p>
 <p>It is important to have our implementation open to new genetic operations. Some particular operations may be crucial to significantly accelerate the convergence toward a solution. In this chapter, we will focus on mutation and crossover. When we will cover neuroevolution, we will need different mutations and crossover operations.</p>
 <p>We can define the class <code>GAOperation</code> as the root class of all operations.</p>
@@ -271,7 +271,31 @@ g</code></pre>
     | i3 |
     i3 := op crossover: i1 with: i2 midpoint: 0.
     self assert: i3 genes equals: 'defg'</code></pre>
-<h2 id="mutation"><span class="header-section-number">1.6</span> Mutation</h2>
+<p>We can also test the method <code>crossover:with:</code> using the following test:</p>
+<pre class="smalltalk"><code>GACrossoverOperationTest&gt;&gt;testCrossover4
+    | i3 |
+    op random: (Random seed: 42).
+    i3 := op crossover: i1 with: i2.
+    self assert: i3 genes equals: 'aefg'</code></pre>
+<h2 id="mutation-genetic-operation"><span class="header-section-number">1.6</span> Mutation Genetic Operation</h2>
+<p>Numerous mutations operations may be defined. Having a dedicated hierarchy in which each subclass express variation in the mutation operations is a natural strategy using an object-oriented programming language.</p>
+<p>Consider the abstract class:</p>
+<pre class="smalltalk"><code>GAOperation subclass: #GAAbstractMutationOperation
+    instanceVariableNames: 'mutationRate'
+    classVariableNames: ''
+    package: 'GeneticAlgo-Core'</code></pre>
+<p>The commonalities among all future mutation operation is to have a mutation rate. Typically, the value of that variable is a small positive number, close to 0.0 and significantly less than 1.0. We set it per default:</p>
+<pre class="smalltalk"><code>GAAbstractMutationOperation&gt;&gt;initialize
+    super initialize.
+    self mutationRate: 0.01</code></pre>
+<p>The variable <code>mutationRate</code> may be accessed using:</p>
+<pre class="smalltalk"><code>GAAbstractMutationOperation&gt;&gt;mutationRate
+    &quot;Return the used mutation rate. Typically, a small positive number, close to 0.0 and significantly less than 1.0&quot;
+    ^ mutationRate</code></pre>
+<p>The variable <code>mutationRate</code> may be set using:</p>
+<pre class="smalltalk"><code>GAAbstractMutationOperation&gt;&gt;mutationRate: aFloat
+    &quot;Set the mutation rate. Typically, a small positive number, close to 0.0 and significantly less than 1.0&quot;
+    mutationRate := aFloat</code></pre>
             </div>
     </div>
   </div>
