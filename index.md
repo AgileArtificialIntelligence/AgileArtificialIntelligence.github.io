@@ -13,8 +13,8 @@ Part I: Neural Network
 1. Using Keras from Pharo
 
 Part II: Genetic Algorithm
-1. Evolution Algorithm
 1. Genetic Algorithm
+1. Genetic Algorithm Tuning
 1. Selecting Algorithms
 1. Application: Suduko
 
