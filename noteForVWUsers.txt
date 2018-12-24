@@ -1,0 +1,21 @@
+From Jon Paynter:
+
+Upgrading VW to the latest 8.3 version and loading the grease package from seaside did not supply the missing methods.
+but I found loading the rossal2-full package from the public repository supplied most of the missing methods - but I still needed to copy one from a pharo image.
+namely SequenceableCollection>>with:collect:
+
+Also, visualworks doesnt have the {} paradigm of runtime evaluation like pharo does, so I had to convert some of the methods to use Array>>with:with:
+like so:
+      aLb := and feed: { notA . b }.
+to:
+      aLb := and feed: (Array with: notA with: b ).
+Note -- if somebody on the list knows how to enable this for visualworks, please share.
+
+Next, the code assumes arrays are mutable, but in visualworks Array>>at:put: throws an exception, but a simple change to Neuron>>weights: fixes the problem (for now)
+Neuron>>weights: anObject 
+     weights := anObject asOrderedCollection
+
+Lastly, in the tests, the book makes use of Float>>closeTo:precision:  which doesnt exist in vw, but it has a method that does the same thing:  Float>>closeTo:range: so it was easy to add a wrapper method.
+
+With these few changes, everything seems to work. all the tests pass, the graphs display exactly whats in the screenshots from the book.
+Ive worked through the first 2 sections of the book, Perceptron and Artifical Neuron.  I'll post more if needed.
