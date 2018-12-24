@@ -35,7 +35,7 @@ To create a new package, we first need to open a _system browser_ by selecting t
 
 Figure @fig:systemBrowser shows a system browser, which is composed of five different parts. The top part is composed of four lists. The left-most list gives the available and ready-to-be-used packages. In the figure, the names `Announcement`, `AST-Core` and `Alien` are examples of packages. The `Announcement` package is selected in the figure. 
 
-The second list gives the classes that belong to the selected package. Many classes composes the `Announcement` package, including the classes called `Announcement`, `AnnouncementSet`, and `Announcer`.
+The second list gives the classes that belong to the selected package. Many classes compose the `Announcement` package, including the classes called `Announcement`, `AnnouncementSet`, and `Announcer`.
 
 The third list shows the method categories of the selected class. Method categories sort methods into logical groups to clarify their purpose and make them easier to find. Think of them as a kind of package for methods. Since no class is selected, no method category is listed.
 
