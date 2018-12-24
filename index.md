@@ -25,6 +25,10 @@ Part III: Neuroevolution
 1. Application: Pong game
 1. Application: Flappy bird
 
+Agile Artificial Intelligence uses the Pharo programming language to illustrates the numerous concept explained in the book. We believe the book is written is such a way that non-expert with Pharo will enjoy its content. Translation to other programming language should not be an issue.
+
+Jon Paynter wrote some notes for users of [VisualWorks](./noteForVWUsers.txt).
+
 # Hey Reader!
 
 A tremendous effort has been put in these chapters. Although we put a maximum of dedication, there are always things that could be improved. Your feedback is essential to improve the book content. By providing feedback, you will:
@@ -39,10 +43,9 @@ So, provide feedback! There are several ways to do so:
 - by chatting with us on [Discord, channel #AI](http://pharo.org/community)
 - by sending us an [email](mailto:alexandre.bergel@me.com)
 
-
 # Big thanks!
 Since the announcement of the book many have encouraged us, provided feedback, and improved the writing. In no particular order, we are grateful to 
-CH Huang, Chris Thorgrimsson, Milton Mamani, Jhonny Cerezo, Oleks Zaytsev, Stéphane Ducasse, Torsten Bergmann, Serge Stinckwich, Alexandre Rousseau, Sean P. DeNigris, Julián Grigera, Cesar Rabak, Yvan Guemkam, John Borden, Sudhakar Krishnamachari, Leandro Caniglia, mldavis99, darth-cheney, Andy S.
+CH Huang, Chris Thorgrimsson, Milton Mamani, Jhonny Cerezo, Oleks Zaytsev, Stéphane Ducasse, Torsten Bergmann, Serge Stinckwich, Alexandre Rousseau, Sean P. DeNigris, Julián Grigera, Cesar Rabak, Yvan Guemkam, John Borden, Sudhakar Krishnamachari, Leandro Caniglia, mldavis99, darth-cheney, Andy S., Jon Paynter.
 
 We are also deeply grateful to 
 - Lam Research for sponsoring part of this work
