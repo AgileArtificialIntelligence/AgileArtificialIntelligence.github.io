@@ -9,7 +9,7 @@ like so:
       aLb := and feed: { notA . b }.
 to:
       aLb := and feed: (Array with: notA with: b ).
-Note -- if somebody on the list knows how to enable this for visualworks, please share.
+Note -- the store package is called BraceConstructor, and it works great. 
 
 Next, the code assumes arrays are mutable, but in visualworks Array>>at:put: throws an exception, but a simple change to Neuron>>weights: fixes the problem (for now)
 Neuron>>weights: anObject 
