@@ -56,10 +56,10 @@ Lastly, the method set the learning rate of each neuron at `0.1`. The method `le
 
 ```Smalltalk
 NeuronLayer>>learningRate: aLearningRate
-	"Set the learning rate for all the layers
+	"Set the learning rate for all the neurons
 	Note that this method should be called after configuring the network, and _not_ before"
-	self assert: [ layers notEmpty ] description: 'learningRate: should be invoked after configuring the network'.
-	layers do: [ :l | l learningRate: aLearningRate ] 
+	self assert: [ neurons notEmpty ] description: 'learningRate: should be invoked after configuring the layer'.
+	neurons do: [ : n | n learningRate: aLearningRate ] 
 ```
 
 Forward feeding the layer is an essential operation. It consists in feeding each neuron and forwarding the values to the next layer. We define the method `feed:` as:
@@ -307,7 +307,7 @@ We add two variables, `delta` and `output`, to the `Neuron` class. So, our new d
 
 ```Smalltalk
 Object subclass: #Neuron
-	instanceVariableNames: 'weights bias delta output activationFunction'
+	instanceVariableNames: 'weights bias learningRate activationFunction delta output'
 	classVariableNames: ''
 	package: 'NeuralNetwork'
 ```
@@ -448,14 +448,14 @@ NeuronLayer>>updateWeight
 
 And we need the following methods to update a neuron's weights:
 ```Smalltalk
-Neuron>>adjustWeightWithInput: inputs learningRate: learningRate
+Neuron>>adjustWeightWithInput: inputs
 	inputs withIndexDo: [ :anInput :index | 
 		weights at: index put: ((weights at: index) + (learningRate * delta * anInput)) ]
 ```
 
 We also need to update the bias:
 ```Smalltalk
-Neuron>>adjustBiasUsingLearningRate: learningRate
+Neuron>>adjustBias
 	bias := bias + (learningRate * delta)
 ```
 
