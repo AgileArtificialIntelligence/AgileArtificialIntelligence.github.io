@@ -194,6 +194,20 @@ Object subclass: #Neuron
 	package: 'NeuralNetwork'
 ```
 
+The variable `learningRate` must be accessed from outside:
+
+```Smalltalk
+Neuron>>learningRate: aLearningRateAsFloat
+	"Set the learning rate of the neuron. The argument should be a small floating value. For example, 0.01"
+	learningRate := aLearningRateAsFloat
+```
+
+```Smalltalk
+Neuron>> learningRate
+	"Return the learning rate of the neuron"
+	^ learningRate 
+```
+
 Feeding has to be adapted:
 ```Smalltalk
 Neuron>>feed: inputs

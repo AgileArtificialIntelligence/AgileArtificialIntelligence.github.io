@@ -83,12 +83,15 @@ The expression `weights := someWeightsAsNumbers` assigns the value `someWeightsA
 Your system browser should now look like Figure @fig:systemBrowserAndMethodWeight.
 The method `weights:` writes a value to the variable `weights`. Its sibling method that returns its value is:
 
-~~~~~~~
+```Smalltalk
 Neuron>>weights
+	"Return the weights of the neuron."
 	^ weights
-~~~~~~~
+```
 
 The character `^` returns the value of an expression, in this case the value of the variable `weights`.
+
+
 
 Similarly, we need to define methods to assign a value to the `bias` variable and to read its content. The method `bias:` is defined as follow:
 
