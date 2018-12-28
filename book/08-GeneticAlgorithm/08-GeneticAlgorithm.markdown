@@ -1085,7 +1085,6 @@ GAEngine>>initializePopulation
 		timesRepeat: [ 
 			| ind |
 			ind := GAIndividual new.
-			callbackBeforeCreatingIndividual value: random value: ind.
 			population
 				add:
 					(ind
