@@ -3,20 +3,25 @@
 
 The first part of the book is about neural network, a computational metaphor for how the brain operates. In this second part, we will focus on evolution in general. Genetic algorithm are a computational metaphor of how evolution naturally happens.
 
+This chapter is self-contained: we therefore expect a reader familiar with Pharo to fully enjoy this chapter, even without reading any previous chapters.
+
 ## Natural Evolution Inspired Algorithms
 
 We, as humans beings, are the result of a few thousands years of evolution. Biological evolution refers to some alteration of the heritable characteristics of biological populations over successive generations. Most of the characteristics are the expressions of genes that are passed on from parent to offspring during reproduction.
 
-The Darwinian Natural Selection_ stipulates that in oder to have a natural evolution, the evolution mechanism needs to support:
+The _Darwinian Natural Selection_ stipulates that in order to have a natural evolution, the evolution mechanism needs to support:
+
 - _Heredity_: a child receives a number of properties from its parents. In particular, if parents are robust and can live long enough, then the child should too.
 - _Variation_: some variation may be introduced in children. As such, children should not be identical copy of their parents.
 - _Selection_: some members of a population must have the opportunity to be parents, and have offspring in order to pass their genetic information. The selection is typically referred to as "survival of the fittest".
 
 Computer scientists have produced a number of algorithms that simulate evolution. For example:
+
 - _ant colony optimization_ is based on the idea that ant are foraging by pheromone communication to form a path. Such algorithm is suitable for graph-related problems
 - _Bees algorithm_ is based on the honey bees foraging behavior. Such algorithm is suitable for scheduling and ordering problems. 
 
 We will focus on _genetic algorithm_ (GA). It is an evolutionary algorithm that simulate the evolution of DNA information across a population. Genetic algorithm has three important properties that we will exploit in the book:
+
 - GA is efficient to solve optimization problem,
 - GA is easy implemented and does not require a strong theoretical background,
 - GA can be easily combined with neural networks. We will go into details in the third part of the book.
@@ -580,7 +585,7 @@ GAMutationOperationTest>>testRandomAndGeneFactoryMustBeSet
 
 ## Parent Selection
 
-We will define a hierarchy of selection mechanism. The class `GASelection` is a relatively large and complex class. This class is closely tied to the class `GAEngine` that we will subsequently present.
+We will define a hierarchy of selection mechanism. The class `GASelection` is a relatively large and complex class. This class is closely tied to the class `GAEngine` that we will present later in this chapter.
 
 The class `GASelection` may be defined as follow:
 
@@ -591,7 +596,7 @@ Object subclass: #GASelection
 	package: 'GeneticAlgorithm-Core'
 ```
 
-`GASelection` references a `population` of `GAIndividual`s. The selection is meant to pick the `fittest` individual based on a strategy, implemented by a subclass of `GASelection`. The selection also is aware of the `initialPopulation`, necessary to deduce a new `population`, of a size `populationSize`. The `fitnessBlock` gives to the selection the way the fitness of each individual is computed. The variable `compareFitness` references to a two-arg block useful to indicates which of two fitness values is the best. In some situations, a high fitness indicates a good individual, in some other situations, it may indicates a bad individual. At last, the variable `engine` reference to the genetic algorithm engine. 
+`GASelection` references a `population` of `GAIndividual`s. The purpose of `GASelection` is to pick the `fittest` individual based on a strategy, implemented by a subclass of `GASelection`. The selection also is aware of the `initialPopulation`, necessary to deduce a new `population`, of a size `populationSize`. The `fitnessBlock` gives to the selection the way the fitness of each individual is computed. The variable `compareFitness` references a two-arguments block that is useful to indicates which of two fitness values is the best. In some situations, a high fitness indicates a good individual, in some other situations, a high fitness value may indicates a bad individual. At last, the variable `engine` references the genetic algorithm engine. 
 
 First, we provide a simple constructor for `GASelection`:
 
@@ -617,6 +622,13 @@ GASelection>>engine: theEngine
 	self checkIfEngineSet
 ```
 
+We provide a simple guard, defined as:
+
+```Smalltalk
+GASelection>>checkIfEngineSet
+	self assert: [ engine notNil ] description: 'Should set the engine'.
+```
+
 The population may be accessed using:
 
 ```Smalltalk
@@ -630,8 +642,7 @@ The fitness block may be accessed using `fitnessBlock:`:
 ```Smalltalk
 GASelection>>fitnessBlock: aOneArgBlock
 	"The argument is evaluated on the genes of each individual.
-	The block argument has to compute the fitness. 
-	Higher fitness means to be closer to the solution"
+	The block argument has to compute the fitness."
 	fitnessBlock := aOneArgBlock
 ```
 
@@ -660,7 +671,16 @@ GASelection>>initialPopulation: aPopulationAsIndividuals
 	self checkIfInitialPopulationSet
 ```
 
-The way fitness are compared may be set:
+We provide a new guard that prevent some predictable errors to happen:
+
+```Smalltalk
+GASelection>>checkIfInitialPopulationSet
+	self assert: [ initialPopulation notNil ] description: 'Should set the initial population'.
+	self assert: [ initialPopulation isCollection ] description: 'Has to be a collection'.
+	self assert: [ initialPopulation notEmpty ] description: 'Cannot be empty'
+```
+
+The way fitness values are compared may be set:
 
 ```Smalltalk
 GASelection>>compareFitness: aTwoArgBlock
@@ -708,21 +728,7 @@ GASelection>>doSelection
     initialPopulation := population.
 ```
 
-The method first begins to perform some sanity checks. These checks are intended to help a user to not make incorrect usage of the code. We provide some guard that prevent some predictable error to happen. We therefore define:
-
-```Smalltalk
-GASelection>>checkIfEngineSet
-	self assert: [ engine notNil ] description: 'Should set the engine'.
-```
-
-And for the second check:
-
-```Smalltalk
-GASelection>>checkIfInitialPopulationSet
-	self assert: [ initialPopulation notNil ] description: 'Should set the initial population'.
-	self assert: [ initialPopulation isCollection ] description: 'Has to be a collection'.
-	self assert: [ initialPopulation notEmpty ] description: 'Cannot be empty'
-```
+The method first begins by performing some sanity checks. These checks are intended to help a user to not make incorrect usage of the code. 
 
 Some utility method may be written to use the use of a selection. For example, the crossover operation may be delegated using:
 
@@ -732,7 +738,7 @@ GASelection>>crossover: partnerA with: partnerB
 	^ engine crossover: partnerA with: partnerB
 ```
 
-The difference using:
+Comparison between individual may be defined as:
 
 ```Smalltalk
 GASelection>>isIndividual: ind betterThan: fittestIndividual
@@ -804,7 +810,7 @@ GATournamentSelection>>createNewPopulation
 
 ## Monitoring the Evolution
 
-Being able to monitor the execution of the algorithm is essential. For example, this is important to decide upon when the algorithm should stop. We will produce a dedicated class to monitor the progresses. Consider the class `GALog`:
+Being able to monitor the execution of the algorithm is essential. For example, this is important to have a termination condition to indicate when the algorithm has to stop. We will produce a dedicated class to monitor the progresses. Consider the class `GALog`:
 
 ```Smalltalk
 Object subclass: #GALog
@@ -823,7 +829,7 @@ GALog>>fittestIndividual
 	^ fittestIndividual
 ```
 
-The best individual will be set by the genetic algorithm engine we will soon see. 
+The best individual will be set by the genetic algorithm engine we will soon see:
 
 ```Smalltalk
 GALog>>fittestIndividual: anIndividual
@@ -977,6 +983,23 @@ GAEngine>>populationSize: anInteger
 	populationSize := anInteger
 ```
 
+The selection operator may be set using a dedicated method:
+
+```Smalltalk
+GAEngine>>selection: aSelection
+	"Set the selection method to be used to create a new population"
+	selection := aSelection.
+	aSelection engine: self.
+```
+
+Typically, a tournament object is used as argument of `selection:`. The variable `selection` may be accessed using:
+
+```Smalltalk
+GAEngine>>selection
+	"Return the selection operator"
+	^ selection
+```
+
 In many situations, a better individual is the one with the highest fitness value:
 
 ```Smalltalk
@@ -1088,38 +1111,8 @@ GAEngine>>logs
 
 Note that the `copy` message ensure that the collection `logs` is not modified afterwards. 
 
-When the algorithm is run, it is essential to let the system notify some progresses
+Here is the central method of the algorithm. The method `GAEngine>>run` is entry point of the algorithm:
 
-```Smalltalk
-GAEngine>>microPause
-	"Useful when you wish to log in the Transcript and see progresses"
-	(Delay forMilliseconds: 1) wait.
-	World doOneCycleNow.
-```
-
-
-
-
-
-```Smalltalk
-GAEngine>>produceNewPopulation
-	"This method has 
-		- produce a new population, put in the variable 'population'
-		- to return the fittest element of the population"
-	selection doSelection.
-	population := selection population.
-	
-```
-
-```Smalltalk
-GAEngine>>randomNumber: maxNumber
-	^ random nextInt: maxNumber
-```
-```Smalltalk
-GAEngine>>result
-	"Return the genes of the fittest individual. This method is expected to be executed after #run has completed"
-	^ self logs last fittestIndividual genes
-```
 ```Smalltalk
 GAEngine>>run
     "Public method -- Run the genetic algorithm"
@@ -1147,20 +1140,48 @@ GAEngine>>run
                     logs add: log ] ]
 ```
 
-```Smalltalk
-GAEngine>>selection
-	"Return the selection operator"
-	^ selection
-```
+When the algorithm is run, it is essential to let the system notify about its progresses. We therefore add the method `microPause` that makes the current running thread the possibility to let other thread do some work:
 
 ```Smalltalk
-GAEngine>>selection: aSelection
-	"Set the selection method to be used to create a new population"
-	selection := aSelection.
-	aSelection engine: self.
+GAEngine>>microPause
+	"Useful when you wish to log in the Transcript and see progresses"
+	(Delay forMilliseconds: 1) wait.
+	World doOneCycleNow.
 ```
+
+The method `produceNewPopulation` is central to the engine:
+
+```Smalltalk
+GAEngine>>produceNewPopulation
+	"This method  
+		- produces a new population, put in the variable 'population'
+		- select the fittest element of the population"
+	selection doSelection.
+	population := selection population.
+```
+
+We also employ a small utility method to produce random numbers:
+
+```Smalltalk
+GAEngine>>randomNumber: maxNumber
+	"Return a number between 1 and maxNumber"
+	^ random nextInt: maxNumber
+```
+
+Result of the algorithm is accessed using the method `result`:
+
+```Smalltalk
+GAEngine>>result
+	"Return the genes of the fittest individual. This method is expected to be executed after #run has completed"
+	^ self logs last fittestIndividual genes
+```
+
 
 ## Terminating the Genetic Algorithm
+
+Terminating a genetic algorithm is a sensitive aspect that should be carefully considered. The condition that should be met in order to stop the algorithm may depend on a number of different factors (_e.g.,_ if the exact solution exist and may be found).
+
+The method `shouldTerminate` indicates whether the algorithm has to terminate. If no log has been registered, it means that the algorithm was not run, and in that case, we evaluate the `terminationBlock` variable:
 
 ```Smalltalk
 GAEngine>>shouldTerminate
@@ -1168,23 +1189,31 @@ GAEngine>>shouldTerminate
 	^ terminationBlock value
 ```
 
+The following method defines the variable `terminationBlock` according to a particular strategy. The method `endForMaxNumberOfGeneration:` defines a termination condition based on the number of generations. The algorithm stops after a particular number of created generations:
+
 ```Smalltalk
 GAEngine>>endForMaxNumberOfGeneration: nbOfGenerations
 	"End the algorithm after a fixed number of generations"
 	terminationBlock := [ logs last generationNumber >= nbOfGenerations ]
 ```
 
+It may happen that if the fitness is above a particular value, the fittest individual may be considered as an acceptable solution. In such a case, there is no reason to pursue the execution of the algorithm:
+
 ```Smalltalk
 GAEngine>>endIfFitnessIsAbove: aFitnessValueThreshold
-	"End the algorithm if the best fitness value is above a particular threashold"
+	"End the algorithm if the best fitness value is above a particular threshold"
 	terminationBlock := [ logs last fittestIndividual fitness >= aFitnessValueThreshold ]
 ```
+
+Another strategy is to stop the algorithm if the if no better solution is found for a given number of generation:
 
 ```Smalltalk
 GAEngine>>endIfNoImprovementFor: nbOfGenerations
 	"End if no improvement occurred within a given number of generations"
 	^ self endIfNoImprovementFor: nbOfGenerations withinRangeOf: 0
 ```
+
+Complex strategy may be formulated. For example, `endIfNoImprovementFor:withinRangeOf:` defines a condition based on the number of generations and a range of delta values:
 
 ```Smalltalk
 GAEngine>>endIfNoImprovementFor: nbOfGenerations withinRangeOf: delta
@@ -1197,6 +1226,9 @@ GAEngine>>endIfNoImprovementFor: nbOfGenerations withinRangeOf: delta
 			 ] ]
 ```
 
+
+## Testing our Algorithm
+
 We can now test our engine. Consider the class `GAEngineTest`:
 
 ```Smalltalk
@@ -1206,7 +1238,7 @@ TestCase subclass: #GAEngineTest
 	package: 'GeneticAlgorithm-Tests'
 ```
 
-We can now implement the introducing example we use about searching a secret words.
+We can now implement the introducing example we use about searching a secret words:
 
 ```Smalltalk
 GAEngineTest>>testExamples01
@@ -1227,4 +1259,9 @@ GAEngineTest>>testExamples01
 
 ## What have we seen in this chapter
 This chapter covers the following topics:
+
+- It presents the complete implementation of a genetic algorithm.
+- It presents a very simple, but representative, example of finding a word.
+
+The following chapter will build on top of this chapter by showing some more interesting problem to solve using genetic algorithm
 
