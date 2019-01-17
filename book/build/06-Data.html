@@ -555,7 +555,7 @@ g(x) = \frac{(d_L - d_H)x - (n_H d_L) + d_H n_L}{n_L - n_H}
 </annotation></semantics></math></p>
 <p>We give the denormalization function for sake of completeness. We will not use it since we excluded data regression from this chapter.</p>
 <h2 id="integrating-the-normalization-into-nnetwork"><span class="header-section-number">1.11</span> Integrating the Normalization into NNetwork</h2>
-<p>The previous section described the normalization functionality. Currently, it is disconnected from the class <code>NNetwork</code>. The method <code>train:nbEpoch:</code> can be redefined as follow:</p>
+<p>The previous section described the normalization functionality. Currently, it is disconnected from the class <code>NNetwork</code>. Integrating the normalization in our neural network is the natural next step. The method <code>train:nbEpoch:</code> can be redefined as follow:</p>
 <pre class="smalltalk"><code>NNetwork&gt;&gt;train: train nbEpoch: nbEpoch
     &quot;Train the network using the train data set.&quot;
     | sumError outputs expectedOutput epochPrecision t normalizedTrain |
@@ -577,8 +577,8 @@ g(x) = \frac{(d_L - d_H)x - (n_H d_L) + d_H n_L}{n_L - n_H}
         errors add: sumError.
           precisions add: (epochPrecision / train size) asFloat.
     ] </code></pre>
-<p>The revision of the method normalize the input data with the expression <code>Normalization new normalizeData: train</code>.</p>
-<p>Running the following script will quickly achieve a high precision (Figure <a href="#fig:learningCurve">1</a>):</p>
+<p>The revision of the method normalizes the input data with the expression <code>Normalization new normalizeData: train</code>. The result of this expression is used to actually train the network.</p>
+<p>Running the following script indicates that a high precision is quickly reached (Figure <a href="#fig:learningCurve">1</a>):</p>
 <pre class="smalltalk"><code>n := NNetwork new.
 n configure: 3 hidden: 8 nbOfOutputs: 8.
 

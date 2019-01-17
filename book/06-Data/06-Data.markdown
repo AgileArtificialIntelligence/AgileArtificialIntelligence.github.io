@@ -727,7 +727,7 @@ We give the denormalization function for sake of completeness. We will not use i
 
 ## Integrating the Normalization into NNetwork
 
-The previous section described the normalization functionality. Currently, it is disconnected from the class `NNetwork`. The method `train:nbEpoch:` can be redefined as follow:
+The previous section described the normalization functionality. Currently, it is disconnected from the class `NNetwork`. Integrating the normalization in our neural network is the natural next step. The method `train:nbEpoch:` can be redefined as follow:
 
 ```Smalltalk
 NNetwork>>train: train nbEpoch: nbEpoch
@@ -753,9 +753,9 @@ NNetwork>>train: train nbEpoch: nbEpoch
     ] 
 ``` 
 
-The revision of the method normalize the input data with the expression `Normalization new normalizeData: train`.
+The revision of the method normalizes the input data with the expression `Normalization new normalizeData: train`. The result of this expression is used to actually train the network.
 
-Running the following script will quickly achieve a high precision (Figure @fig:learningCurve):
+Running the following script indicates that a high precision is quickly reached (Figure @fig:learningCurve):
 
 ```Smalltalk
 n := NNetwork new.
