@@ -727,7 +727,7 @@ We give the denormalization function for sake of completeness. We will not use i
 
 ## Integrating the Normalization into NNetwork
 
-The previous section described the normalization functionality. Currently, it is disconnected from the class `NNetwork`. Integrating the normalization in our neural network is the natural next step. The method `train:nbEpoch:` can be redefined as follow:
+The previous section described the normalization functionality. Currently, it is disconnected from the class `NNetwork`. Integrating the normalization in our neural network is the natural next step to seamlessly benefit from it. The method `train:nbEpoch:` can be redefined as follow:
 
 ```Smalltalk
 NNetwork>>train: train nbEpoch: nbEpoch
@@ -775,7 +775,7 @@ n train: data nbEpoch: 10000.
 
 ![The Iris dataset oddly scaled.](06-Data/figures/irisWithNormalization.png){#fig:irisWithNormalization}
 
-Figure @fig:learningCurve shows the precision reaching 1.0. Thanks to the normalization, all the input values have the same relevance for the network. As a consequence, it is able to learn properly. Note that in this example we use a linear normalization. It may be that a non-linear transformation may improve the learning, especially in presence of outlier values in the training data.
+Figure @fig:learningCurve shows the precision reaching 1.0. Thanks to the normalization, all the input values have the same relevance for the network. As a consequence, the network is able to learn properly. Note that in this example we use a linear normalization. It may be that a non-linear transformation may improve the learning, especially in presence of outlier values in the training data. However, we consider non-linear data transformation as out of the scope of this book. Keep in mind that you may need it in case of dataset with relevant outliers.
 
 ## What have we seen in this chapter
 
