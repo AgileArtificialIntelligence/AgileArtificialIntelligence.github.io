@@ -725,6 +725,58 @@ $$
 
 We give the denormalization function for sake of completeness. We will not use it since we excluded data regression from this chapter.
 
+## Integrating the Normalization into NNetwork
+
+The previous section described the normalization functionality. Currently, it is disconnected from the class `NNetwork`. The method `train:nbEpoch:` can be redefined as follow:
+
+```Smalltalk
+NNetwork>>train: train nbEpoch: nbEpoch
+    "Train the network using the train data set."
+    | sumError outputs expectedOutput epochPrecision t normalizedTrain |
+	normalizedTrain := Normalization new normalizeData: train. 
+    1 to: nbEpoch do: [ :epoch |
+        sumError := 0.
+          epochPrecision := 0.
+        normalizedTrain do: [ :row |
+            outputs := self feed: row allButLast.
+            expectedOutput := (1 to: self numberOfOutputs) collect: [ :notUsed | 0 ].
+            expectedOutput at: (row last) + 1 put: 1.
+            (row last = (self predict: row allButLast)) ifTrue: [ epochPrecision := epochPrecision + 1 ].
+            t := (1 to: expectedOutput size) 
+                    collect: [ :i | ((expectedOutput at: i) - (outputs at: i)) raisedTo: 2 ].
+            sumError := sumError + t sum.
+            self backwardPropagateError: expectedOutput.
+            self updateWeight: row allButLast.
+        ].
+        errors add: sumError.
+          precisions add: (epochPrecision / train size) asFloat.
+    ] 
+``` 
+
+The revision of the method normalize the input data with the expression `Normalization new normalizeData: train`.
+
+Running the following script will quickly achieve a high precision (Figure @fig:learningCurve):
+
+```Smalltalk
+n := NNetwork new.
+n configure: 3 hidden: 8 nbOfOutputs: 8.
+
+data := {#(0 0 0 0).
+    #(0 0 1 1).
+    #(0 1000 0 2).
+    #(0 1000 1 3).
+    #(0.1 0 0 4).
+    #(0.1 0 1 5).
+    #(0.1 1000 0 6).
+    #(0.1 1000 1 7) }.
+n train: data nbEpoch: 10000.
+```
+
+
+![The Iris dataset oddly scaled.](06-Data/figures/irisWithNormalization.png){#fig:irisWithNormalization}
+
+Figure @fig:learningCurve shows the precision reaching 1.0. Thanks to the normalization, all the input values have the same relevance for the network. As a consequence, it is able to learn properly. Note that in this example we use a linear normalization. It may be that a non-linear transformation may improve the learning, especially in presence of outlier values in the training data.
+
 ## What have we seen in this chapter
 
 This chapter was like a long road exploring different aspects of data manipulation. In particular, it explores:
