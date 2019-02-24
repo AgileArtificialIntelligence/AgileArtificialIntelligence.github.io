@@ -11,7 +11,7 @@
 
 FILES=`ls \
 	08-GeneticAlgorithm/*.markdown \
-	09-GATuning/*.markdown`
+	09-GAExamples/*.markdown`
 
 
 #FILES=`ls 06-Data/*.markdown`

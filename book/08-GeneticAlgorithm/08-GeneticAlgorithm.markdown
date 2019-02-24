@@ -487,6 +487,15 @@ GAAbstractMutationOperation>>doMutate: individual
 	self subclassResponsibility 
 ```
 
+Most of the mutation operations require a way to create an individual gene. We add the empty method:
+
+```Smalltalk
+GAAbstractMutationOperation>>geneFactoryBlock: oneArgBlock
+	"Do nothing. May be overridden if necessary"
+```
+
+The method will be overridden in subclasses. This method is called by `GAEngine`
+
 We can now define the standard mutation operation. Consider the class:
 
 ```Smalltalk
@@ -897,12 +906,12 @@ The engine is a central class to use the genetic algorithm. It offers methods to
 
 ```Smalltalk
 GAObject subclass: #GAEngine
-	instanceVariableNames: 'fitnessBlock createGeneBlock numberOfGenes populationSize logs population terminationBlock compareFitness mutationOperator crossoverOperator selection'
+	instanceVariableNames: 'fitnessBlock createGeneBlock numberOfGenes populationSize logs population terminationBlock compareFitness mutationOperator crossoverOperator selection beforeCreatingInitialIndividual'
 	classVariableNames: ''
 	package: 'GeneticAlgorithm-Core'
 ```
 
-`GAEngine` is a complex and relatively long class. It has 11 variables:
+`GAEngine` is a complex and relatively long class. It has a number of variables:
 
 - `fitnessBlock` is a one-argument block. It takes the genes of each individual as argument and returns the fitness of the individual.
 - `createGeneBlock` takes a gene block factory.
@@ -913,8 +922,9 @@ GAObject subclass: #GAEngine
 - `terminationBlock` is a block that indicates when the algorithm has to stop. The block represents the termination condition and does not take any argument.
 - `compareFitness` is a two-argument block, taking two fitness value. The block indicates which fitness is better than the other.
 - `mutationOperator` represents the mutation operator.
-- `crossoverOperator` represents the crossover operator
+- `crossoverOperator` represents the crossover operator.
 - `selection` refers to a selection algorithm.
+- `beforeCreatingInitialIndividual` contains a one-argument block that is evaluated before an individual of the initial population is created. The block takes a random number generator as argument.
 
 Some accessors are necessary to let the user configure the algorithm. Note that an example of using the algorithm is provided at the end of the chapter. The method `createGeneBlock:` is used to indicates how a gene has to be created:
 
@@ -1034,6 +1044,8 @@ GAEngine>>initialize
 	crossoverOperator random: random.
 	
 	self selection: GATournamentSelection new.
+
+	beforeCreatingInitialIndividual := [ :rand | "do nothing" ] 
 ```
 
 As you can see, several parameters have a default value. Prior to actually run the algorithm, a few evaluation has to be made. The `fitnessBlock` is passed from the engine to the `selection`:
@@ -1084,6 +1096,7 @@ GAEngine>>initializePopulation
 	populationSize
 		timesRepeat: [ 
 			| ind |
+			beforeCreatingInitialIndividual value: random.
 			ind := GAIndividual new.
 			population
 				add:
