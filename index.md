@@ -14,9 +14,9 @@ Part I: Neural Network
 
 Part II: Genetic Algorithm
 1. [Genetic Algorithm](./book/build/08-GeneticAlgorithm.html)
-1. Genetic Algorithm Tuning
-1. Selecting Algorithms
-1. Application: Suduko
+1. [Genetic Algorithm in Action](./book/build/09-GAExamples.html)
+1. Travelling salesman problem
+1. Zoomorphic creature
 
 Part III: Neuroevolution
 1. Neural Network Are Greedy of Examples
