@@ -202,4 +202,6 @@ The fitness function computes the number of different room and the number of ove
 
 ## What have we seen in this chapter?
 
-The chapter presents three examples on how genetic algorithm can be efficiently employed to find a solution to some optimization problems. As we have said, the genetic algorithm does not guarantee that the result is actually the optimal solution. 
+The chapter presents three examples on how genetic algorithm can be efficiently employed to find a solution to some optimization problems. As we have said, the genetic algorithm does not guarantee that the result is actually the optimal solution.
+
+The next chapter covers the 
