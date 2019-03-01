@@ -10,8 +10,7 @@
 
 
 FILES=`ls \
-	08-GeneticAlgorithm/*.markdown \
-	09-GAExamples/*.markdown`
+	10-TravelingSalesmanProblem/*.markdown`
 
 
 #FILES=`ls 06-Data/*.markdown`

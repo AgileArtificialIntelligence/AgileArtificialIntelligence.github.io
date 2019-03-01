@@ -3,7 +3,7 @@
 
 The Traveling Salesman Problem is a classical algorithm problem. It consists in visiting a number of cities using the shortest possible route. Each city has a 2D coordinate. Consider the example given in Figure @fig:TSPExample.
 
-![Illustration of the Traveling Salesman Problem.](09-TravelingSalesmanProblem/figures/TSPExample.png){#fig:TSPExample}
+![Illustration of the Traveling Salesman Problem.](10-TravelingSalesmanProblem/figures/TSPExample.png){#fig:TSPExample}
 
 The figure shows three cities and the traveler. 
 
