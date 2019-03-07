@@ -865,7 +865,7 @@ table {
   max-width: 100%;
   background-color: transparent;
   border-collapse: collapse;
-  border-spacing: 0;
+  border-spacing: 20px;
 }
 .table {
   width: 100%;
@@ -873,7 +873,7 @@ table {
 }
 .table th,
 .table td {
-  padding: 8px;
+  padding: 20=px;
   line-height: 20px;
   text-align: left;
   vertical-align: top;
