@@ -9,6 +9,8 @@ The figure shows three cities and the traveler.
 
 ## Swap mutation operation
 
+A particular operation for mutation is necessary. 
+
 ```Smalltalk
 GAAbstractMutationOperation subclass: #GASwapMutationOperation
 	instanceVariableNames: ''
