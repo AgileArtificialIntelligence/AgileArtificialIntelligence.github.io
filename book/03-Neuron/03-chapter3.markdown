@@ -3,9 +3,20 @@
 
 In the previous chapter we have seen how a perceptron operates and how a simple learning algorithm can be implemented. However, the perceptron has some serious limitations, which will motivate us to formulate a more robust artificial neuron, called the sigmoid neuron.
 
+This chapters uses Roassal to plot values. As seen in the previous chapter, Roassal may be loaded in Pharo by executing the following script in a playground:
+
+```Smalltalk
+Metacello new
+    baseline: 'Roassal2';
+    repository: 'github://ObjectProfile/Roassal2/src';
+    load.
+```
+
+A complete description of Roassal may be found in the book Agile Visualization ([http://agilevisualization.com](http://agilevisualization.com)).
+
 ## Limit of the Perceptron
 
-A perceptron works well as an independent small machine. We have seen that we can compose a few perceptrons to express a complex behavior such as the digital comparator. We have also seen that a single perceptron can learn a behavior that is not too complex. However, there are two main restrictions with combining perceptrons:
+A perceptron works well as an independent small machine. We have seen that we can compose a few perceptrons to express a complex behavior such as the digital comparator. We have also seen that a single perceptron can learn a simple behavior. However, there are two main restrictions with combining perceptrons:
 
 - _Only 0 or 1 as output_: The fact that a perceptron can have only two different output values, 0 or 1, seriously limits the kind of problem it can solve. In particular, when some perceptrons are chained, using binary values significantly reduce the space we live in. Not everything can be reduced as a set of 0 and 1 without leading to an explosion of perceptrons.
 - _A chain of perceptrons cannot learn_: We have seen how to combine perceptrons, and we have seen how a single perceptron can learn. But, can a combination of perceptrons also learn? The answer is no. This is another consequence of having only two output values. An essential property of most common learning algorithms is to be able to express a smooth learning curve, which cannot be expressing using two different values. How can we tell if a perceptron is learning well, poorly, or not at all with only two different output values?
@@ -40,9 +51,9 @@ g
 
 You can recognize the step function provided to the `y:` instruction. Note that the function provided to `y:` refers to the input as $x$ while $z$ is provided to $\sigma$. This is an inoffensive renaming.
 
-Consider a value $z = 0$. We therefore have $\sigma(z) = 0$. If we add $0.00001$, a small value, to $z$ then we have $\sigma(z) = 1$. A small value added to $z$ produces a large change in $\sigma(z)$. As we previously said, a chain of perceptron is not able to learn.
+Consider a value $z = 0$. We therefore have $\sigma(z) = 0$. If we add $0.00001$, a small value, to $z$ then we have $\sigma(z) = 1$. A small value added to $z$ produces a large change in $\sigma(z)$ going from $0$ to $1$. The fact that a small change in $z$ produces a big change in $\sigma(z)$ is actually a serious problem: a chain of perceptron is not able to learn.
 
-The step function is characterized with having a vertical step, which produces two angles in its curve. These angles are problematic as we will shortly see.
+The step function is characterized for having a vertical step, which produces two angles in its curve. These angles are makes the step function as non-derivable, which is quite a problem as we will shortly see.
 
 ## The Sigmoid Neuron
 
@@ -79,7 +90,7 @@ As we will later see, the training has to be slightly adjusted to take advantage
 
 In the previous chapter we have defined the class `Neuron`. We will improve this class to accept an activation function. First, let's introduce a small class hierarchy for activation functions. 
 
-Let's define the abstract class `ActivationFunction`:
+The abstract class `ActivationFunction` may be defined as:
 
 ```Smalltalk
 Object subclass: #ActivationFunction
@@ -88,7 +99,7 @@ Object subclass: #ActivationFunction
 	package: 'NeuralNetwork'
 ```
 
-An activation function object has two main responsibilities: computing (i) the activation value and (ii) the transfer derivative. This transfer derivative is an essential piece of the the backpropagation learning algorithm, but we will go into detail later on.
+An activation function object has two main responsibilities, computing (i) the activation value and (ii) the transfer derivative. This transfer derivative is an essential piece of the backpropagation learning algorithm. Implementation of the backpropagation is given in this chapter, while the theoretical background is given in Chapter 5.
 
 We define the following two abstract methods:
 ```Smalltalk

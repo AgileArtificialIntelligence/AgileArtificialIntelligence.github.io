@@ -4,7 +4,7 @@
 All major animal groups have brains made of neurons. 
 A neuron is a specialized cell that transmits electrochemical stimulation using an axon to other neurons. A neuron receives this nerve impulse via a *dendrite*. Since the early age of computers, scientists have tried to produce a computational model of a neuron. The perceptron was one of the first models to mimic the behavior of a neuron.
 
-This chapter plays two essential roles in this book. First, it presents the perceptron, a fundamental model on which neural networks are built. Second, it also provides a gentle introduction to the Pharo programming language. The chapter builds a simple perceptron model in Pharo.
+This chapter plays two essential roles in the book. First, it presents the _perceptron_, a fundamental model on which neural networks are based on. Second, it also provides a gentle introduction to the Pharo programming language. The chapter builds a simple perceptron model in Pharo.
 
 ## Perceptron
 
@@ -21,7 +21,7 @@ Not all inputs have the same importance for the perceptron. For example, an inpu
 
 In addition to the weighted input value, a perceptron requires a _bias_, a numerical value acting as a threshold. We denote the bias as _b_.
 
-A perceptron receives a stimulus as input and responds to that stimulus by producing an output value. The output obeys a very simple rule: if the sum of the weighted inputs is above a value, then the perceptron fires 1, else it fires 0. Programmatically, we first compute the sum of the weighted inputs and the bias. If this sum is strictly above 0, then the perceptron produces 1, else it produces 0.
+A perceptron receives a stimulus as input and responds to that stimulus by producing an output value. The output obeys a very simple rule: if the sum of the weighted inputs is above a particular given value, then the perceptron fires 1, else it fires 0. Programmatically, we first compute the sum of the weighted inputs and the bias. If this sum is strictly above 0, then the perceptron produces 1, else it produces 0.
 
 Formally, based on the perceptron given in Figure @fig:perceptron, we write $z = x1 * w1 + x2 * w2 + x3 * w3 + b$. In the general case, we write $z = \sum_i{x_i * w_i}~ + b$. The variable $i$ ranges over all the inputs of the perceptron. If $z > 0$, then the perceptron produces 1, else if $z \leq 0$ it produces 0.
 
@@ -29,15 +29,15 @@ In the next section, we will implement a perceptron model that is both extensibl
 
 ## Implementing the perceptron
 
-In this section, we will put our hands to work and implement the perceptron model in Pharo. We will produce an object-oriented implementation of the model. We will implement a class `Neuron` in a package called `NeuralNetwork`. Our class will have a method called `feed` which will be used to compute two values, $z$ and the perceptron output.
+In this section, we will put our hands to work and implement the perceptron model in the Pharo programming language. We will produce an object-oriented implementation of the model. We will implement a class `Neuron` in a package called `NeuralNetwork`. Our class will have a method called `feed` which will be used to compute two values, $z$ and the perceptron output.
 
-To create a new package, we first need to open a _system browser_ by selecting the corresponding entry in the Pharo menu. The system browser is an essential tool in Pharo. It allows one to read and write code. Most of the programming activity in Pharo typically happens in a system browser. 
+Our code will be contained in a package. To create a new package, we first need to open a _system browser_ by selecting the corresponding entry in the Pharo menu. The system browser is an essential tool in Pharo. It allows one to read and write code. Most of the programming activity in Pharo typically happens in a system browser. 
 
 Figure @fig:systemBrowser shows a system browser, which is composed of five different parts. The top part is composed of four lists. The left-most list gives the available and ready-to-be-used packages. In the figure, the names `Announcement`, `AST-Core` and `Alien` are examples of packages. The `Announcement` package is selected in the figure. 
 
-The second list gives the classes that belong to the selected package. Many classes compose the `Announcement` package, including the classes called `Announcement`, `AnnouncementSet`, and `Announcer`.
+The second list gives the classes that belong to the selected package. Many classes are part of the `Announcement` package, including the classes called `Announcement`, `AnnouncementSet`, and `Announcer`.
 
-The third list shows the method categories of the selected class. Method categories sort methods into logical groups to clarify their purpose and make them easier to find. Think of them as a kind of package for methods. Since no class is selected, no method category is listed.
+The third list shows the method categories of the selected class. Method categories sort methods into logical groups to clarify their purpose and make them easier to find. Think of them as a kind of package for methods. Since no class is selected in the figure, no method category is listed.
 
 The right-most list shows the methods of the selected class, filtered by the selected method category if any. Since no class is selected, no methods are listed.
 The bottom part of a system browser displays source code, which is one of the following:
@@ -50,7 +50,7 @@ The bottom part of a system browser displays source code, which is one of the fo
 
 ![The Pharo system browser.](02-Perceptron/figures/systemBrowser.png){#fig:systemBrowser}
 
-Right-click on the left-most top list to create a new package, named `NeuralNetwork`. This package will contain most of the code we will write in this book. 
+Right-click on the left-most top list to create a new package, named `NeuralNetwork`. This package will contain most of the code we will write in this first part of the book. 
 
 Select the package `NeuralNetwork` you have just created and modify the template in the bottom pane as follows:
 
@@ -63,9 +63,9 @@ Object subclass: #Neuron
 
 You then need to compile the code by "accepting" the source code. Right click on the text pane and select the `Accept` option. The class `Neuron` defines two instance variables, `weights` and `bias`. Note that we do not need to have variables for the inputs and output values. These values will be provided as message arguments and returned values. 
 We need to add some methods to define the logic of our perceptron.
-In particular, we need to compute the $z$ and the output values. Let's first focus on the `weights` variable. We will define two methods to write a value to that variable and another one to read from it.
+In particular, we need to compute the intermediate $z$ and the output values. Let's first focus on the `weights` variable. We will define two methods to write a value to that variable and another one to read from it.
 
-You may wonder why we define a class `Neuron` and not `Perceptron`. In the next chapter we will extend our class `Neuron` by turning it into an open abstraction for an artificial neuron. Our `Neuron` class is therefore a placeholder for improvements we will make in the subsequent chapters. In this chapter we consider a perceptron, but in the coming chapter we will move toward an abstract neuron implementation.
+You may wonder why we define a class `Neuron` and not `Perceptron`. In the next chapter we will extend our class `Neuron` by turning it into an open abstraction for an artificial neuron. Our `Neuron` class is therefore a placeholder for improvements we will make in the subsequent chapters. In this chapter we consider a perceptron, but in the coming chapter we will move toward an abstract neuron implementation. The name `Neuron` is better suited therefore.
 
 Here is the code of the `weights:` method defined in the class `Neuron`:
 
@@ -143,7 +143,7 @@ This piece of code evaluates to `1` (since `(5*1 + 2*2)-2` equals to `7`, which 
 
 ## Testing our code
 
-Now it's time to talk about testing. Testing is an essential activity whenever we write code using agile methodologies and is about raising the confidence that the code we write does what it is supposed to do.
+Now it is time to talk about testing. Testing is an essential activity whenever we write code using agile methodologies. Testing is about raising the confidence that the code we write does what it is supposed to do.
 
 Although this book is not about writing large software artifacts, we _do_ write source code. And making sure that this code can be tested in an automatic fashion significantly improves the quality of our work. More importantly, most code is read far more often than it is written. Testing helps us produce maintainable and adaptable code. Throughout this book, we will improve our codebase. It is therefore very important to make sure that our improvements do not break existing functionalities. 
 

@@ -146,7 +146,6 @@ g
 
 Figure @fig:gradientDescent gives the result of the script execution. The script computes the values of `a` and `b` that make the blue line close to the four points. Said in other terms, the gradient descent technique is applied to minimize the $J(a,b)$ cost function. Actually, after 1000 iterations, we approximate the minimum of $J$ at the point $(1.42, 1.39)$.
 
-
 ## Parameter update
 
 The script we gave above may look a bit mysterious. We repeatedly decrease the values `a` and `b` with a little step, result of multiplying a derivative value multiplied by `learningRate`. For some reason, the cost function decreases. Why?
@@ -217,6 +216,13 @@ g
 ![Variation of the MSE cost function](05-Learning/figures/gradientDescent2.png){#fig:gradientDescent2 width=400px}
 
 Figure @fig:gradientDescent2 gives the variation of the cost function at each update of the `a` and `b` values. You can see that it gets closer to 0, but still remains far away. The reason is that since the points we used are not perfectly lined up, there is no `a` and `b` that makes the cost value equals to 0. If you pick points that are perfectly lined up, (_e.g.,_ `{(4@6.5). (2@3.5). (2@3.5). (2@3.5)}`), then the cost function is asymptotic to 0.
+
+## Stochastic Gradient Descent
+
+The gradient descent computes the gradient of the loss function from the whole dataset. This is often impracticable because minimum local points and saddle points may be found on our way to search for the global minimum. Furthermore, gradient descent adjust the parameters based on the sum of the accumulated errors over all samples. This means that parameters are updated only after a prediction is made after predicting each point of the whole dataset. This is largely impracticable as soon as the dataset is large.
+You can see this in the previous section where we used `sum` when computing `deriMSEa` and `deriMSEb`. 
+
+An alternative to _gradient descent_ is called _stochastic gradient descent_ (SGD). With SCG, the parameters are updated incrementally, with a single training sample. Such an example is randomly chosen.
 
 ## Gradient Descent in our implementation
 

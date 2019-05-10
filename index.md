@@ -51,6 +51,8 @@ We are also deeply grateful to
 - Lam Research for sponsoring part of this work
 - INRIA Chile for helping us with the infrastructure
 
+Publishing a book involves some legal aspects that need to be carefully considered. We thank Fernanda Carvajal Gezan and Rosa Leal, from the University of Chile.
+
 # What do our readers think about the book?
 
 _"One of the best technical books I have read. Even in its current evolving form it is the simplest presentation of a complex subject. Words or review cannot do justice to the way it is presented. I would be recommending this to everyone, I can to read and download Pharo specially the interface with Keras, which I followed on in another thread.  The concepts of perceptron, neuron and neural networks cannot be simplified any further in words or code. It is the combination of the presentation of the material and Pharo Smalltalk, that will resonate for the artists in programming world._

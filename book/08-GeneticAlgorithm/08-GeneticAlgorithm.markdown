@@ -805,16 +805,16 @@ Finally, a new population may be created using:
 
 ```Smalltalk
 GATournamentSelection>>createNewPopulation
-	"Return a new population made of newly breed individual"
-	| partnerA partnerB child |
-	population := OrderedCollection new.
-	[ population size < self populationSize ]
-		whileTrue: [ 
-			partnerA := self getGoodIndividual.
-			partnerB := self getGoodIndividual.
-			child := self mutate: (self crossover: partnerA with: partnerB).
-			child computeFitnessUsing: engine fitnessBlock.
-			population add: child ]
+   "Return a new population made of newly breed individual"
+    | partnerA partnerB child |
+    population := (1 to: self populationSize) collect: [ :seed |
+      engine random: (Random seed: seed).
+      partnerA := self getGoodIndividual.
+      partnerB := self getGoodIndividual.
+      child := self mutate: (self crossover: partnerA with: partnerB).
+      child computeFitnessUsing: engine fitnessBlock.
+      child.
+    ]
 ```
 
 ## Monitoring the Evolution
