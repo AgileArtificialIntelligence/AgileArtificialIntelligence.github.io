@@ -1,7 +1,7 @@
 
 # Neural Networks
 
-The previous chapter covers the design and implementation of an individual neuron. This chapter builds upon the effort initiated in previous chapters by connecting multiple neurons. We provide a complete implementation of a neural network and a backpropagation algorithm, which bring us at the core of the book.
+The previous chapter covers the design and implementation of an individual neuron. This chapter builds upon the effort initiated in previous chapters by connecting multiple neurons. We provide a complete implementation of a neural network and a backpropagation algorithm, which bring us at the core of the first part of the book.
 
 ## General architecture
 
@@ -15,7 +15,7 @@ Figure @fig:generalStructure shows a simple neural network made of five neurons,
 
 All values transmitted between neurons are numerical values. The output values, `o1` and `o2` are number ranging between 0 and 1. Since all the neurons we will consider have a sigmoid activation function, only values ranging between 0 and 1 are transmitted between neuron layers.
 
-The depicted neural network is qualified as _fully-connected_ since each neuron of the hidden layer is connected with _all_ the neurons of the input layer and _all_ the neurons of the output layer. Such a network corresponds to the simplest architecture. More sophisticated architecture may be recurrent neural network and convolutional neural networks.
+The depicted neural network is qualified as _fully-connected_ since each neuron of the hidden layer is connected with _all_ the neurons of the input layer and _all_ the neurons of the output layer. Such a network corresponds to the simplest architecture. More sophisticated architecture may be recurrent neural network and convolutional neural networks, which are not covered by the present book.
 
 This chapter provides an implementation of abstraction we informally presented. The next chapter will uncover some theoretical aspects of the fully-connected network.
 
@@ -50,7 +50,7 @@ NeuronLayer>>initializeNbOfNeurons: nbOfNeurons nbOfWeights: nbOfWeights using: 
 
 The method `initializeNbOfNeurons:nbOfWeights:using:` accepts three arguments. The first one, `nbOfNeurons` is an integer value and represents the number of neurons the layer should contains. The second argument, `nbOfWeights`, is an integer that indicates the number of weights each neuron should have. This number of weights reflects the number of input values the layer is accepting. The last argument, `random`, is a random number generator. As in the previous chapter, using a random number generator is useful to make the behavior deterministic. This random generator is used to initialize each individual neuron.
 
-The method first creates `nbOfNeurons` different neurons, each having `nbOfWeights` weight values. Each weight is a random number between -2 and +2. The expression `random next` produces a random number within 0 and 1. Multiplying it by 4 and subtracting 2 produces a value between -2 and +2. Each neuron has a sigmoid activation function thanks to the message `sigmoid`.
+The method first creates `nbOfNeurons` different neurons, each having `nbOfWeights` weight values. Each weight is a random number between $-2$ and $+2$. These boundary are arbitrary chosen. The expression `random next` produces a random number within 0 and 1. Multiplying it by 4 and subtracting 2 produces a value between -2 and +2. Each neuron has a sigmoid activation function thanks to the message `sigmoid`.
 
 Lastly, the method set the learning rate of each neuron at `0.1`. The method `learningRate:` is defined as:
 
@@ -156,7 +156,7 @@ NeuronLayerTest>>testBasic
 		do: [ :res :test | self assert: (res closeTo: test precision: 0.0000000001) ]
 ```
 
-The method `testBasic` create a new neuron layer, composed of 3 neurons, each having 4 weights and 1 bias. The weights and biases are initialized using the random number generator `r`.
+The method `testBasic` creates a new neuron layer, composed of 3 neurons, each having 4 weights and 1 bias. The weights and biases are initialized using the random number generator `r`.
 
 We can also build up a chain of layers and see how they perform:
 ```Smalltalk
@@ -202,7 +202,7 @@ NNetwork>>initialize
 	precisions := OrderedCollection new.
 ```
 
-Both the `layers`, `errors`, and `precisions` instance variables are initialized with an empty collection. The variable `layers` will contains instances of the class `NeuronLayer`. The variables `errors` and `precisions` will contains numerical values, representing the errors and precisions during the training process. We will exploit these variables in the chapter about classifying data.
+Both the `layers`, `errors`, and `precisions` instance variables are initialized with an empty collection. The variable `layers` will contains instances of the class `NeuronLayer`. The variables `errors` and `precisions` will contains numerical values, representing the errors and precisions during the training process. We will exploit these variables when we will classify data, in a future chapter.
 
 Adding a layer is simply done through the method `addLayer:`, which takes a layer as argument:
 ```Smalltalk
@@ -398,9 +398,7 @@ NeuronLayer>>backwardPropagateError
 			 self previousLayer backwardPropagateError ].
 ```
 
-The recursion end on the first hidden layer, which is the layer with no previous layer. Note that we do not explicitly model the input layer. 
-
-We also need the following helper method on the class `Neuron`:
+The recursion end on the first hidden layer, which is the layer with no previous layer. Note that we do not explicitly model the input layer since there is no use of it. We also need the following helper method on the class `Neuron`:
 ```Smalltalk
 Neuron>>adjustDeltaWith: anError
 	delta := anError * (activationFunction derivative: output)
