@@ -51,7 +51,7 @@ g
 
 You can recognize the step function provided to the `y:` instruction. Note that the function provided to `y:` refers to the input as $x$ while $z$ is provided to $\sigma$. This is an inoffensive renaming.
 
-Consider a value $z = 0$. We therefore have $\sigma(z) = 0$. If we add $0.00001$, a small value, to $z$ then we have $\sigma(z) = 1$. A small value added to $z$ produces a large change in $\sigma(z)$ going from $0$ to $1$. The fact that a small change in $z$ produces a big change in $\sigma(z)$ is actually a serious problem: a chain of perceptron is not able to learn.
+Consider a value $z = 0$. We therefore have $\sigma(z) = 0$. If we add $0.00001$, a small value, to $z$ then we have $\sigma(z) = 1$. A small value added to $z$ produces a large change in $\sigma(z)$, which goes from $0$ to $1$. The fact that a small change in $z$ produces a big change in $\sigma(z)$ is actually a serious problem: a chain of perceptron is not able to learn.
 
 The step function is characterized for having a vertical step, which produces two angles in its curve. These angles are makes the step function as non-derivable, which is quite a problem as we will shortly see.
 
@@ -99,19 +99,21 @@ Object subclass: #ActivationFunction
 	package: 'NeuralNetwork'
 ```
 
-An activation function object has two main responsibilities, computing (i) the activation value and (ii) the transfer derivative. This transfer derivative is an essential piece of the backpropagation learning algorithm. Implementation of the backpropagation is given in this chapter, while the theoretical background is given in Chapter 5.
+An activation function object has the responsibily of computing two things: (i) the activation value and (ii) the transfer derivative. This transfer derivative is an essential piece of the backpropagation learning algorithm. Implementation of the backpropagation is given in this chapter, while the theoretical background is covered in Chapter 5.
 
-We define the following two abstract methods:
+We define the following two abstract methods. The method `eval:` computes the activation value:
 ```Smalltalk
 ActivationFunction>>eval: z
 	^ self subclassResponsibility
 ```
-and
+and the method `derivative:` computes the transfer derivative:
 
 ```Smalltalk
 ActivationFunction>>derivative: output
 	^ self subclassResponsibility
 ```
+
+The two methods we have just defined are abtract methods, which means they are placeholder for subclasses of `ActivationFunction` to actually provide an adequate implementation of these methods.
 
 We can now define the two activation functions, each as being a subclass of `ActivationFunction`. The sigmoid function may be defined as:
 
@@ -136,7 +138,7 @@ SigmoidAF>>derivative: output
 	^ output * (1 - output)
 ```
 
-Without entering into details, we have $\sigma(z)' = \sigma(z) * (1 - \sigma(z))$. We will come back on that point in a future chapter.
+Without entering into details, we have $\sigma(z)' = \sigma(z) * (1 - \sigma(z))$. We will come back on that point in Chapter 5.
 
 Similarly, we can define the step function as follows:
 ```Smalltalk
@@ -164,7 +166,10 @@ The formulation of the `derivative:` of the step function does not match the mat
 
 ## Extending the neuron with the activation functions
 
-We can now generalize the way an artificial neuron can learn with the following rules:
+We can now generalize the way an artificial neuron can learn from examples. Assume an example value $(x, d)$, in which $x$ is example input and $d$ is the example output. At the beginning, when providing the input $x = (x_1, ..., x_i, ..., x_N)$ to a sidmoid neuron, the output is likely to be different than $d$, a number between $0$ and $1$. This is not surprising since the weights and bias are randomly chosen. This is exactly why we are training the neuron with that example, to have the neuron output $d$ if $x$ is provided.
+
+
+The learning mechanism may be summarized with the following rules:
 
 $$\delta = (d - z) * \sigma'(z)$$
 $$w_i(t+1) = w_i(t) + \delta * x_i * \alpha$$
@@ -173,18 +178,20 @@ $$b(t+1) = b(t) + \delta * \alpha$$
 
 in which:
 
-- $\sigma$ is the activation function. Either the step or sigmoid function 
-- $\sigma'$ is the derivative function of $\sigma$
-- $\delta$ is the difference between the desired output and the actual output of the neuron
-- $i$ is the weight index, which ranges from 1 to the number of weights contained in the neuron.
-- $w_i(t)$ is the weight $i$ at a given time $t$
-- $b(t)$ is the bias at a given time $t$
-- $d$ is the desired value
-- $z$ is the actual output of the perceptron
-- $x_i$ corresponds to the provided input at index $i$
-- $\alpha$ is the learning rate
+- $\delta$ is the difference between the desired output and the actual output of the neuron;
+- $d$ is the example output, which is the desired value;
+- $z$ is the actual output of the perceptron;
+- $\sigma$ is the activation function (either the step or sigmoid function);
+- $\sigma'$ is the derivative function of $\sigma$;
+- $i$ is the weight index, which ranges from $1$ to $N$, the number of weights contained in the neuron;
+- $w_i(t)$ is the weight $i$ at a given time $t$;
+- $b(t)$ is the bias at a given time $t$;
+- $x_i$ corresponds to the provided input at index $i$;
+- $\alpha$ is the learning rate, a small positive value close to $0$.
 
-These equations can be translated into the following pseudocode:
+With little or no training, the neuron will output a value $z$ which is very different from $d$. As a consequence, $\delta$ will also be large. With an adequate number of trainings, the $\delta$ should get close to $0$.
+
+These equations will be explained in Chapter 5. For now, the most important is that they can be translated into the following pseudocode:
 
 ```
 diff = desiredOutput - realOutput
@@ -195,6 +202,7 @@ For all N:
 bias = bias + (alpha * diff)
 ```
 
+We are here assuming that the neuron has $N$ inputs, and therefore $N$ weights.
 We can now extend our definition of neuron to use an activation function. We can do so by adding a new instance variable `activationFunction` to the`Neuron` class:
 
 
@@ -231,10 +239,10 @@ We are now ready to implement the algorithm to train a sigmoid neuron. Here is t
 
 ```Smalltalk
 Neuron>>train: inputs desiredOutput: desiredOutput
-    | theError output delta |
+    | diff output delta |
     output := self feed: inputs.
-    theError := desiredOutput - output.
-    delta := theError * (activationFunction derivative: output).    
+    diff := desiredOutput - output.
+    delta := diff * (activationFunction derivative: output).    
 
     inputs withIndexDo: [ :anInput :index | 
         weights at: index put: ((weights at: index) + (learningRate * delta * anInput)) ].
@@ -242,7 +250,7 @@ Neuron>>train: inputs desiredOutput: desiredOutput
     bias := bias + (learningRate * delta)
 ```
 
-The method `train:desiredOutput:` is very similar to what we have seen with the perceptron. We have introduced a `delta` local variable is represents the error multiplied by the transfer derivative. We use the transfer derivative to formulate a _gradient descent_. We will explore that topic in detail in a future chapter. 
+The method `train:desiredOutput:` is very similar to what we have seen with the perceptron. We have introduced a `delta` local variable, which represents the error multiplied by the transfer derivative. We use the transfer derivative to formulate a _gradient descent_. We will explore that topic in detail in Chapter 5.
 
 We now need to initialize a neuron as being a sigmoid:
 
@@ -284,7 +292,7 @@ PerceptronTest>>testAND
     self assert: (p feed: #(1 1)) equals: 1.
 ```
 
-Adding the call to `step` make the neuron behaves as a perceptron. Omitting this line would instead use a sigmoid neuron, and the tests would fail since the output would not exactly be `0` or `1`.
+Adding the call to `step` makes the neuron behave as a perceptron. Omitting this line would instead use a sigmoid neuron, and the tests would fail since the output would not exactly be `0` or `1`.
 
 *EXERCISE:* Adapt all the test methods of `PerceptronTest` to use a neuron with a step function.
 
@@ -355,7 +363,7 @@ As you can see, using a sigmoid neuron does not mess up our tests. We simply nee
 
 This chapter started by pointing out a strong limitation of the perceptron. This has motivated us to formulate the sigmoid neuron. We see one drawback of the sigmoid neuron: it is slower to learn than the perceptron. We are here making a bet, which is trading efficiency for flexibility: as we will see in the next chapter, sigmoid neuron can be nicely combined.
 
-We can easily make the comparison between the sigmoid neuron and perceptron. Consider the following script:
+We can easily compare the learning of the sigmoid neuron versus the perceptron. Consider the following script:
 
 ```Smalltalk
 learningCurveNeuron := OrderedCollection new.
@@ -435,7 +443,7 @@ This chapter covers the following topics:
 
 - _Briefly discussed the limitation of the perceptron._ The perceptron cannot learn when combined with other perceptrons. Although we have not discussed this aspect further, you need to trust me for now. In the next chapter we will develop this further.
 - _Definition of the sigmoid neuron._ The sigmoid neuron is an improvement of the perceptron since it can be combined with other sigmoid neurons and this combination can learn. In the next chapter we will detail the backpropagation algorithm, a central aspect when making a neural network learn.
-- _Activation functions._ We have seen two activation functions, the step and sigmoid functions. Many other activation functions are around. We will develop activation functions later on in the book.
+- _Activation functions._ We have seen two activation functions, the step and sigmoid functions. Many other activation functions are around. 
 
 The next chapter is about composing sigmoid neuron to build artificial neural networks.
 
