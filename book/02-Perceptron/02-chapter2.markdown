@@ -8,8 +8,8 @@ This chapter plays two essential roles in the book. First, it presents the _perc
 
 ## Perceptron
 
-A perceptron is a kind of artificial neuron that models the behavior of a real neuron.
-A perceptron is a machine that produces an output for a provided input. Figure @fig:perceptron gives an example of a perceptron.
+A perceptron is a kind of artificial neuron that models the behavior of a biological neuron.
+A perceptron is a machine that produces an output for a provided set of input values. Figure @fig:perceptron gives a visual representation of a perceptron.
 
 A perceptron accepts 1, 2, or more numerical values as inputs. It produces a numerical value as output (result of a simple equation that we will shortly see). A perceptron operates on numbers, which means that the inputs and the output are numerical values (_e.g.,_ integers or floating point values).
 
@@ -25,7 +25,7 @@ A perceptron receives a stimulus as input and responds to that stimulus by produ
 
 Formally, based on the perceptron given in Figure @fig:perceptron, we write $z = x1 * w1 + x2 * w2 + x3 * w3 + b$. In the general case, we write $z = \sum_i{x_i * w_i}~ + b$. The variable $i$ ranges over all the inputs of the perceptron. If $z > 0$, then the perceptron produces 1, else if $z \leq 0$ it produces 0.
 
-In the next section, we will implement a perceptron model that is both extensible and maintainable. You may wonder, "What is the big deal about this?" After all, the perceptron model may be implemented in a few lines of code. However, implementing the perceptron functionality is just a fraction of the job. Creating a perceptron model that is testable, well tested, and extensible is the real value of this chapter.
+In the next section, we will implement a perceptron model that is both extensible and maintainable. You may wonder, "What is the big deal about this?" After all, the perceptron model may be implemented in a few lines of code. However, implementing the perceptron functionality is just a fraction of the job. Creating a perceptron model that is testable, well tested, and extensible is the real value of this chapter. Soon we will see how we can train a network of artificial neurons, and it is important to build this network framework on a solid base.
 
 ## Implementing the perceptron
 
@@ -63,7 +63,7 @@ Object subclass: #Neuron
 
 You then need to compile the code by "accepting" the source code. Right click on the text pane and select the `Accept` option. The class `Neuron` defines two instance variables, `weights` and `bias`. Note that we do not need to have variables for the inputs and output values. These values will be provided as message arguments and returned values. 
 We need to add some methods to define the logic of our perceptron.
-In particular, we need to compute the intermediate $z$ and the output values. Let's first focus on the `weights` variable. We will define two methods to write a value to that variable and another one to read from it.
+In particular, we need to compute the intermediate $z$ and the output values. Let's first focus on the `weights` variable. We will define two methods to write a value in that variable and another one to read from it.
 
 You may wonder why we define a class `Neuron` and not `Perceptron`. In the next chapter we will extend our class `Neuron` by turning it into an open abstraction for an artificial neuron. Our `Neuron` class is therefore a placeholder for improvements we will make in the subsequent chapters. In this chapter we consider a perceptron, but in the coming chapter we will move toward an abstract neuron implementation. The name `Neuron` is better suited therefore.
 
@@ -123,7 +123,7 @@ The expression `inputs with: weights collect: [ :x :w | x * w ]` transforms the 
 #(1 2 3) with: #(10 20 30) collect: [ :a :b | a + b ]
 ~~~~~~~
 
-The above expression evaluates to `#(11 22 33)`. Syntactically, the expression means that the literal value `#(1 2 3)` receives a message called `with:collect:`, with two arguments, the literal `#(10 20 30)` and the block `[ :a :b | a + b ]`.
+The above expression evaluates to `#(11 22 33)`. Syntactically, the expression means that the literal value `#(1 2 3)` receives a message called `with:collect:`, with two arguments, the literal array `#(10 20 30)` and the block `[ :a :b | a + b ]`.
 You can verify the value of that expression by opening a playground (accessible from the main Pharo menu). A playground is a kind of command terminal for Pharo (_e.g.,_ xterm in the Unix World). Figure @fig:playground illustrates the evaluation of the expression given above (evaluated either by choosing "Print It" from the right click menu, or using the adequate shortcut (Cmd + p on OSX or Alt + p on other operating systems).
 
 ![The Playground.](02-Perceptron/figures/playground.png){#fig:playground width=400px}
@@ -188,7 +188,7 @@ In general, it is a very good practice to write a thorough suite of tests, even 
 
 ## Formulating logical expressions
 
-A canonical example of using a perceptron is to express boolean logical gates. The idea is to have a perceptron with two inputs (each being a boolean value), and the result of a logical gate as output. 
+A canonical example of using a perceptron is to express boolean logical gates. The idea is to have a perceptron with two inputs (each being a boolean value), and the result of the modeled logical gate as output. 
 
 A little bit of arithmetic indicates that a perceptron with the weights `#(1 1)` and the bias `-1.5` formulates the AND logical gate. The AND gate may be represented as the following table:
 
@@ -253,7 +253,7 @@ PerceptronTest>>testNOR
 	self assert: (p feed: #(1 1)) equals: 0.
 ~~~~~~~
 
-So far we have built perceptrons with two inputs. The number of inputs has to be the same than the number of weights. Therefore, if only one weight is provided, only one input is required. Consider the NOT logical gate:
+So far we have built perceptrons with two inputs. The number of input values has to be the same than the number of weights. Therefore, if only one weight is provided, only one input is required. Consider the NOT logical gate:
 
 ~~~~~~~
 PerceptronTest>>testNOT
@@ -286,9 +286,9 @@ The test `testWrongFeeding` passes only if the expression `p feed: #(1 1)` raise
 
 ![Running our tests.](02-Perceptron/figures/runningTests.png){#fig:runningTests}
 
-Until now, we have defined the class `Neuron` with five methods, and the unit test `PerceptronTest` with six test methods. All the tests can be run by pressing the circle next to the unit test name (Figure @fig:runningTests).
+Until now, we have defined the class `Neuron` with five methods, and the unit test `PerceptronTest` with six test methods. All the tests can be run by pressing the circle next to the unit test name, `PerceptronTest` (Figure @fig:runningTests).
 
-It is important to emphasize that rigorously testing our code, which also involve verifying that errors are properly handled, is important when implementing a neural network from scratch. Facing errors due to mismatched size of inputs and weights is unfortunately too frequent to be lax on that front. 
+It is important to emphasize that rigorously testing our code, which also involves verifying that errors are properly handled, is important when implementing a neural network from scratch. Facing errors due to mismatched size of inputs and weights is unfortunately too frequent to be lax on that front. 
 
 ## Combining perceptrons
 
@@ -332,11 +332,11 @@ PerceptronTest>>digitalComparator: inputs
     ^ { aGb . aEb . aLb }
 ~~~~~~~
 
-The method accepts a set of inputs as its argument. We first extract the first and second elements of these inputs and assign them to the temporary variables `a` and `b`. 
+The method accepts a set of inputs as its argument. We begin by extracting the first and second elements of these inputs and assign them to the temporary variables `a` and `b`. 
 
-Next we create our three logical gates as perceptrons. Then we wire them together using the variables `notA`, `notB`, `aGb` (standing for `a` greater than `b`), `aLb` (`a` less than `b`), and `aEb` (`a` equals `b`).
+Next, we create our three logical gates as perceptrons. Then we wire them together using the variables `notA`, `notB`, `aGb` (standing for `a` greater than `b`), `aLb` (`a` less than `b`), and `aEb` (`a` equals `b`).
 
-We then compute `notA` and `notB`. Here, we use an alternative syntax to define an array. The expression `{ A }` creates an array with the object referenced by `A`. The elements of this array syntax will be evaluated at run time, unlike the `#(...)` notation, which is evaluated at compile time. Therefore, for "literal" objects like numbers always use `#(...)` (_e.g.,_ `#(1 -1)`). To pass expressions as elements, always use `{...}`. Note that technically we can also write numbers using the `{...}` syntax (_e.g.,_ `{1 . -1}`), but this is rarely done due to the performance penalty of runtime evaluation without any advantage. It is important to keep these two notations in mind as we will use them heavily throughout the book.
+We then compute `notA` and `notB`. Here, we use an alternative syntax to define an array. The expression `{ A }` creates an array with the object referenced by `A`. The elements of this array syntax will be evaluated at run time, unlike the `#(...)` notation, which is evaluated at compile time. Therefore, for "literal" objects like numbers always use `#(...)` (_e.g.,_ `#(1 -1)`). To create an array which contains results of expressions always use `{...}`. Note that technically we can also write numbers using the `{...}` syntax (_e.g.,_ `{1 . -1}`), but this is rarely done due to the performance penalty of runtime evaluation without any advantage. It is important to keep these two notations in mind as we will use them heavily throughout the book.
 
 The method `digitalComparator:` returns the result of the circuit evaluation as an array. We can test it using the following test method:
 
@@ -349,7 +349,7 @@ PerceptronTest>>testDigitalComparator
 ~~~~~~~
 
 The digital comparator circuit example shows how perceptrons may be "manually" combined. 
-The overall behavior is divided into parts, each referenced with a variable. These variables must then be combined to express the logical flow (_e.g.,_ the variable `notA` must be computed before computing an output). When we discuss training a neural network, we will come back to that particular example. A training will actually (i) compute some weights and a bias and (ii) establish the wiring between the neurons automatically. 
+The overall behavior is divided into parts, each referenced with a variable. These variables must then be combined to express the logical flow (_e.g.,_ the variable `notA` must be computed before computing an output). 
 
 ## Training a Perceptron
 
@@ -429,7 +429,7 @@ Neuron>>train: inputs desiredOutput: desiredOutput
 	bias := bias + (learningRate * theError)
 ~~~~~~~
 
-Before doing any adjustment of the weights and bias, we need to know how well the perceptron evaluates the set of inputs. We therefore need to evaluate the perceptron with the argument `inputs`. The result is assigned to the variable `output`. The variable `theError` represents the difference between the desired output and the actual output. We also need to decide how fast the perceptron is supposed to learn. The `learningRate` value ranges between`0.0` and `1.0`. We arbitrarily picked the value `0.1`. 
+Before doing any adjustment of the weights and bias, we need to know how well the perceptron evaluates the set of inputs. We therefore need to evaluate the perceptron with the argument `inputs`. The result is assigned to the variable `output`. The variable `theError` represents the difference between the desired output and the actual output. We also need to decide how fast the perceptron is supposed to learn. The `learningRate` value ranges between `0.0` and `1.0`. We arbitrarily picked the value `0.1`. 
 
 
 Let's see how to use the training in practice. Consider the perceptron `p` in the following example:
@@ -544,17 +544,17 @@ g
 
 ![Example of a graph.](02-Perceptron/figures/exampleGraph.png){#fig:exampleGraph}
 
-We will make an intense use of graphs along the book. More information about drawing graph can be found in the [http://AgileVisualization.com](Agile Visualization book), Chapter II.3. 
+We will make an intense use of graphs along the book. More information about drawing graph can be found in the examples of Roassal.
 
 
 ## Predicting side of a 2D point
 
-We will now see a second application of the perceptron. A perceptron can be used to classify data and make some predictions. We will pick a simple classification problem. Consider the following:
+We will now see a new application of the perceptron. A perceptron can be used to classify data and make some predictions. We will pick a simple classification problem. Consider the following:
 
 - A space composed of red and blue points
 - A straight line divides the red points from the blue points
 
-Consider the following interaction between two (real) people, a teacher and a student. The goal of the teacher is to let the student infer where is the straight separation line between the blue and the red points. First, the teacher can gives an arbitrary number of examples. Each example is given to the student as a location and a color. After a few examples, the students is able to guess the color of a random location. Intuitively, more examples the teacher will give to the student, more the student will be likely to correctly predict the color.
+Consider the following interaction between two (real) people, a teacher and a student. The goal of the teacher is to let the student infer where is the straight separation line between the blue and the red points. First, the teacher can gives an arbitrary number of examples. Each example is given to the student as a location and a color. After a few examples, the students is able to guess the color of a random location. Intuitively, more examples the teacher will give to the student, more the student will be likely to correctly predict the color of a location.
 
 Some questions arise:
 
@@ -765,7 +765,7 @@ The script produces a curve with the precision on the Y-axis and the number of t
 
 ## Historical perspective
 
-Expressing a computation in terms of artificial neurons was first explored in 1943, by Warren S. McCulloch and Walter Pitts in their seminal article *A logical calculus of the ideas immanent in nervous activity*. This paper had a significant impact in the field of artificial intelligence. It is interesting to realize the knowledge we had about biological neurons at that time. The perceptron model presented in this chapter originated from this seminal paper.
+Expressing a computation in terms of artificial neurons was first explored in 1943, by Warren S. McCulloch and Walter Pitts in their seminal article *A logical calculus of the ideas immanent in nervous activity*. This paper had a significant impact in the field of artificial intelligence. It is interesting to read about the knowledge we had about biological neurons at that time. The perceptron model presented in this chapter originated from this seminal paper.
 
 ## Review
 This chapter covered the following topics:

@@ -46,7 +46,7 @@ The prime factors may be obtained using the expression:
 	g result copyWithout: 1.
 ```
 
-![Identification prime factors of `345`.](09-GAExamples/figures/primeNumbers.png){#fig:primeNumbersOf345}
+![Identification prime factors of `345`.](11-GAExamples/figures/primeNumbers.png){#fig:primeNumbersOf345}
 
 Figure @fig:primeNumbersOf345 gives the results of executing the whole script.
 
@@ -58,7 +58,7 @@ The knapsack problem is a well-known problem in combinatorial optimization. It c
 
 We will consider two variants of the problem, _unbounded knapsack problem_ and _0-1 knapsack problem_.
 
-![Knapsack problem (obtained from Wikipedia, authored by Dake, under Creative Commons Attribution-Share Alike 2.5 Generic).](09-GAExamples/figures/knapsack.png){#fig:knapsackExample width=250px}
+![Knapsack problem (obtained from Wikipedia, authored by Dake, under Creative Commons Attribution-Share Alike 2.5 Generic).](11-GAExamples/figures/knapsack.png){#fig:knapsackExample width=250px}
 
 Figure @fig:knapsackExample illustrates the knapsack problem. Five boxes are available, each having a particular value and weight. The bag cannot held contains more than 15 kilograms of boxes. If we consider the unbounded variant of the problem, then the solution is three boxes of 10\$ and three boxes of 2\$. If we consider the 0-1 variant, then all the boxes exact the 4\$ one. 
 
@@ -96,7 +96,7 @@ The variable `knapsackMaxWeight` refers to the knapsack capacity. The variable `
 
 The fitness function contains three variables. The variable `totalValue` sums up the value of the set of boxes contained in the `genes` variable. The variable `totalWeight` is the boxes' weight. We defined a variable `penalty` which is the absolute difference between the bag capacity and the `totalWeight`. We use a factor 50 to actually make sure that the value does not take over the penalty. 
 
-![Genetic algorithm applied to the Knapsack problem.](09-GAExamples/figures/knapsackAndGA.png){#fig:knapsackAndGA}
+![Genetic algorithm applied to the Knapsack problem.](11-GAExamples/figures/knapsackAndGA.png){#fig:knapsackAndGA}
 
 Figure @fig:knapsackExample illustrates the execution of the script. 
 

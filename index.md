@@ -10,11 +10,13 @@ Part I: Neural Network
 1. [Neural Network](./book/build/04-NeuralNetwork.html)
 1. [Theory on Learning](./book/build/05-Learning.html)
 1. [Application: Data Classification](./book/build/06-Data.html)
+1. [A Matrix Library](./book/build/07-Matrix.html)
+1. [Matrix-Based Neural Network](./book/build/08-MatrixNN.html)
 1. Using Keras from Pharo
 
 Part II: Genetic Algorithm
-1. [Genetic Algorithm](./book/build/08-GeneticAlgorithm.html)
-1. [Genetic Algorithm in Action](./book/build/09-GAExamples.html)
+1. [Genetic Algorithm](./book/build/10-GeneticAlgorithm.html)
+1. [Genetic Algorithm in Action](./book/build/11-GAExamples.html)
 1. Travelling salesman problem
 1. Zoomorphic creature
 
@@ -45,7 +47,7 @@ So, provide feedback! There are several ways to do so:
 
 # Big thanks!
 Since the announcement of the book many have encouraged us, provided feedback, and improved the writing. In no particular order, we are grateful to 
-CH Huang, Chris Thorgrimsson, Milton Mamani, Jhonny Cerezo, Oleks Zaytsev, Stéphane Ducasse, Torsten Bergmann, Serge Stinckwich, Alexandre Rousseau, Sean P. DeNigris, Julián Grigera, Cesar Rabak, Yvan Guemkam, John Borden, Sudhakar Krishnamachari, Leandro Caniglia, mldavis99, darth-cheney, Andy S., Jon Paynter.
+CH Huang, Chris Thorgrimsson, Milton Mamani, Jhonny Cerezo, Oleks Zaytsev, Stéphane Ducasse, Torsten Bergmann, Serge Stinckwich, Alexandre Rousseau, Sean P. DeNigris, Julián Grigera, Cesar Rabak, Yvan Guemkam, John Borden, Sudhakar Krishnamachari, Leandro Caniglia, mldavis99, darth-cheney, Andy S., Jon Paynter, Esteban Lorenzano.
 
 We are also deeply grateful to 
 - Lam Research for sponsoring part of this work

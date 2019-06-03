@@ -60,7 +60,7 @@ g
 
 Figure @fig:pointsAndLine shows the points and the blue line that we arbitrarily defined. As one can see, the value we picked for `a` and `b` are not really good since the blue line is rather far away from the first and the fourth points. If we want to look for better `a` and `b`, then we need to translate in some way how far the blue lines is from the points. 
 
-A _loss function_ is a mathematical function that maps an event, described as a set of values of one ore more variables, into a real number. The numerical value given by the loss function intuitively represents the _cost_ associated with the event. In our case, the loss function approximates the distance between the straight blue line with the four points. If the blue line is close to the four points, then the cost will be relatively low. Oppositely, if it is far away from the points, then the cost will be high.
+A _loss function_ is a mathematical function that maps an event, described as a set of values of one or more variables, into a numerical value. The numerical value given by the loss function intuitively represents the _cost_ associated with the event. In our case, the loss function approximates the distance between the straight blue line with the four points. If the blue line is close to the four points, then the cost will be relatively low. Oppositely, if it is far away from the points, then the cost will be high.
 
 A common loss function is the _mean squared error_ (MSE). This function, in our case, is defined as the $J$ function as follows:
 

@@ -260,7 +260,7 @@ g axisX noTick.
 g
 ```
 
-![Visualizing the fitness distribution of 1000 individuals.](08-GeneticAlgorithm/figures/distributionResults.png){#fig:distributionResults}
+![Visualizing the fitness distribution of 1000 individuals.](10-GeneticAlgorithm/figures/distributionResults.png){#fig:distributionResults}
 
 The graphic shows, using a vertical logarithmic scale, that from the 1000 initial individual, 880 individuals have a fitness of 0, 113 individuals have a fitness of 1, and only 7 individuals have a fitness of 2. None have a fitness of 3. 
 
@@ -292,7 +292,7 @@ g axisX noTick.
 g
 ```
 
-![Visualizing the fitness distribution of 100 000 individuals.](08-GeneticAlgorithm/figures/distributionResults2.png){#fig:distributionResults2}
+![Visualizing the fitness distribution of 100 000 individuals.](10-GeneticAlgorithm/figures/distributionResults2.png){#fig:distributionResults2}
 
 Locating the mouse above the bar 3 reveals that 4 individuals with the secret words have been created. 
 

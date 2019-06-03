@@ -7,9 +7,11 @@ FILES=`ls 01-introduction/*.markdown \
 	04-NeuralNetwork/*.markdown \
 	05-Learning/*.markdown \
 	06-Data/*.markdown \
-	08-GeneticAlgorithm/*.markdown \
-	09-GAExamples/*.markdown \
-	10-TravelingSalesmanProblem/*.markdown`
+	07-MatrixLibrary/*.markdown \
+	08-MatrixNN/*.markdown \
+	10-GeneticAlgorithm/*.markdown \
+	11-GAExamples/*.markdown \
+	12-TravelingSalesmanProblem/*.markdown`
 
 if [ ! -d "build" ]; then
 	mkdir build

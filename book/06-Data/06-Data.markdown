@@ -24,10 +24,10 @@ After evaluating this script, the expression `n feed: #(1 0)` evaluates to `#(0.
 Consider the following method:
 
 ```Smalltalk
-NNetwork>>train: train nbEpoch: nbEpoch
+NNetwork>>train: train nbEpochs: nbEpochs
     "Train the network using the train data set."
     | sumError outputs expectedOutput epochPrecision t |
-    1 to: nbEpoch do: [ :epoch |
+    1 to: nbEpochs do: [ :epoch |
         sumError := 0.
 		  epochPrecision := 0.
         train do: [ :row |
@@ -68,7 +68,7 @@ data := {#(0 0 0) .
 	#(0 1 1) .
 	#(1 0 1) .
 	#(1 1 0) }.
-n train: data nbEpoch: 20000
+n train: data nbEpochs: 20000
 ```
 
 The `data` variable is an array of arrays of numbers. Each row represents an example and it contains the input values and the output value. For example, the row `#(0 1 1)` represents the line `n train: #(0 1) desiredOutputs: #(1)` given above. Note that the neural network has two output neurons. This is the result of using a one-hot encoding for the output. The examples have two different output values, either `0` or `1`, therefore using the one-hot encoding we have two output neurons, each neuron for a particular value. Later on in this chapter we will detail this encoding.
@@ -87,7 +87,7 @@ data := {#(0 0 0 0).
 	#(1 0 1 5).
 	#(1 1 0 6).
 	#(1 1 1 7) }.
-n train: data nbEpoch: 1000.
+n train: data nbEpochs: 1000.
 ```
 
 The code above builds a neural network trained to convert binary numbers into a decimal number. The binary number is encoded using 3 bits, we therefore need a neural network with 3 inputs. Since the decimal value ranges from 0 to 7, we need 8 output neurons of the network. As an example, the conversion of the binary number you can evaluate the following:
@@ -97,7 +97,7 @@ n predict: #(0 1 1)
 "==> 3"
 ```
 
-The way `train:nbEpoch:` and `predict:` are implemented enforces the training data to follow some rules. Each element contained in `data` must be a collection of numbers. All but the last numbers represents the inputs values. The last value of an example is a number representing the expected output. The expected output is a positive value ranging from 0 and the number of outputs of the neural network minus one.
+The way `train:nbEpochs:` and `predict:` are implemented enforces the training data to follow some rules. Each element contained in `data` must be a collection of numbers. All but the last numbers represents the inputs values. The last value of an example is a number representing the expected output. The expected output is a positive value ranging from 0 and the number of outputs of the neural network minus one.
 
 
 ## Neural network as a Hashmap
@@ -136,7 +136,7 @@ The network somehow matches the input values `#(0.4 0.7 0.6)` to `#(0 1 1)`, whi
 
 We have seen that the first step of the backpropagation is to actually evaluate the network with the provided inputs. The output values are then compared with the expected output values. The difference between the actual output and the expected output is then used to adjust the weights and biases by back-propagating this difference to the network. 
 
-The method `NNetwork>>train:nbEpoch:` contains the statements `errors add: sumError` and `precisions add: (epochPrecision / train size) asFloat`. These two lines of code have the effect to record the value of `sumError`, indicating how well the network has performed for the provided example, and the value of precision per epoch. These two collections of numbers can be visualized as a helper to characterize the overall learning process for a given network and example set.
+The method `NNetwork>>train:nbEpochs:` contains the statements `errors add: sumError` and `precisions add: (epochPrecision / train size) asFloat`. These two lines of code have the effect to record the value of `sumError`, indicating how well the network has performed for the provided example, and the value of precision per epoch. These two collections of numbers can be visualized as a helper to characterize the overall learning process for a given network and example set.
 
 We define the method `viewLearningCurve` on the class `NNetwork`:
 
@@ -201,7 +201,7 @@ data := {#(0 0 0) .
     #(0 1 1) .
     #(1 0 1) .
     #(1 1 0) }.
-n train: data nbEpoch: 10000.
+n train: data nbEpochs: 10000.
 ```
 
 ![Visualizing the learning.](06-Data/figures/errorCurve.png){#fig:learningCurve}
@@ -278,7 +278,7 @@ n configure: 2 hidden: 3 nbOfOutputs: 2.
 
 data := {#(0 0 0) .
 	#(0 0 1) }.
-n train: data nbEpoch: 1000.
+n train: data nbEpochs: 1000.
 ```
 
 The script trains a neural network with two contradictory examples. The first example trains the network to output `0` with the inputs `0` and `0`. The second example trains the network to output `1` for the same input values. 
@@ -293,7 +293,7 @@ Using a real and non-trivial dataset it is likely that this situation will happe
 
 Classification can be defined as grouping elements based on their features. Elements sharing similar features are grouped together. The XOR dataset given above may be considered as a (simple) classification model, in which each group is made of two elements. The group 0 is made of the elements [0, 0] and [1, 1], while the group 1 is made of [0, 1] and [1, 0]. 
 
-Have you noticed that when we introduced the `train:nbEpoch:` when we have to define a neural network with two outputs for the XOR dataset? The reason is that we encode the output value using the _one-hot encoding_. 
+Have you noticed that when we introduced the `train:nbEpochs:` when we have to define a neural network with two outputs for the XOR dataset? The reason is that we encode the output value using the _one-hot encoding_. 
 
 One hot encoding is a simple mechanism that converts a categorical variable into a numerical form, eligible to be fed into a neural network. Consider the variable $v$ which represents a word within the set { _"hello", "bonjour", "Buenos dias"_ }. Applying one-hot encoding would assign to each word a unique number. For example, _"hello"_ is associated to the index 0, _"bonjour"_ associated to index 1, and _"Buenos dias"_ to 2. The value of $v$ can then be encoded with 3 different bits, since the dataset has 3 different words. We can then encode the word
 
@@ -313,7 +313,7 @@ data := {#(0 0 0) .
 	#(0 1 1) .
 	#(1 0 1) .
 	#(1 1 0) }.
-n train: data nbEpoch: 10000
+n train: data nbEpochs: 10000
 ```
 
 Since there are two different values of the datasets, 0 and 1, we have two output neurons: the value 0 is encoded [1, 0], and 1 is encoded [0, 1].
@@ -397,7 +397,7 @@ Training a network is actually easy since we carefully prepared the battlefield.
 ```Smalltalk
 n := NNetwork new.
 n configure: 4 hidden: 6 nbOfOutputs: 3.
-n train: irisData nbEpoch: 1000.
+n train: irisData nbEpochs: 1000.
 ```
 
 The code above builds a network with 4 input values, one hidden layer with 6 neurons, and the output layer has 3 neurons. The number of inputs represents the size of a row in the iris dataset minus 1, the expected output value which is not part of the input. We pick an arbitrary 6 as the size of the hidden layer. A general rule for the hidden layer size, is to contain 50% more neurons than the number of inputs. We have three neurons in the output layers since there are three different families of Iris.
@@ -452,7 +452,7 @@ The effect observed on a single sigmoid neuron _cannot_ be observed on a whole n
 n := NNetwork new.
 n configure: 4 hidden: 6 nbOfOutputs: 3.
 n learningRate: 0.3. " Repeat the script with a different value"
-n train: irisData nbEpoch: 1000.
+n train: irisData nbEpochs: 1000.
 ```
 
 We run the script for each of the value 0.001, 0.01, 0.1, and 0.3. Results are presented in Figure @fig:learningRateNetwork.
@@ -489,7 +489,7 @@ We can train a network based on the `trainingData`:
 ```
 n := NNetwork new.
 n configure: 4 hidden: 6 nbOfOutputs: 3.
-n train: trainingData nbEpoch: 1000.
+n train: trainingData nbEpochs: 1000.
 ```
 
 We see that the network is able to properly learn `trainingData`, as the error curve is close to 0, similarly than in Figure @fig:networkOnIris.
@@ -504,7 +504,7 @@ trainingData := irisData first: cutTraining.
 testData := irisData last: cutTest.
 n := NNetwork new.
 n configure: 4 hidden: 6 nbOfOutputs: 3.
-n train: trainingData nbEpoch: 1000.
+n train: trainingData nbEpochs: 1000.
 
 (((testData collect: [ :d |
 	(n predict: d allButLast) = d last
@@ -534,7 +534,7 @@ trainingData := irisData first: cutTraining.
 testData := irisData last: cutTest.
 n := NNetwork new.
 n configure: 4 hidden: 6 nbOfOutputs: 3.
-n train: trainingData nbEpoch: 1000.
+n train: trainingData nbEpochs: 1000.
 
 (((testData collect: [ :d |
 	(n predict: d allButLast) = d last
@@ -556,7 +556,7 @@ trainingData := shuffledIrisData first: cutTraining.
 testData := shuffledIrisData last: cutTest.
 n := NNetwork new.
 n configure: 4 hidden: 6 nbOfOutputs: 3.
-n train: trainingData nbEpoch: 1000.
+n train: trainingData nbEpochs: 1000.
 
 (((testData collect: [ :d |
 	(n predict: d allButLast) = d last
@@ -596,7 +596,7 @@ data := {#(0 0 0 0).
     #(1 0 1 5).
     #(1 1 0 6).
     #(1 1 1 7) }.
-n train: data nbEpoch: 1000.
+n train: data nbEpochs: 1000.
 ```
 
 ![Learning the Iris dataset.](06-Data/figures/digitConvertion.png){#fig:digitConvertion}
@@ -615,7 +615,7 @@ data := {#(0 0 0 0).
     #(0.1 0 1 5).
     #(0.1 1000 0 6).
     #(0.1 1000 1 7) }.
-n train: data nbEpoch: 10000.
+n train: data nbEpochs: 10000.
 ```
 
 ![The Iris dataset oddly scaled.](06-Data/figures/digitConvertionBiased.png){#fig:digitConvertionBiased}
@@ -727,14 +727,14 @@ We give the denormalization function for sake of completeness. We will not use i
 
 ## Integrating the Normalization into NNetwork
 
-The previous section described the normalization functionality. Currently, it is disconnected from the class `NNetwork`. Integrating the normalization in our neural network is the natural next step to seamlessly benefit from it. The method `train:nbEpoch:` can be redefined as follow:
+The previous section described the normalization functionality. Currently, it is disconnected from the class `NNetwork`. Integrating the normalization in our neural network is the natural next step to seamlessly benefit from it. The method `train:nbEpochs:` can be redefined as follow:
 
 ```Smalltalk
-NNetwork>>train: train nbEpoch: nbEpoch
+NNetwork>>train: train nbEpochs: nbEpochs
     "Train the network using the train data set."
     | sumError outputs expectedOutput epochPrecision t normalizedTrain |
 	normalizedTrain := Normalization new normalizeData: train. 
-    1 to: nbEpoch do: [ :epoch |
+    1 to: nbEpochs do: [ :epoch |
         sumError := 0.
           epochPrecision := 0.
         normalizedTrain do: [ :row |
@@ -769,7 +769,7 @@ data := {#(0 0 0 0).
     #(0.1 0 1 5).
     #(0.1 1000 0 6).
     #(0.1 1000 1 7) }.
-n train: data nbEpoch: 10000.
+n train: data nbEpochs: 10000.
 ```
 
 
