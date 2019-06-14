@@ -1,9 +1,11 @@
 
 # Matrix-based Neural Network
 
-This chapter revises the implementation of our neural network, but using matrix to express the forward and backward propagation algorithm.
+This chapter revises the implementation of our neural network. However, it uses matrices to compute the forward and backward propagation algorithm. Overall, our matrix-based implementation is composed of two classes, `NMLayer` and `NMNetwork`.
 
 ## Layer
+
+A layer may be described with the class `NMLayer`:
 
 ```Smalltalk
 Object subclass: #NMLayer
@@ -12,12 +14,17 @@ Object subclass: #NMLayer
 	package: 'NeuralNetwork-Matrix'
 ```
 
+The class `NMLayer` does not contains neurons, as we have seen in our first implementation. Instead, a matrix describing weights is used, kept in the `w` variable, and another matrix to keep the bias vector, kept in the `b` variable. 
+
+
+The initialization of a layer set the value of the learning rate:
 ```Smalltalk
 NMLayer>>initialize
 	super initialize.
 	lr := 0.1
 ```
 
+Some 
 ```Smalltalk
 NMLayer>>b: biasVector
 	b := biasVector
@@ -333,3 +340,32 @@ NMNetwork>>viewLearningCurveIn: composite
 			self viewLearningCurve ]
 ```
 
+## Iris Dataset
+
+We can now adapt the script to train a neural network on the Iris dataset. Consider the script:
+
+```Smalltalk
+"The execution of this script initializes the variable irisData.
+     This variable is used in the subsequent scripts of this chapter"
+irisCSV := (ZnEasy get: 'https://agileartificialintelligence.github.io/Datasets/iris.csv') contents.
+lines := irisCSV lines.
+lines := lines allButFirst.
+tLines := lines collect: [ :l |
+             | ss |
+             ss := l substrings: ','.
+             (ss allButLast collect: [ :w | w asNumber ]), (Array with: ss
+last) ].
+irisData := tLines collect: [ :row | |l|
+             row last = 'setosa' ifTrue: [ l := #( 0 ) ].
+             row last = 'versicolor' ifTrue: [ l := #( 1 ) ].
+             row last = 'virginica' ifTrue: [ l := #( 2 ) ].
+             row allButLast, l ].
+irisData.
+
+n := NMNetwork new.
+n configure: 4 hidden: 56 nbOfOutputs: 3. 
+n train: irisData nbEpochs: 1000. 
+n
+```
+
+The result is the same than we we previously seen

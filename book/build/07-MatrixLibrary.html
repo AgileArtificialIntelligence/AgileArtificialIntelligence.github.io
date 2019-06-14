@@ -1,0 +1,3679 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>07-Matrix</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <style type="text/css">
+
+.clearfix {
+*zoom: 1;
+}
+.clearfix:before,
+.clearfix:after {
+display: table;
+content: "";
+line-height: 0;
+}
+.clearfix:after {
+clear: both;
+}
+.hide-text {
+font: 0/0 a;
+color: transparent;
+text-shadow: none;
+background-color: transparent;
+border: 0;
+}
+.input-block-level {
+display: block;
+width: 100%;
+min-height: 30px;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+}
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+nav,
+section {
+display: block;
+}
+audio,
+canvas,
+video {
+display: inline-block;
+*display: inline;
+*zoom: 1;
+}
+audio:not([controls]) {
+display: none;
+}
+html {
+font-size: 100%;
+-webkit-text-size-adjust: 100%;
+-ms-text-size-adjust: 100%;
+}
+a:focus {
+outline: thin dotted #333;
+outline: 5px auto -webkit-focus-ring-color;
+outline-offset: -2px;
+}
+a:hover,
+a:active {
+outline: 0;
+}
+sub,
+sup {
+position: relative;
+font-size: 75%;
+line-height: 0;
+vertical-align: baseline;
+}
+sup {
+top: -0.5em;
+}
+sub {
+bottom: -0.25em;
+}
+img {
+
+max-width: 100%;
+
+width: auto\9;
+
+height: auto;
+
+vertical-align: middle;
+border: 0;
+-ms-interpolation-mode: bicubic;
+}
+#map_canvas img,
+.google-maps img {
+max-width: none;
+}
+button,
+input,
+select,
+textarea {
+margin: 0;
+font-size: 100%;
+vertical-align: middle;
+}
+button,
+input {
+*overflow: visible;
+line-height: normal;
+}
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+padding: 0;
+border: 0;
+}
+button,
+html input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+-webkit-appearance: button;
+cursor: pointer;
+}
+label,
+select,
+button,
+input[type="button"],
+input[type="reset"],
+input[type="submit"],
+input[type="radio"],
+input[type="checkbox"] {
+cursor: pointer;
+}
+input[type="search"] {
+-webkit-box-sizing: content-box;
+-moz-box-sizing: content-box;
+box-sizing: content-box;
+-webkit-appearance: textfield;
+}
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button {
+-webkit-appearance: none;
+}
+textarea {
+overflow: auto;
+vertical-align: top;
+}
+@media print {
+* {
+text-shadow: none !important;
+color: #000 !important;
+background: transparent !important;
+box-shadow: none !important;
+}
+a,
+a:visited {
+text-decoration: underline;
+}
+a[href]:after {
+content: " (" attr(href) ")";
+}
+abbr[title]:after {
+content: " (" attr(title) ")";
+}
+.ir a:after,
+a[href^="javascript:"]:after,
+a[href^="#"]:after {
+content: "";
+}
+pre,
+blockquote {
+border: 1px solid #999;
+page-break-inside: avoid;
+}
+thead {
+display: table-header-group;
+}
+tr,
+img {
+page-break-inside: avoid;
+}
+img {
+max-width: 100% !important;
+}
+@page {
+margin: 0.5cm;
+}
+p,
+h2,
+h3 {
+orphans: 3;
+widows: 3;
+}
+h2,
+h3 {
+page-break-after: avoid;
+}
+}
+body {
+margin: 0;
+font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 20px;
+color: #333333;
+background-color: #ffffff;
+}
+a {
+color: #0088cc;
+text-decoration: none;
+}
+a:hover,
+a:focus {
+color: #005580;
+text-decoration: underline;
+}
+.img-rounded {
+-webkit-border-radius: 6px;
+-moz-border-radius: 6px;
+border-radius: 6px;
+}
+.img-polaroid {
+padding: 4px;
+background-color: #fff;
+border: 1px solid #ccc;
+border: 1px solid rgba(0, 0, 0, 0.2);
+-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+-moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.img-circle {
+-webkit-border-radius: 500px;
+-moz-border-radius: 500px;
+border-radius: 500px;
+}
+.row {
+margin-left: -20px;
+*zoom: 1;
+}
+.row:before,
+.row:after {
+display: table;
+content: "";
+line-height: 0;
+}
+.row:after {
+clear: both;
+}
+[class*="span"] {
+float: left;
+min-height: 1px;
+margin-left: 20px;
+}
+.container,
+.navbar-static-top .container,
+.navbar-fixed-top .container,
+.navbar-fixed-bottom .container {
+width: 940px;
+}
+.span12 {
+width: 940px;
+}
+.span11 {
+width: 860px;
+}
+.span10 {
+width: 780px;
+}
+.span9 {
+width: 700px;
+}
+.span8 {
+width: 620px;
+}
+.span7 {
+width: 540px;
+}
+.span6 {
+width: 460px;
+}
+.span5 {
+width: 380px;
+}
+.span4 {
+width: 300px;
+}
+.span3 {
+width: 220px;
+}
+.span2 {
+width: 140px;
+}
+.span1 {
+width: 60px;
+}
+.offset12 {
+margin-left: 980px;
+}
+.offset11 {
+margin-left: 900px;
+}
+.offset10 {
+margin-left: 820px;
+}
+.offset9 {
+margin-left: 740px;
+}
+.offset8 {
+margin-left: 660px;
+}
+.offset7 {
+margin-left: 580px;
+}
+.offset6 {
+margin-left: 500px;
+}
+.offset5 {
+margin-left: 420px;
+}
+.offset4 {
+margin-left: 340px;
+}
+.offset3 {
+margin-left: 260px;
+}
+.offset2 {
+margin-left: 180px;
+}
+.offset1 {
+margin-left: 100px;
+}
+.row-fluid {
+width: 100%;
+*zoom: 1;
+}
+.row-fluid:before,
+.row-fluid:after {
+display: table;
+content: "";
+line-height: 0;
+}
+.row-fluid:after {
+clear: both;
+}
+.row-fluid [class*="span"] {
+display: block;
+width: 100%;
+min-height: 30px;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+float: left;
+margin-left: 2.127659574468085%;
+*margin-left: 2.074468085106383%;
+}
+.row-fluid [class*="span"]:first-child {
+margin-left: 0;
+}
+.row-fluid .controls-row [class*="span"] + [class*="span"] {
+margin-left: 2.127659574468085%;
+}
+.row-fluid .span12 {
+width: 100%;
+*width: 99.94680851063829%;
+}
+.row-fluid .span11 {
+width: 91.48936170212765%;
+*width: 91.43617021276594%;
+}
+.row-fluid .span10 {
+width: 82.97872340425532%;
+*width: 82.92553191489361%;
+}
+.row-fluid .span9 {
+width: 74.46808510638297%;
+*width: 74.41489361702126%;
+}
+.row-fluid .span8 {
+width: 65.95744680851064%;
+*width: 65.90425531914893%;
+}
+.row-fluid .span7 {
+width: 57.44680851063829%;
+*width: 57.39361702127659%;
+}
+.row-fluid .span6 {
+width: 48.93617021276595%;
+*width: 48.88297872340425%;
+}
+.row-fluid .span5 {
+width: 40.42553191489362%;
+*width: 40.37234042553192%;
+}
+.row-fluid .span4 {
+width: 31.914893617021278%;
+*width: 31.861702127659576%;
+}
+.row-fluid .span3 {
+width: 23.404255319148934%;
+*width: 23.351063829787233%;
+}
+.row-fluid .span2 {
+width: 14.893617021276595%;
+*width: 14.840425531914894%;
+}
+.row-fluid .span1 {
+width: 6.382978723404255%;
+*width: 6.329787234042553%;
+}
+.row-fluid .offset12 {
+margin-left: 104.25531914893617%;
+*margin-left: 104.14893617021275%;
+}
+.row-fluid .offset12:first-child {
+margin-left: 102.12765957446808%;
+*margin-left: 102.02127659574467%;
+}
+.row-fluid .offset11 {
+margin-left: 95.74468085106382%;
+*margin-left: 95.6382978723404%;
+}
+.row-fluid .offset11:first-child {
+margin-left: 93.61702127659574%;
+*margin-left: 93.51063829787232%;
+}
+.row-fluid .offset10 {
+margin-left: 87.23404255319149%;
+*margin-left: 87.12765957446807%;
+}
+.row-fluid .offset10:first-child {
+margin-left: 85.1063829787234%;
+*margin-left: 84.99999999999999%;
+}
+.row-fluid .offset9 {
+margin-left: 78.72340425531914%;
+*margin-left: 78.61702127659572%;
+}
+.row-fluid .offset9:first-child {
+margin-left: 76.59574468085106%;
+*margin-left: 76.48936170212764%;
+}
+.row-fluid .offset8 {
+margin-left: 70.2127659574468%;
+*margin-left: 70.10638297872339%;
+}
+.row-fluid .offset8:first-child {
+margin-left: 68.08510638297872%;
+*margin-left: 67.9787234042553%;
+}
+.row-fluid .offset7 {
+margin-left: 61.70212765957446%;
+*margin-left: 61.59574468085106%;
+}
+.row-fluid .offset7:first-child {
+margin-left: 59.574468085106375%;
+*margin-left: 59.46808510638297%;
+}
+.row-fluid .offset6 {
+margin-left: 53.191489361702125%;
+*margin-left: 53.085106382978715%;
+}
+.row-fluid .offset6:first-child {
+margin-left: 51.063829787234035%;
+*margin-left: 50.95744680851063%;
+}
+.row-fluid .offset5 {
+margin-left: 44.68085106382979%;
+*margin-left: 44.57446808510638%;
+}
+.row-fluid .offset5:first-child {
+margin-left: 42.5531914893617%;
+*margin-left: 42.4468085106383%;
+}
+.row-fluid .offset4 {
+margin-left: 36.170212765957444%;
+*margin-left: 36.06382978723405%;
+}
+.row-fluid .offset4:first-child {
+margin-left: 34.04255319148936%;
+*margin-left: 33.93617021276596%;
+}
+.row-fluid .offset3 {
+margin-left: 27.659574468085104%;
+*margin-left: 27.5531914893617%;
+}
+.row-fluid .offset3:first-child {
+margin-left: 25.53191489361702%;
+*margin-left: 25.425531914893618%;
+}
+.row-fluid .offset2 {
+margin-left: 19.148936170212764%;
+*margin-left: 19.04255319148936%;
+}
+.row-fluid .offset2:first-child {
+margin-left: 17.02127659574468%;
+*margin-left: 16.914893617021278%;
+}
+.row-fluid .offset1 {
+margin-left: 10.638297872340425%;
+*margin-left: 10.53191489361702%;
+}
+.row-fluid .offset1:first-child {
+margin-left: 8.51063829787234%;
+*margin-left: 8.404255319148938%;
+}
+[class*="span"].hide,
+.row-fluid [class*="span"].hide {
+display: none;
+}
+[class*="span"].pull-right,
+.row-fluid [class*="span"].pull-right {
+float: right;
+}
+.container {
+margin-right: auto;
+margin-left: auto;
+*zoom: 1;
+}
+.container:before,
+.container:after {
+display: table;
+content: "";
+line-height: 0;
+}
+.container:after {
+clear: both;
+}
+.container-fluid {
+padding-right: 20px;
+padding-left: 20px;
+*zoom: 1;
+}
+.container-fluid:before,
+.container-fluid:after {
+display: table;
+content: "";
+line-height: 0;
+}
+.container-fluid:after {
+clear: both;
+}
+p {
+margin: 0 0 10px;
+}
+.lead {
+margin-bottom: 20px;
+font-size: 21px;
+font-weight: 200;
+line-height: 30px;
+}
+small {
+font-size: 85%;
+}
+strong {
+font-weight: bold;
+}
+em {
+font-style: italic;
+}
+cite {
+font-style: normal;
+}
+.muted {
+color: #999999;
+}
+a.muted:hover,
+a.muted:focus {
+color: #808080;
+}
+.text-warning {
+color: #c09853;
+}
+a.text-warning:hover,
+a.text-warning:focus {
+color: #a47e3c;
+}
+.text-error {
+color: #b94a48;
+}
+a.text-error:hover,
+a.text-error:focus {
+color: #953b39;
+}
+.text-info {
+color: #3a87ad;
+}
+a.text-info:hover,
+a.text-info:focus {
+color: #2d6987;
+}
+.text-success {
+color: #468847;
+}
+a.text-success:hover,
+a.text-success:focus {
+color: #356635;
+}
+.text-left {
+text-align: left;
+}
+.text-right {
+text-align: right;
+}
+.text-center {
+text-align: center;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+margin: 10px 0;
+font-family: inherit;
+font-weight: bold;
+line-height: 20px;
+color: inherit;
+text-rendering: optimizelegibility;
+}
+h1 small,
+h2 small,
+h3 small,
+h4 small,
+h5 small,
+h6 small {
+font-weight: normal;
+line-height: 1;
+color: #999999;
+}
+h1,
+h2,
+h3 {
+line-height: 40px;
+}
+h1 {
+font-size: 38.5px;
+}
+h2 {
+font-size: 31.5px;
+}
+h3 {
+font-size: 24.5px;
+}
+h4 {
+font-size: 17.5px;
+}
+h5 {
+font-size: 14px;
+}
+h6 {
+font-size: 11.9px;
+}
+h1 small {
+font-size: 24.5px;
+}
+h2 small {
+font-size: 17.5px;
+}
+h3 small {
+font-size: 14px;
+}
+h4 small {
+font-size: 14px;
+}
+.page-header {
+padding-bottom: 9px;
+margin: 20px 0 30px;
+border-bottom: 1px solid #eeeeee;
+}
+ul,
+ol {
+padding: 0;
+margin: 0 0 10px 25px;
+}
+ul ul,
+ul ol,
+ol ol,
+ol ul {
+margin-bottom: 0;
+}
+li {
+line-height: 20px;
+}
+ul.unstyled,
+ol.unstyled {
+margin-left: 0;
+list-style: none;
+}
+ul.inline,
+ol.inline {
+margin-left: 0;
+list-style: none;
+}
+ul.inline > li,
+ol.inline > li {
+display: inline-block;
+*display: inline;
+
+*zoom: 1;
+padding-left: 5px;
+padding-right: 5px;
+}
+dl {
+margin-bottom: 20px;
+}
+dt,
+dd {
+line-height: 20px;
+}
+dt {
+font-weight: bold;
+}
+dd {
+margin-left: 10px;
+}
+.dl-horizontal {
+*zoom: 1;
+}
+.dl-horizontal:before,
+.dl-horizontal:after {
+display: table;
+content: "";
+line-height: 0;
+}
+.dl-horizontal:after {
+clear: both;
+}
+.dl-horizontal dt {
+float: left;
+width: 160px;
+clear: left;
+text-align: right;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+}
+.dl-horizontal dd {
+margin-left: 180px;
+}
+hr {
+margin: 20px 0;
+border: 0;
+border-top: 1px solid #eeeeee;
+border-bottom: 1px solid #ffffff;
+}
+abbr[title],
+abbr[data-original-title] {
+cursor: help;
+border-bottom: 1px dotted #999999;
+}
+abbr.initialism {
+font-size: 90%;
+text-transform: uppercase;
+}
+blockquote {
+padding: 0 0 0 15px;
+margin: 0 0 20px;
+border-left: 5px solid #eeeeee;
+}
+blockquote p {
+margin-bottom: 0;
+font-size: 17.5px;
+font-weight: 300;
+line-height: 1.25;
+}
+blockquote small {
+display: block;
+line-height: 20px;
+color: #999999;
+}
+blockquote small:before {
+content: '\2014 \00A0';
+}
+blockquote.pull-right {
+float: right;
+padding-right: 15px;
+padding-left: 0;
+border-right: 5px solid #eeeeee;
+border-left: 0;
+}
+blockquote.pull-right p,
+blockquote.pull-right small {
+text-align: right;
+}
+blockquote.pull-right small:before {
+content: '';
+}
+blockquote.pull-right small:after {
+content: '\00A0 \2014';
+}
+q:before,
+q:after,
+blockquote:before,
+blockquote:after {
+content: "";
+}
+address {
+display: block;
+margin-bottom: 20px;
+font-style: normal;
+line-height: 20px;
+}
+code,
+pre {
+padding: 0 3px 2px;
+font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+font-size: 12px;
+color: #333333;
+-webkit-border-radius: 3px;
+-moz-border-radius: 3px;
+border-radius: 3px;
+}
+code {
+padding: 2px 4px;
+color: #d14;
+background-color: #f7f7f9;
+border: 1px solid #e1e1e8;
+white-space: nowrap;
+}
+pre {
+display: block;
+padding: 9.5px;
+margin: 0 0 10px;
+font-size: 13px;
+line-height: 20px;
+word-break: break-all;
+word-wrap: break-word;
+white-space: pre;
+white-space: pre-wrap;
+background-color: #f5f5f5;
+border: 1px solid #ccc;
+border: 1px solid rgba(0, 0, 0, 0.15);
+-webkit-border-radius: 4px;
+-moz-border-radius: 4px;
+border-radius: 4px;
+}
+pre.prettyprint {
+margin-bottom: 20px;
+}
+pre code {
+padding: 0;
+color: inherit;
+white-space: pre;
+white-space: pre-wrap;
+background-color: transparent;
+border: 0;
+}
+.pre-scrollable {
+max-height: 340px;
+overflow-y: scroll;
+}
+table {
+max-width: 100%;
+background-color: transparent;
+border-collapse: collapse;
+border-spacing: 20px;
+}
+.table {
+width: 100%;
+margin-bottom: 20px;
+}
+.table th,
+.table td {
+padding: 20=px;
+line-height: 20px;
+text-align: left;
+vertical-align: top;
+border-top: 1px solid #dddddd;
+}
+.table th {
+font-weight: bold;
+}
+.table thead th {
+vertical-align: bottom;
+}
+.table caption + thead tr:first-child th,
+.table caption + thead tr:first-child td,
+.table colgroup + thead tr:first-child th,
+.table colgroup + thead tr:first-child td,
+.table thead:first-child tr:first-child th,
+.table thead:first-child tr:first-child td {
+border-top: 0;
+}
+.table tbody + tbody {
+border-top: 2px solid #dddddd;
+}
+.table .table {
+background-color: #ffffff;
+}
+.table-condensed th,
+.table-condensed td {
+padding: 4px 5px;
+}
+.table-bordered {
+border: 1px solid #dddddd;
+border-collapse: separate;
+*border-collapse: collapse;
+border-left: 0;
+-webkit-border-radius: 4px;
+-moz-border-radius: 4px;
+border-radius: 4px;
+}
+.table-bordered th,
+.table-bordered td {
+border-left: 1px solid #dddddd;
+}
+.table-bordered caption + thead tr:first-child th,
+.table-bordered caption + tbody tr:first-child th,
+.table-bordered caption + tbody tr:first-child td,
+.table-bordered colgroup + thead tr:first-child th,
+.table-bordered colgroup + tbody tr:first-child th,
+.table-bordered colgroup + tbody tr:first-child td,
+.table-bordered thead:first-child tr:first-child th,
+.table-bordered tbody:first-child tr:first-child th,
+.table-bordered tbody:first-child tr:first-child td {
+border-top: 0;
+}
+.table-bordered thead:first-child tr:first-child > th:first-child,
+.table-bordered tbody:first-child tr:first-child > td:first-child,
+.table-bordered tbody:first-child tr:first-child > th:first-child {
+-webkit-border-top-left-radius: 4px;
+-moz-border-radius-topleft: 4px;
+border-top-left-radius: 4px;
+}
+.table-bordered thead:first-child tr:first-child > th:last-child,
+.table-bordered tbody:first-child tr:first-child > td:last-child,
+.table-bordered tbody:first-child tr:first-child > th:last-child {
+-webkit-border-top-right-radius: 4px;
+-moz-border-radius-topright: 4px;
+border-top-right-radius: 4px;
+}
+.table-bordered thead:last-child tr:last-child > th:first-child,
+.table-bordered tbody:last-child tr:last-child > td:first-child,
+.table-bordered tbody:last-child tr:last-child > th:first-child,
+.table-bordered tfoot:last-child tr:last-child > td:first-child,
+.table-bordered tfoot:last-child tr:last-child > th:first-child {
+-webkit-border-bottom-left-radius: 4px;
+-moz-border-radius-bottomleft: 4px;
+border-bottom-left-radius: 4px;
+}
+.table-bordered thead:last-child tr:last-child > th:last-child,
+.table-bordered tbody:last-child tr:last-child > td:last-child,
+.table-bordered tbody:last-child tr:last-child > th:last-child,
+.table-bordered tfoot:last-child tr:last-child > td:last-child,
+.table-bordered tfoot:last-child tr:last-child > th:last-child {
+-webkit-border-bottom-right-radius: 4px;
+-moz-border-radius-bottomright: 4px;
+border-bottom-right-radius: 4px;
+}
+.table-bordered tfoot + tbody:last-child tr:last-child td:first-child {
+-webkit-border-bottom-left-radius: 0;
+-moz-border-radius-bottomleft: 0;
+border-bottom-left-radius: 0;
+}
+.table-bordered tfoot + tbody:last-child tr:last-child td:last-child {
+-webkit-border-bottom-right-radius: 0;
+-moz-border-radius-bottomright: 0;
+border-bottom-right-radius: 0;
+}
+.table-bordered caption + thead tr:first-child th:first-child,
+.table-bordered caption + tbody tr:first-child td:first-child,
+.table-bordered colgroup + thead tr:first-child th:first-child,
+.table-bordered colgroup + tbody tr:first-child td:first-child {
+-webkit-border-top-left-radius: 4px;
+-moz-border-radius-topleft: 4px;
+border-top-left-radius: 4px;
+}
+.table-bordered caption + thead tr:first-child th:last-child,
+.table-bordered caption + tbody tr:first-child td:last-child,
+.table-bordered colgroup + thead tr:first-child th:last-child,
+.table-bordered colgroup + tbody tr:first-child td:last-child {
+-webkit-border-top-right-radius: 4px;
+-moz-border-radius-topright: 4px;
+border-top-right-radius: 4px;
+}
+.table-striped tbody > tr:nth-child(odd) > td,
+.table-striped tbody > tr:nth-child(odd) > th {
+background-color: #f9f9f9;
+}
+.table-hover tbody tr:hover > td,
+.table-hover tbody tr:hover > th {
+background-color: #f5f5f5;
+}
+table td[class*="span"],
+table th[class*="span"],
+.row-fluid table td[class*="span"],
+.row-fluid table th[class*="span"] {
+display: table-cell;
+float: none;
+margin-left: 0;
+}
+.table td.span1,
+.table th.span1 {
+float: none;
+width: 44px;
+margin-left: 0;
+}
+.table td.span2,
+.table th.span2 {
+float: none;
+width: 124px;
+margin-left: 0;
+}
+.table td.span3,
+.table th.span3 {
+float: none;
+width: 204px;
+margin-left: 0;
+}
+.table td.span4,
+.table th.span4 {
+float: none;
+width: 284px;
+margin-left: 0;
+}
+.table td.span5,
+.table th.span5 {
+float: none;
+width: 364px;
+margin-left: 0;
+}
+.table td.span6,
+.table th.span6 {
+float: none;
+width: 444px;
+margin-left: 0;
+}
+.table td.span7,
+.table th.span7 {
+float: none;
+width: 524px;
+margin-left: 0;
+}
+.table td.span8,
+.table th.span8 {
+float: none;
+width: 604px;
+margin-left: 0;
+}
+.table td.span9,
+.table th.span9 {
+float: none;
+width: 684px;
+margin-left: 0;
+}
+.table td.span10,
+.table th.span10 {
+float: none;
+width: 764px;
+margin-left: 0;
+}
+.table td.span11,
+.table th.span11 {
+float: none;
+width: 844px;
+margin-left: 0;
+}
+.table td.span12,
+.table th.span12 {
+float: none;
+width: 924px;
+margin-left: 0;
+}
+.table tbody tr.success > td {
+background-color: #dff0d8;
+}
+.table tbody tr.error > td {
+background-color: #f2dede;
+}
+.table tbody tr.warning > td {
+background-color: #fcf8e3;
+}
+.table tbody tr.info > td {
+background-color: #d9edf7;
+}
+.table-hover tbody tr.success:hover > td {
+background-color: #d0e9c6;
+}
+.table-hover tbody tr.error:hover > td {
+background-color: #ebcccc;
+}
+.table-hover tbody tr.warning:hover > td {
+background-color: #faf2cc;
+}
+.table-hover tbody tr.info:hover > td {
+background-color: #c4e3f3;
+}
+.nav {
+margin-left: 0;
+margin-bottom: 20px;
+list-style: none;
+}
+.nav > li > a {
+display: block;
+}
+.nav > li > a:hover,
+.nav > li > a:focus {
+text-decoration: none;
+background-color: #eeeeee;
+}
+.nav > li > a > img {
+max-width: none;
+}
+.nav > .pull-right {
+float: right;
+}
+.nav-header {
+display: block;
+padding: 3px 15px;
+font-size: 11px;
+font-weight: bold;
+line-height: 20px;
+color: #999999;
+text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+text-transform: uppercase;
+}
+.nav li + .nav-header {
+margin-top: 9px;
+}
+.nav-list {
+padding-left: 15px;
+padding-right: 15px;
+margin-bottom: 0;
+}
+.nav-list > li > a,
+.nav-list .nav-header {
+margin-left: -15px;
+margin-right: -15px;
+text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.nav-list > li > a {
+padding: 3px 15px;
+}
+.nav-list > .active > a,
+.nav-list > .active > a:hover,
+.nav-list > .active > a:focus {
+color: #ffffff;
+text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+background-color: #0088cc;
+}
+.nav-list [class^="icon-"],
+.nav-list [class*=" icon-"] {
+margin-right: 2px;
+}
+.nav-list .divider {
+*width: 100%;
+height: 1px;
+margin: 9px 1px;
+*margin: -5px 0 5px;
+overflow: hidden;
+background-color: #e5e5e5;
+border-bottom: 1px solid #ffffff;
+}
+.nav-tabs,
+.nav-pills {
+*zoom: 1;
+}
+.nav-tabs:before,
+.nav-pills:before,
+.nav-tabs:after,
+.nav-pills:after {
+display: table;
+content: "";
+line-height: 0;
+}
+.nav-tabs:after,
+.nav-pills:after {
+clear: both;
+}
+.nav-tabs > li,
+.nav-pills > li {
+float: left;
+}
+.nav-tabs > li > a,
+.nav-pills > li > a {
+padding-right: 12px;
+padding-left: 12px;
+margin-right: 2px;
+line-height: 14px;
+}
+.nav-tabs {
+border-bottom: 1px solid #ddd;
+}
+.nav-tabs > li {
+margin-bottom: -1px;
+}
+.nav-tabs > li > a {
+padding-top: 8px;
+padding-bottom: 8px;
+line-height: 20px;
+border: 1px solid transparent;
+-webkit-border-radius: 4px 4px 0 0;
+-moz-border-radius: 4px 4px 0 0;
+border-radius: 4px 4px 0 0;
+}
+.nav-tabs > li > a:hover,
+.nav-tabs > li > a:focus {
+border-color: #eeeeee #eeeeee #dddddd;
+}
+.nav-tabs > .active > a,
+.nav-tabs > .active > a:hover,
+.nav-tabs > .active > a:focus {
+color: #555555;
+background-color: #ffffff;
+border: 1px solid #ddd;
+border-bottom-color: transparent;
+cursor: default;
+}
+.nav-pills > li > a {
+padding-top: 8px;
+padding-bottom: 8px;
+margin-top: 2px;
+margin-bottom: 2px;
+-webkit-border-radius: 5px;
+-moz-border-radius: 5px;
+border-radius: 5px;
+}
+.nav-pills > .active > a,
+.nav-pills > .active > a:hover,
+.nav-pills > .active > a:focus {
+color: #ffffff;
+background-color: #0088cc;
+}
+.nav-stacked > li {
+float: none;
+}
+.nav-stacked > li > a {
+margin-right: 0;
+}
+.nav-tabs.nav-stacked {
+border-bottom: 0;
+}
+.nav-tabs.nav-stacked > li > a {
+border: 1px solid #ddd;
+-webkit-border-radius: 0;
+-moz-border-radius: 0;
+border-radius: 0;
+}
+.nav-tabs.nav-stacked > li:first-child > a {
+-webkit-border-top-right-radius: 4px;
+-moz-border-radius-topright: 4px;
+border-top-right-radius: 4px;
+-webkit-border-top-left-radius: 4px;
+-moz-border-radius-topleft: 4px;
+border-top-left-radius: 4px;
+}
+.nav-tabs.nav-stacked > li:last-child > a {
+-webkit-border-bottom-right-radius: 4px;
+-moz-border-radius-bottomright: 4px;
+border-bottom-right-radius: 4px;
+-webkit-border-bottom-left-radius: 4px;
+-moz-border-radius-bottomleft: 4px;
+border-bottom-left-radius: 4px;
+}
+.nav-tabs.nav-stacked > li > a:hover,
+.nav-tabs.nav-stacked > li > a:focus {
+border-color: #ddd;
+z-index: 2;
+}
+.nav-pills.nav-stacked > li > a {
+margin-bottom: 3px;
+}
+.nav-pills.nav-stacked > li:last-child > a {
+margin-bottom: 1px;
+}
+.nav-tabs .dropdown-menu {
+-webkit-border-radius: 0 0 6px 6px;
+-moz-border-radius: 0 0 6px 6px;
+border-radius: 0 0 6px 6px;
+}
+.nav-pills .dropdown-menu {
+-webkit-border-radius: 6px;
+-moz-border-radius: 6px;
+border-radius: 6px;
+}
+.nav .dropdown-toggle .caret {
+border-top-color: #0088cc;
+border-bottom-color: #0088cc;
+margin-top: 6px;
+}
+.nav .dropdown-toggle:hover .caret,
+.nav .dropdown-toggle:focus .caret {
+border-top-color: #005580;
+border-bottom-color: #005580;
+}
+
+.nav-tabs .dropdown-toggle .caret {
+margin-top: 8px;
+}
+.nav .active .dropdown-toggle .caret {
+border-top-color: #fff;
+border-bottom-color: #fff;
+}
+.nav-tabs .active .dropdown-toggle .caret {
+border-top-color: #555555;
+border-bottom-color: #555555;
+}
+.nav > .dropdown.active > a:hover,
+.nav > .dropdown.active > a:focus {
+cursor: pointer;
+}
+.nav-tabs .open .dropdown-toggle,
+.nav-pills .open .dropdown-toggle,
+.nav > li.dropdown.open.active > a:hover,
+.nav > li.dropdown.open.active > a:focus {
+color: #ffffff;
+background-color: #999999;
+border-color: #999999;
+}
+.nav li.dropdown.open .caret,
+.nav li.dropdown.open.active .caret,
+.nav li.dropdown.open a:hover .caret,
+.nav li.dropdown.open a:focus .caret {
+border-top-color: #ffffff;
+border-bottom-color: #ffffff;
+opacity: 1;
+filter: alpha(opacity=100);
+}
+.tabs-stacked .open > a:hover,
+.tabs-stacked .open > a:focus {
+border-color: #999999;
+}
+.tabbable {
+*zoom: 1;
+}
+.tabbable:before,
+.tabbable:after {
+display: table;
+content: "";
+line-height: 0;
+}
+.tabbable:after {
+clear: both;
+}
+.tab-content {
+overflow: auto;
+}
+.tabs-below > .nav-tabs,
+.tabs-right > .nav-tabs,
+.tabs-left > .nav-tabs {
+border-bottom: 0;
+}
+.tab-content > .tab-pane,
+.pill-content > .pill-pane {
+display: none;
+}
+.tab-content > .active,
+.pill-content > .active {
+display: block;
+}
+.tabs-below > .nav-tabs {
+border-top: 1px solid #ddd;
+}
+.tabs-below > .nav-tabs > li {
+margin-top: -1px;
+margin-bottom: 0;
+}
+.tabs-below > .nav-tabs > li > a {
+-webkit-border-radius: 0 0 4px 4px;
+-moz-border-radius: 0 0 4px 4px;
+border-radius: 0 0 4px 4px;
+}
+.tabs-below > .nav-tabs > li > a:hover,
+.tabs-below > .nav-tabs > li > a:focus {
+border-bottom-color: transparent;
+border-top-color: #ddd;
+}
+.tabs-below > .nav-tabs > .active > a,
+.tabs-below > .nav-tabs > .active > a:hover,
+.tabs-below > .nav-tabs > .active > a:focus {
+border-color: transparent #ddd #ddd #ddd;
+}
+.tabs-left > .nav-tabs > li,
+.tabs-right > .nav-tabs > li {
+float: none;
+}
+.tabs-left > .nav-tabs > li > a,
+.tabs-right > .nav-tabs > li > a {
+min-width: 74px;
+margin-right: 0;
+margin-bottom: 3px;
+}
+.tabs-left > .nav-tabs {
+float: left;
+margin-right: 19px;
+border-right: 1px solid #ddd;
+}
+.tabs-left > .nav-tabs > li > a {
+margin-right: -1px;
+-webkit-border-radius: 4px 0 0 4px;
+-moz-border-radius: 4px 0 0 4px;
+border-radius: 4px 0 0 4px;
+}
+.tabs-left > .nav-tabs > li > a:hover,
+.tabs-left > .nav-tabs > li > a:focus {
+border-color: #eeeeee #dddddd #eeeeee #eeeeee;
+}
+.tabs-left > .nav-tabs .active > a,
+.tabs-left > .nav-tabs .active > a:hover,
+.tabs-left > .nav-tabs .active > a:focus {
+border-color: #ddd transparent #ddd #ddd;
+*border-right-color: #ffffff;
+}
+.tabs-right > .nav-tabs {
+float: right;
+margin-left: 19px;
+border-left: 1px solid #ddd;
+}
+.tabs-right > .nav-tabs > li > a {
+margin-left: -1px;
+-webkit-border-radius: 0 4px 4px 0;
+-moz-border-radius: 0 4px 4px 0;
+border-radius: 0 4px 4px 0;
+}
+.tabs-right > .nav-tabs > li > a:hover,
+.tabs-right > .nav-tabs > li > a:focus {
+border-color: #eeeeee #eeeeee #eeeeee #dddddd;
+}
+.tabs-right > .nav-tabs .active > a,
+.tabs-right > .nav-tabs .active > a:hover,
+.tabs-right > .nav-tabs .active > a:focus {
+border-color: #ddd #ddd #ddd transparent;
+*border-left-color: #ffffff;
+}
+.nav > .disabled > a {
+color: #999999;
+}
+.nav > .disabled > a:hover,
+.nav > .disabled > a:focus {
+text-decoration: none;
+background-color: transparent;
+cursor: default;
+}
+.navbar {
+overflow: visible;
+margin-bottom: 20px;
+*position: relative;
+*z-index: 2;
+}
+.navbar-inner {
+min-height: 40px;
+padding-left: 20px;
+padding-right: 20px;
+background-color: #fafafa;
+background-image: -moz-linear-gradient(top, #ffffff, #f2f2f2);
+background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#f2f2f2));
+background-image: -webkit-linear-gradient(top, #ffffff, #f2f2f2);
+background-image: -o-linear-gradient(top, #ffffff, #f2f2f2);
+background-image: linear-gradient(to bottom, #ffffff, #f2f2f2);
+background-repeat: repeat-x;
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#fff2f2f2', GradientType=0);
+border: 1px solid #d4d4d4;
+-webkit-border-radius: 4px;
+-moz-border-radius: 4px;
+border-radius: 4px;
+-webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+-moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+*zoom: 1;
+}
+.navbar-inner:before,
+.navbar-inner:after {
+display: table;
+content: "";
+line-height: 0;
+}
+.navbar-inner:after {
+clear: both;
+}
+.navbar .container {
+width: auto;
+}
+.nav-collapse.collapse {
+height: auto;
+overflow: visible;
+}
+.navbar .brand {
+float: left;
+display: block;
+padding: 10px 20px 10px;
+margin-left: -20px;
+font-size: 20px;
+font-weight: 200;
+color: #777777;
+text-shadow: 0 1px 0 #ffffff;
+}
+.navbar .brand:hover,
+.navbar .brand:focus {
+text-decoration: none;
+}
+.navbar-text {
+margin-bottom: 0;
+line-height: 40px;
+color: #777777;
+}
+.navbar-link {
+color: #777777;
+}
+.navbar-link:hover,
+.navbar-link:focus {
+color: #333333;
+}
+.navbar .divider-vertical {
+height: 40px;
+margin: 0 9px;
+border-left: 1px solid #f2f2f2;
+border-right: 1px solid #ffffff;
+}
+.navbar .btn,
+.navbar .btn-group {
+margin-top: 5px;
+}
+.navbar .btn-group .btn,
+.navbar .input-prepend .btn,
+.navbar .input-append .btn,
+.navbar .input-prepend .btn-group,
+.navbar .input-append .btn-group {
+margin-top: 0;
+}
+.navbar-form {
+margin-bottom: 0;
+*zoom: 1;
+}
+.navbar-form:before,
+.navbar-form:after {
+display: table;
+content: "";
+line-height: 0;
+}
+.navbar-form:after {
+clear: both;
+}
+.navbar-form input,
+.navbar-form select,
+.navbar-form .radio,
+.navbar-form .checkbox {
+margin-top: 5px;
+}
+.navbar-form input,
+.navbar-form select,
+.navbar-form .btn {
+display: inline-block;
+margin-bottom: 0;
+}
+.navbar-form input[type="image"],
+.navbar-form input[type="checkbox"],
+.navbar-form input[type="radio"] {
+margin-top: 3px;
+}
+.navbar-form .input-append,
+.navbar-form .input-prepend {
+margin-top: 5px;
+white-space: nowrap;
+}
+.navbar-form .input-append input,
+.navbar-form .input-prepend input {
+margin-top: 0;
+}
+.navbar-search {
+position: relative;
+float: left;
+margin-top: 5px;
+margin-bottom: 0;
+}
+.navbar-search .search-query {
+margin-bottom: 0;
+padding: 4px 14px;
+font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 13px;
+font-weight: normal;
+line-height: 1;
+-webkit-border-radius: 15px;
+-moz-border-radius: 15px;
+border-radius: 15px;
+}
+.navbar-static-top {
+position: static;
+margin-bottom: 0;
+}
+.navbar-static-top .navbar-inner {
+-webkit-border-radius: 0;
+-moz-border-radius: 0;
+border-radius: 0;
+}
+.navbar-fixed-top,
+.navbar-fixed-bottom {
+position: fixed;
+right: 0;
+left: 0;
+z-index: 1030;
+margin-bottom: 0;
+}
+.navbar-fixed-top .navbar-inner,
+.navbar-static-top .navbar-inner {
+border-width: 0 0 1px;
+}
+.navbar-fixed-bottom .navbar-inner {
+border-width: 1px 0 0;
+}
+.navbar-fixed-top .navbar-inner,
+.navbar-fixed-bottom .navbar-inner {
+padding-left: 0;
+padding-right: 0;
+-webkit-border-radius: 0;
+-moz-border-radius: 0;
+border-radius: 0;
+}
+.navbar-static-top .container,
+.navbar-fixed-top .container,
+.navbar-fixed-bottom .container {
+width: 940px;
+}
+.navbar-fixed-top {
+top: 0;
+}
+.navbar-fixed-top .navbar-inner,
+.navbar-static-top .navbar-inner {
+-webkit-box-shadow: 0 1px 10px rgba(0,0,0,.1);
+-moz-box-shadow: 0 1px 10px rgba(0,0,0,.1);
+box-shadow: 0 1px 10px rgba(0,0,0,.1);
+}
+.navbar-fixed-bottom {
+bottom: 0;
+}
+.navbar-fixed-bottom .navbar-inner {
+-webkit-box-shadow: 0 -1px 10px rgba(0,0,0,.1);
+-moz-box-shadow: 0 -1px 10px rgba(0,0,0,.1);
+box-shadow: 0 -1px 10px rgba(0,0,0,.1);
+}
+.navbar .nav {
+position: relative;
+left: 0;
+display: block;
+float: left;
+margin: 0 10px 0 0;
+}
+.navbar .nav.pull-right {
+float: right;
+margin-right: 0;
+}
+.navbar .nav > li {
+float: left;
+}
+.navbar .nav > li > a {
+float: none;
+padding: 10px 15px 10px;
+color: #777777;
+text-decoration: none;
+text-shadow: 0 1px 0 #ffffff;
+}
+.navbar .nav .dropdown-toggle .caret {
+margin-top: 8px;
+}
+.navbar .nav > li > a:focus,
+.navbar .nav > li > a:hover {
+background-color: transparent;
+color: #333333;
+text-decoration: none;
+}
+.navbar .nav > .active > a,
+.navbar .nav > .active > a:hover,
+.navbar .nav > .active > a:focus {
+color: #555555;
+text-decoration: none;
+background-color: #e5e5e5;
+-webkit-box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.125);
+-moz-box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.125);
+box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.125);
+}
+.navbar .btn-navbar {
+display: none;
+float: right;
+padding: 7px 10px;
+margin-left: 5px;
+margin-right: 5px;
+color: #ffffff;
+text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+background-color: #ededed;
+background-image: -moz-linear-gradient(top, #f2f2f2, #e5e5e5);
+background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#f2f2f2), to(#e5e5e5));
+background-image: -webkit-linear-gradient(top, #f2f2f2, #e5e5e5);
+background-image: -o-linear-gradient(top, #f2f2f2, #e5e5e5);
+background-image: linear-gradient(to bottom, #f2f2f2, #e5e5e5);
+background-repeat: repeat-x;
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff2f2f2', endColorstr='#ffe5e5e5', GradientType=0);
+border-color: #e5e5e5 #e5e5e5 #bfbfbf;
+border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+*background-color: #e5e5e5;
+
+filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+-webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 1px 0 rgba(255,255,255,.075);
+-moz-box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 1px 0 rgba(255,255,255,.075);
+box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 1px 0 rgba(255,255,255,.075);
+}
+.navbar .btn-navbar:hover,
+.navbar .btn-navbar:focus,
+.navbar .btn-navbar:active,
+.navbar .btn-navbar.active,
+.navbar .btn-navbar.disabled,
+.navbar .btn-navbar[disabled] {
+color: #ffffff;
+background-color: #e5e5e5;
+*background-color: #d9d9d9;
+}
+.navbar .btn-navbar:active,
+.navbar .btn-navbar.active {
+background-color: #cccccc \9;
+}
+.navbar .btn-navbar .icon-bar {
+display: block;
+width: 18px;
+height: 2px;
+background-color: #f5f5f5;
+-webkit-border-radius: 1px;
+-moz-border-radius: 1px;
+border-radius: 1px;
+-webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+-moz-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+}
+.btn-navbar .icon-bar + .icon-bar {
+margin-top: 3px;
+}
+.navbar .nav > li > .dropdown-menu:before {
+content: '';
+display: inline-block;
+border-left: 7px solid transparent;
+border-right: 7px solid transparent;
+border-bottom: 7px solid #ccc;
+border-bottom-color: rgba(0, 0, 0, 0.2);
+position: absolute;
+top: -7px;
+left: 9px;
+}
+.navbar .nav > li > .dropdown-menu:after {
+content: '';
+display: inline-block;
+border-left: 6px solid transparent;
+border-right: 6px solid transparent;
+border-bottom: 6px solid #ffffff;
+position: absolute;
+top: -6px;
+left: 10px;
+}
+.navbar-fixed-bottom .nav > li > .dropdown-menu:before {
+border-top: 7px solid #ccc;
+border-top-color: rgba(0, 0, 0, 0.2);
+border-bottom: 0;
+bottom: -7px;
+top: auto;
+}
+.navbar-fixed-bottom .nav > li > .dropdown-menu:after {
+border-top: 6px solid #ffffff;
+border-bottom: 0;
+bottom: -6px;
+top: auto;
+}
+.navbar .nav li.dropdown > a:hover .caret,
+.navbar .nav li.dropdown > a:focus .caret {
+border-top-color: #333333;
+border-bottom-color: #333333;
+}
+.navbar .nav li.dropdown.open > .dropdown-toggle,
+.navbar .nav li.dropdown.active > .dropdown-toggle,
+.navbar .nav li.dropdown.open.active > .dropdown-toggle {
+background-color: #e5e5e5;
+color: #555555;
+}
+.navbar .nav li.dropdown > .dropdown-toggle .caret {
+border-top-color: #777777;
+border-bottom-color: #777777;
+}
+.navbar .nav li.dropdown.open > .dropdown-toggle .caret,
+.navbar .nav li.dropdown.active > .dropdown-toggle .caret,
+.navbar .nav li.dropdown.open.active > .dropdown-toggle .caret {
+border-top-color: #555555;
+border-bottom-color: #555555;
+}
+.navbar .pull-right > li > .dropdown-menu,
+.navbar .nav > li > .dropdown-menu.pull-right {
+left: auto;
+right: 0;
+}
+.navbar .pull-right > li > .dropdown-menu:before,
+.navbar .nav > li > .dropdown-menu.pull-right:before {
+left: auto;
+right: 12px;
+}
+.navbar .pull-right > li > .dropdown-menu:after,
+.navbar .nav > li > .dropdown-menu.pull-right:after {
+left: auto;
+right: 13px;
+}
+.navbar .pull-right > li > .dropdown-menu .dropdown-menu,
+.navbar .nav > li > .dropdown-menu.pull-right .dropdown-menu {
+left: auto;
+right: 100%;
+margin-left: 0;
+margin-right: -1px;
+-webkit-border-radius: 6px 0 6px 6px;
+-moz-border-radius: 6px 0 6px 6px;
+border-radius: 6px 0 6px 6px;
+}
+.navbar-inverse .navbar-inner {
+background-color: #1b1b1b;
+background-image: -moz-linear-gradient(top, #222222, #111111);
+background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#222222), to(#111111));
+background-image: -webkit-linear-gradient(top, #222222, #111111);
+background-image: -o-linear-gradient(top, #222222, #111111);
+background-image: linear-gradient(to bottom, #222222, #111111);
+background-repeat: repeat-x;
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff222222', endColorstr='#ff111111', GradientType=0);
+border-color: #252525;
+}
+.navbar-inverse .brand,
+.navbar-inverse .nav > li > a {
+color: #999999;
+text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+.navbar-inverse .brand:hover,
+.navbar-inverse .nav > li > a:hover,
+.navbar-inverse .brand:focus,
+.navbar-inverse .nav > li > a:focus {
+color: #ffffff;
+}
+.navbar-inverse .brand {
+color: #999999;
+}
+.navbar-inverse .navbar-text {
+color: #999999;
+}
+.navbar-inverse .nav > li > a:focus,
+.navbar-inverse .nav > li > a:hover {
+background-color: transparent;
+color: #ffffff;
+}
+.navbar-inverse .nav .active > a,
+.navbar-inverse .nav .active > a:hover,
+.navbar-inverse .nav .active > a:focus {
+color: #ffffff;
+background-color: #111111;
+}
+.navbar-inverse .navbar-link {
+color: #999999;
+}
+.navbar-inverse .navbar-link:hover,
+.navbar-inverse .navbar-link:focus {
+color: #ffffff;
+}
+.navbar-inverse .divider-vertical {
+border-left-color: #111111;
+border-right-color: #222222;
+}
+.navbar-inverse .nav li.dropdown.open > .dropdown-toggle,
+.navbar-inverse .nav li.dropdown.active > .dropdown-toggle,
+.navbar-inverse .nav li.dropdown.open.active > .dropdown-toggle {
+background-color: #111111;
+color: #ffffff;
+}
+.navbar-inverse .nav li.dropdown > a:hover .caret,
+.navbar-inverse .nav li.dropdown > a:focus .caret {
+border-top-color: #ffffff;
+border-bottom-color: #ffffff;
+}
+.navbar-inverse .nav li.dropdown > .dropdown-toggle .caret {
+border-top-color: #999999;
+border-bottom-color: #999999;
+}
+.navbar-inverse .nav li.dropdown.open > .dropdown-toggle .caret,
+.navbar-inverse .nav li.dropdown.active > .dropdown-toggle .caret,
+.navbar-inverse .nav li.dropdown.open.active > .dropdown-toggle .caret {
+border-top-color: #ffffff;
+border-bottom-color: #ffffff;
+}
+.navbar-inverse .navbar-search .search-query {
+color: #ffffff;
+background-color: #515151;
+border-color: #111111;
+-webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.1), 0 1px 0 rgba(255,255,255,.15);
+-moz-box-shadow: inset 0 1px 2px rgba(0,0,0,.1), 0 1px 0 rgba(255,255,255,.15);
+box-shadow: inset 0 1px 2px rgba(0,0,0,.1), 0 1px 0 rgba(255,255,255,.15);
+-webkit-transition: none;
+-moz-transition: none;
+-o-transition: none;
+transition: none;
+}
+.navbar-inverse .navbar-search .search-query:-moz-placeholder {
+color: #cccccc;
+}
+.navbar-inverse .navbar-search .search-query:-ms-input-placeholder {
+color: #cccccc;
+}
+.navbar-inverse .navbar-search .search-query::-webkit-input-placeholder {
+color: #cccccc;
+}
+.navbar-inverse .navbar-search .search-query:focus,
+.navbar-inverse .navbar-search .search-query.focused {
+padding: 5px 15px;
+color: #333333;
+text-shadow: 0 1px 0 #ffffff;
+background-color: #ffffff;
+border: 0;
+-webkit-box-shadow: 0 0 3px rgba(0, 0, 0, 0.15);
+-moz-box-shadow: 0 0 3px rgba(0, 0, 0, 0.15);
+box-shadow: 0 0 3px rgba(0, 0, 0, 0.15);
+outline: 0;
+}
+.navbar-inverse .btn-navbar {
+color: #ffffff;
+text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+background-color: #0e0e0e;
+background-image: -moz-linear-gradient(top, #151515, #040404);
+background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#151515), to(#040404));
+background-image: -webkit-linear-gradient(top, #151515, #040404);
+background-image: -o-linear-gradient(top, #151515, #040404);
+background-image: linear-gradient(to bottom, #151515, #040404);
+background-repeat: repeat-x;
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff151515', endColorstr='#ff040404', GradientType=0);
+border-color: #040404 #040404 #000000;
+border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+*background-color: #040404;
+
+filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+}
+.navbar-inverse .btn-navbar:hover,
+.navbar-inverse .btn-navbar:focus,
+.navbar-inverse .btn-navbar:active,
+.navbar-inverse .btn-navbar.active,
+.navbar-inverse .btn-navbar.disabled,
+.navbar-inverse .btn-navbar[disabled] {
+color: #ffffff;
+background-color: #040404;
+*background-color: #000000;
+}
+.navbar-inverse .btn-navbar:active,
+.navbar-inverse .btn-navbar.active {
+background-color: #000000 \9;
+}
+.well {
+min-height: 20px;
+padding: 19px;
+margin-bottom: 20px;
+background-color: #f5f5f5;
+border: 1px solid #e3e3e3;
+-webkit-border-radius: 4px;
+-moz-border-radius: 4px;
+border-radius: 4px;
+-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+.well blockquote {
+border-color: #ddd;
+border-color: rgba(0, 0, 0, 0.15);
+}
+.well-large {
+padding: 24px;
+-webkit-border-radius: 6px;
+-moz-border-radius: 6px;
+border-radius: 6px;
+}
+.well-small {
+padding: 9px;
+-webkit-border-radius: 3px;
+-moz-border-radius: 3px;
+border-radius: 3px;
+}
+@-ms-viewport {
+width: device-width;
+}
+.hidden {
+display: none;
+visibility: hidden;
+}
+.visible-phone {
+display: none !important;
+}
+.visible-tablet {
+display: none !important;
+}
+.hidden-desktop {
+display: none !important;
+}
+.visible-desktop {
+display: inherit !important;
+}
+@media (min-width: 768px) and (max-width: 979px) {
+.hidden-desktop {
+display: inherit !important;
+}
+.visible-desktop {
+display: none !important ;
+}
+.visible-tablet {
+display: inherit !important;
+}
+.hidden-tablet {
+display: none !important;
+}
+}
+@media (max-width: 767px) {
+.hidden-desktop {
+display: inherit !important;
+}
+.visible-desktop {
+display: none !important;
+}
+.visible-phone {
+display: inherit !important;
+}
+.hidden-phone {
+display: none !important;
+}
+}
+.visible-print {
+display: none !important;
+}
+@media print {
+.visible-print {
+display: inherit !important;
+}
+.hidden-print {
+display: none !important;
+}
+}
+@media (max-width: 767px) {
+body {
+padding-left: 20px;
+padding-right: 20px;
+}
+.navbar-fixed-top,
+.navbar-fixed-bottom,
+.navbar-static-top {
+margin-left: -20px;
+margin-right: -20px;
+}
+.container-fluid {
+padding: 0;
+}
+.dl-horizontal dt {
+float: none;
+clear: none;
+width: auto;
+text-align: left;
+}
+.dl-horizontal dd {
+margin-left: 0;
+}
+.container {
+width: auto;
+}
+.row-fluid {
+width: 100%;
+}
+.row,
+.thumbnails {
+margin-left: 0;
+}
+.thumbnails > li {
+float: none;
+margin-left: 0;
+}
+[class*="span"],
+.uneditable-input[class*="span"],
+.row-fluid [class*="span"] {
+float: none;
+display: block;
+width: 100%;
+margin-left: 0;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+}
+.span12,
+.row-fluid .span12 {
+width: 100%;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+}
+.row-fluid [class*="offset"]:first-child {
+margin-left: 0;
+}
+.input-large,
+.input-xlarge,
+.input-xxlarge,
+input[class*="span"],
+select[class*="span"],
+textarea[class*="span"],
+.uneditable-input {
+display: block;
+width: 100%;
+min-height: 30px;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+}
+.input-prepend input,
+.input-append input,
+.input-prepend input[class*="span"],
+.input-append input[class*="span"] {
+display: inline-block;
+width: auto;
+}
+.controls-row [class*="span"] + [class*="span"] {
+margin-left: 0;
+}
+.modal {
+position: fixed;
+top: 20px;
+left: 20px;
+right: 20px;
+width: auto;
+margin: 0;
+}
+.modal.fade {
+top: -100px;
+}
+.modal.fade.in {
+top: 20px;
+}
+}
+@media (max-width: 480px) {
+.nav-collapse {
+-webkit-transform: translate3d(0, 0, 0);
+}
+.page-header h1 small {
+display: block;
+line-height: 20px;
+}
+input[type="checkbox"],
+input[type="radio"] {
+border: 1px solid #ccc;
+}
+.form-horizontal .control-label {
+float: none;
+width: auto;
+padding-top: 0;
+text-align: left;
+}
+.form-horizontal .controls {
+margin-left: 0;
+}
+.form-horizontal .control-list {
+padding-top: 0;
+}
+.form-horizontal .form-actions {
+padding-left: 10px;
+padding-right: 10px;
+}
+.media .pull-left,
+.media .pull-right {
+float: none;
+display: block;
+margin-bottom: 10px;
+}
+.media-object {
+margin-right: 0;
+margin-left: 0;
+}
+.modal {
+top: 10px;
+left: 10px;
+right: 10px;
+}
+.modal-header .close {
+padding: 10px;
+margin: -10px;
+}
+.carousel-caption {
+position: static;
+}
+}
+@media (min-width: 768px) and (max-width: 979px) {
+.row {
+margin-left: -20px;
+*zoom: 1;
+}
+.row:before,
+.row:after {
+display: table;
+content: "";
+line-height: 0;
+}
+.row:after {
+clear: both;
+}
+[class*="span"] {
+float: left;
+min-height: 1px;
+margin-left: 20px;
+}
+.container,
+.navbar-static-top .container,
+.navbar-fixed-top .container,
+.navbar-fixed-bottom .container {
+width: 724px;
+}
+.span12 {
+width: 724px;
+}
+.span11 {
+width: 662px;
+}
+.span10 {
+width: 600px;
+}
+.span9 {
+width: 538px;
+}
+.span8 {
+width: 476px;
+}
+.span7 {
+width: 414px;
+}
+.span6 {
+width: 352px;
+}
+.span5 {
+width: 290px;
+}
+.span4 {
+width: 228px;
+}
+.span3 {
+width: 166px;
+}
+.span2 {
+width: 104px;
+}
+.span1 {
+width: 42px;
+}
+.offset12 {
+margin-left: 764px;
+}
+.offset11 {
+margin-left: 702px;
+}
+.offset10 {
+margin-left: 640px;
+}
+.offset9 {
+margin-left: 578px;
+}
+.offset8 {
+margin-left: 516px;
+}
+.offset7 {
+margin-left: 454px;
+}
+.offset6 {
+margin-left: 392px;
+}
+.offset5 {
+margin-left: 330px;
+}
+.offset4 {
+margin-left: 268px;
+}
+.offset3 {
+margin-left: 206px;
+}
+.offset2 {
+margin-left: 144px;
+}
+.offset1 {
+margin-left: 82px;
+}
+.row-fluid {
+width: 100%;
+*zoom: 1;
+}
+.row-fluid:before,
+.row-fluid:after {
+display: table;
+content: "";
+line-height: 0;
+}
+.row-fluid:after {
+clear: both;
+}
+.row-fluid [class*="span"] {
+display: block;
+width: 100%;
+min-height: 30px;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+float: left;
+margin-left: 2.7624309392265194%;
+*margin-left: 2.709239449864817%;
+}
+.row-fluid [class*="span"]:first-child {
+margin-left: 0;
+}
+.row-fluid .controls-row [class*="span"] + [class*="span"] {
+margin-left: 2.7624309392265194%;
+}
+.row-fluid .span12 {
+width: 100%;
+*width: 99.94680851063829%;
+}
+.row-fluid .span11 {
+width: 91.43646408839778%;
+*width: 91.38327259903608%;
+}
+.row-fluid .span10 {
+width: 82.87292817679558%;
+*width: 82.81973668743387%;
+}
+.row-fluid .span9 {
+width: 74.30939226519337%;
+*width: 74.25620077583166%;
+}
+.row-fluid .span8 {
+width: 65.74585635359117%;
+*width: 65.69266486422946%;
+}
+.row-fluid .span7 {
+width: 57.18232044198895%;
+*width: 57.12912895262725%;
+}
+.row-fluid .span6 {
+width: 48.61878453038674%;
+*width: 48.56559304102504%;
+}
+.row-fluid .span5 {
+width: 40.05524861878453%;
+*width: 40.00205712942283%;
+}
+.row-fluid .span4 {
+width: 31.491712707182323%;
+*width: 31.43852121782062%;
+}
+.row-fluid .span3 {
+width: 22.92817679558011%;
+*width: 22.87498530621841%;
+}
+.row-fluid .span2 {
+width: 14.3646408839779%;
+*width: 14.311449394616199%;
+}
+.row-fluid .span1 {
+width: 5.801104972375691%;
+*width: 5.747913483013988%;
+}
+.row-fluid .offset12 {
+margin-left: 105.52486187845304%;
+*margin-left: 105.41847889972962%;
+}
+.row-fluid .offset12:first-child {
+margin-left: 102.76243093922652%;
+*margin-left: 102.6560479605031%;
+}
+.row-fluid .offset11 {
+margin-left: 96.96132596685082%;
+*margin-left: 96.8549429881274%;
+}
+.row-fluid .offset11:first-child {
+margin-left: 94.1988950276243%;
+*margin-left: 94.09251204890089%;
+}
+.row-fluid .offset10 {
+margin-left: 88.39779005524862%;
+*margin-left: 88.2914070765252%;
+}
+.row-fluid .offset10:first-child {
+margin-left: 85.6353591160221%;
+*margin-left: 85.52897613729868%;
+}
+.row-fluid .offset9 {
+margin-left: 79.8342541436464%;
+*margin-left: 79.72787116492299%;
+}
+.row-fluid .offset9:first-child {
+margin-left: 77.07182320441989%;
+*margin-left: 76.96544022569647%;
+}
+.row-fluid .offset8 {
+margin-left: 71.2707182320442%;
+*margin-left: 71.16433525332079%;
+}
+.row-fluid .offset8:first-child {
+margin-left: 68.50828729281768%;
+*margin-left: 68.40190431409427%;
+}
+.row-fluid .offset7 {
+margin-left: 62.70718232044199%;
+*margin-left: 62.600799341718584%;
+}
+.row-fluid .offset7:first-child {
+margin-left: 59.94475138121547%;
+*margin-left: 59.838368402492065%;
+}
+.row-fluid .offset6 {
+margin-left: 54.14364640883978%;
+*margin-left: 54.037263430116376%;
+}
+.row-fluid .offset6:first-child {
+margin-left: 51.38121546961326%;
+*margin-left: 51.27483249088986%;
+}
+.row-fluid .offset5 {
+margin-left: 45.58011049723757%;
+*margin-left: 45.47372751851417%;
+}
+.row-fluid .offset5:first-child {
+margin-left: 42.81767955801105%;
+*margin-left: 42.71129657928765%;
+}
+.row-fluid .offset4 {
+margin-left: 37.01657458563536%;
+*margin-left: 36.91019160691196%;
+}
+.row-fluid .offset4:first-child {
+margin-left: 34.25414364640884%;
+*margin-left: 34.14776066768544%;
+}
+.row-fluid .offset3 {
+margin-left: 28.45303867403315%;
+*margin-left: 28.346655695309746%;
+}
+.row-fluid .offset3:first-child {
+margin-left: 25.69060773480663%;
+*margin-left: 25.584224756083227%;
+}
+.row-fluid .offset2 {
+margin-left: 19.88950276243094%;
+*margin-left: 19.783119783707537%;
+}
+.row-fluid .offset2:first-child {
+margin-left: 17.12707182320442%;
+*margin-left: 17.02068884448102%;
+}
+.row-fluid .offset1 {
+margin-left: 11.32596685082873%;
+*margin-left: 11.219583872105325%;
+}
+.row-fluid .offset1:first-child {
+margin-left: 8.56353591160221%;
+*margin-left: 8.457152932878806%;
+}
+input,
+textarea,
+.uneditable-input {
+margin-left: 0;
+}
+.controls-row [class*="span"] + [class*="span"] {
+margin-left: 20px;
+}
+input.span12,
+textarea.span12,
+.uneditable-input.span12 {
+width: 710px;
+}
+input.span11,
+textarea.span11,
+.uneditable-input.span11 {
+width: 648px;
+}
+input.span10,
+textarea.span10,
+.uneditable-input.span10 {
+width: 586px;
+}
+input.span9,
+textarea.span9,
+.uneditable-input.span9 {
+width: 524px;
+}
+input.span8,
+textarea.span8,
+.uneditable-input.span8 {
+width: 462px;
+}
+input.span7,
+textarea.span7,
+.uneditable-input.span7 {
+width: 400px;
+}
+input.span6,
+textarea.span6,
+.uneditable-input.span6 {
+width: 338px;
+}
+input.span5,
+textarea.span5,
+.uneditable-input.span5 {
+width: 276px;
+}
+input.span4,
+textarea.span4,
+.uneditable-input.span4 {
+width: 214px;
+}
+input.span3,
+textarea.span3,
+.uneditable-input.span3 {
+width: 152px;
+}
+input.span2,
+textarea.span2,
+.uneditable-input.span2 {
+width: 90px;
+}
+input.span1,
+textarea.span1,
+.uneditable-input.span1 {
+width: 28px;
+}
+}
+@media (min-width: 1200px) {
+.row {
+margin-left: -30px;
+*zoom: 1;
+}
+.row:before,
+.row:after {
+display: table;
+content: "";
+line-height: 0;
+}
+.row:after {
+clear: both;
+}
+[class*="span"] {
+float: left;
+min-height: 1px;
+margin-left: 30px;
+}
+.container,
+.navbar-static-top .container,
+.navbar-fixed-top .container,
+.navbar-fixed-bottom .container {
+width: 1170px;
+}
+.span12 {
+width: 1170px;
+}
+.span11 {
+width: 1070px;
+}
+.span10 {
+width: 970px;
+}
+.span9 {
+width: 870px;
+}
+.span8 {
+width: 770px;
+}
+.span7 {
+width: 670px;
+}
+.span6 {
+width: 570px;
+}
+.span5 {
+width: 470px;
+}
+.span4 {
+width: 370px;
+}
+.span3 {
+width: 270px;
+}
+.span2 {
+width: 170px;
+}
+.span1 {
+width: 70px;
+}
+.offset12 {
+margin-left: 1230px;
+}
+.offset11 {
+margin-left: 1130px;
+}
+.offset10 {
+margin-left: 1030px;
+}
+.offset9 {
+margin-left: 930px;
+}
+.offset8 {
+margin-left: 830px;
+}
+.offset7 {
+margin-left: 730px;
+}
+.offset6 {
+margin-left: 630px;
+}
+.offset5 {
+margin-left: 530px;
+}
+.offset4 {
+margin-left: 430px;
+}
+.offset3 {
+margin-left: 330px;
+}
+.offset2 {
+margin-left: 230px;
+}
+.offset1 {
+margin-left: 130px;
+}
+.row-fluid {
+width: 100%;
+*zoom: 1;
+}
+.row-fluid:before,
+.row-fluid:after {
+display: table;
+content: "";
+line-height: 0;
+}
+.row-fluid:after {
+clear: both;
+}
+.row-fluid [class*="span"] {
+display: block;
+width: 100%;
+min-height: 30px;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+float: left;
+margin-left: 2.564102564102564%;
+*margin-left: 2.5109110747408616%;
+}
+.row-fluid [class*="span"]:first-child {
+margin-left: 0;
+}
+.row-fluid .controls-row [class*="span"] + [class*="span"] {
+margin-left: 2.564102564102564%;
+}
+.row-fluid .span12 {
+width: 100%;
+*width: 99.94680851063829%;
+}
+.row-fluid .span11 {
+width: 91.45299145299145%;
+*width: 91.39979996362975%;
+}
+.row-fluid .span10 {
+width: 82.90598290598291%;
+*width: 82.8527914166212%;
+}
+.row-fluid .span9 {
+width: 74.35897435897436%;
+*width: 74.30578286961266%;
+}
+.row-fluid .span8 {
+width: 65.81196581196582%;
+*width: 65.75877432260411%;
+}
+.row-fluid .span7 {
+width: 57.26495726495726%;
+*width: 57.21176577559556%;
+}
+.row-fluid .span6 {
+width: 48.717948717948715%;
+*width: 48.664757228587014%;
+}
+.row-fluid .span5 {
+width: 40.17094017094017%;
+*width: 40.11774868157847%;
+}
+.row-fluid .span4 {
+width: 31.623931623931625%;
+*width: 31.570740134569924%;
+}
+.row-fluid .span3 {
+width: 23.076923076923077%;
+*width: 23.023731587561375%;
+}
+.row-fluid .span2 {
+width: 14.52991452991453%;
+*width: 14.476723040552828%;
+}
+.row-fluid .span1 {
+width: 5.982905982905983%;
+*width: 5.929714493544281%;
+}
+.row-fluid .offset12 {
+margin-left: 105.12820512820512%;
+*margin-left: 105.02182214948171%;
+}
+.row-fluid .offset12:first-child {
+margin-left: 102.56410256410257%;
+*margin-left: 102.45771958537915%;
+}
+.row-fluid .offset11 {
+margin-left: 96.58119658119658%;
+*margin-left: 96.47481360247316%;
+}
+.row-fluid .offset11:first-child {
+margin-left: 94.01709401709402%;
+*margin-left: 93.91071103837061%;
+}
+.row-fluid .offset10 {
+margin-left: 88.03418803418803%;
+*margin-left: 87.92780505546462%;
+}
+.row-fluid .offset10:first-child {
+margin-left: 85.47008547008548%;
+*margin-left: 85.36370249136206%;
+}
+.row-fluid .offset9 {
+margin-left: 79.48717948717949%;
+*margin-left: 79.38079650845607%;
+}
+.row-fluid .offset9:first-child {
+margin-left: 76.92307692307693%;
+*margin-left: 76.81669394435352%;
+}
+.row-fluid .offset8 {
+margin-left: 70.94017094017094%;
+*margin-left: 70.83378796144753%;
+}
+.row-fluid .offset8:first-child {
+margin-left: 68.37606837606839%;
+*margin-left: 68.26968539734497%;
+}
+.row-fluid .offset7 {
+margin-left: 62.393162393162385%;
+*margin-left: 62.28677941443899%;
+}
+.row-fluid .offset7:first-child {
+margin-left: 59.82905982905982%;
+*margin-left: 59.72267685033642%;
+}
+.row-fluid .offset6 {
+margin-left: 53.84615384615384%;
+*margin-left: 53.739770867430444%;
+}
+.row-fluid .offset6:first-child {
+margin-left: 51.28205128205128%;
+*margin-left: 51.175668303327875%;
+}
+.row-fluid .offset5 {
+margin-left: 45.299145299145295%;
+*margin-left: 45.1927623204219%;
+}
+.row-fluid .offset5:first-child {
+margin-left: 42.73504273504273%;
+*margin-left: 42.62865975631933%;
+}
+.row-fluid .offset4 {
+margin-left: 36.75213675213675%;
+*margin-left: 36.645753773413354%;
+}
+.row-fluid .offset4:first-child {
+margin-left: 34.18803418803419%;
+*margin-left: 34.081651209310785%;
+}
+.row-fluid .offset3 {
+margin-left: 28.205128205128204%;
+*margin-left: 28.0987452264048%;
+}
+.row-fluid .offset3:first-child {
+margin-left: 25.641025641025642%;
+*margin-left: 25.53464266230224%;
+}
+.row-fluid .offset2 {
+margin-left: 19.65811965811966%;
+*margin-left: 19.551736679396257%;
+}
+.row-fluid .offset2:first-child {
+margin-left: 17.094017094017094%;
+*margin-left: 16.98763411529369%;
+}
+.row-fluid .offset1 {
+margin-left: 11.11111111111111%;
+*margin-left: 11.004728132387708%;
+}
+.row-fluid .offset1:first-child {
+margin-left: 8.547008547008547%;
+*margin-left: 8.440625568285142%;
+}
+input,
+textarea,
+.uneditable-input {
+margin-left: 0;
+}
+.controls-row [class*="span"] + [class*="span"] {
+margin-left: 30px;
+}
+input.span12,
+textarea.span12,
+.uneditable-input.span12 {
+width: 1156px;
+}
+input.span11,
+textarea.span11,
+.uneditable-input.span11 {
+width: 1056px;
+}
+input.span10,
+textarea.span10,
+.uneditable-input.span10 {
+width: 956px;
+}
+input.span9,
+textarea.span9,
+.uneditable-input.span9 {
+width: 856px;
+}
+input.span8,
+textarea.span8,
+.uneditable-input.span8 {
+width: 756px;
+}
+input.span7,
+textarea.span7,
+.uneditable-input.span7 {
+width: 656px;
+}
+input.span6,
+textarea.span6,
+.uneditable-input.span6 {
+width: 556px;
+}
+input.span5,
+textarea.span5,
+.uneditable-input.span5 {
+width: 456px;
+}
+input.span4,
+textarea.span4,
+.uneditable-input.span4 {
+width: 356px;
+}
+input.span3,
+textarea.span3,
+.uneditable-input.span3 {
+width: 256px;
+}
+input.span2,
+textarea.span2,
+.uneditable-input.span2 {
+width: 156px;
+}
+input.span1,
+textarea.span1,
+.uneditable-input.span1 {
+width: 56px;
+}
+.thumbnails {
+margin-left: -30px;
+}
+.thumbnails > li {
+margin-left: 30px;
+}
+.row-fluid .thumbnails {
+margin-left: 0;
+}
+}
+@media (max-width: 979px) {
+body {
+padding-top: 0;
+}
+.navbar-fixed-top,
+.navbar-fixed-bottom {
+position: static;
+}
+.navbar-fixed-top {
+margin-bottom: 20px;
+}
+.navbar-fixed-bottom {
+margin-top: 20px;
+}
+.navbar-fixed-top .navbar-inner,
+.navbar-fixed-bottom .navbar-inner {
+padding: 5px;
+}
+.navbar .container {
+width: auto;
+padding: 0;
+}
+.navbar .brand {
+padding-left: 10px;
+padding-right: 10px;
+margin: 0 0 0 -5px;
+}
+.nav-collapse {
+clear: both;
+}
+.nav-collapse .nav {
+float: none;
+margin: 0 0 10px;
+}
+.nav-collapse .nav > li {
+float: none;
+}
+.nav-collapse .nav > li > a {
+margin-bottom: 2px;
+}
+.nav-collapse .nav > .divider-vertical {
+display: none;
+}
+.nav-collapse .nav .nav-header {
+color: #777777;
+text-shadow: none;
+}
+.nav-collapse .nav > li > a,
+.nav-collapse .dropdown-menu a {
+padding: 9px 15px;
+font-weight: bold;
+color: #777777;
+-webkit-border-radius: 3px;
+-moz-border-radius: 3px;
+border-radius: 3px;
+}
+.nav-collapse .btn {
+padding: 4px 10px 4px;
+font-weight: normal;
+-webkit-border-radius: 4px;
+-moz-border-radius: 4px;
+border-radius: 4px;
+}
+.nav-collapse .dropdown-menu li + li a {
+margin-bottom: 2px;
+}
+.nav-collapse .nav > li > a:hover,
+.nav-collapse .nav > li > a:focus,
+.nav-collapse .dropdown-menu a:hover,
+.nav-collapse .dropdown-menu a:focus {
+background-color: #f2f2f2;
+}
+.navbar-inverse .nav-collapse .nav > li > a,
+.navbar-inverse .nav-collapse .dropdown-menu a {
+color: #999999;
+}
+.navbar-inverse .nav-collapse .nav > li > a:hover,
+.navbar-inverse .nav-collapse .nav > li > a:focus,
+.navbar-inverse .nav-collapse .dropdown-menu a:hover,
+.navbar-inverse .nav-collapse .dropdown-menu a:focus {
+background-color: #111111;
+}
+.nav-collapse.in .btn-group {
+margin-top: 5px;
+padding: 0;
+}
+.nav-collapse .dropdown-menu {
+position: static;
+top: auto;
+left: auto;
+float: none;
+display: none;
+max-width: none;
+margin: 0 15px;
+padding: 0;
+background-color: transparent;
+border: none;
+-webkit-border-radius: 0;
+-moz-border-radius: 0;
+border-radius: 0;
+-webkit-box-shadow: none;
+-moz-box-shadow: none;
+box-shadow: none;
+}
+.nav-collapse .open > .dropdown-menu {
+display: block;
+}
+.nav-collapse .dropdown-menu:before,
+.nav-collapse .dropdown-menu:after {
+display: none;
+}
+.nav-collapse .dropdown-menu .divider {
+display: none;
+}
+.nav-collapse .nav > li > .dropdown-menu:before,
+.nav-collapse .nav > li > .dropdown-menu:after {
+display: none;
+}
+.nav-collapse .navbar-form,
+.nav-collapse .navbar-search {
+float: none;
+padding: 10px 15px;
+margin: 10px 0;
+border-top: 1px solid #f2f2f2;
+border-bottom: 1px solid #f2f2f2;
+-webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 1px 0 rgba(255,255,255,.1);
+-moz-box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 1px 0 rgba(255,255,255,.1);
+box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 1px 0 rgba(255,255,255,.1);
+}
+.navbar-inverse .nav-collapse .navbar-form,
+.navbar-inverse .nav-collapse .navbar-search {
+border-top-color: #111111;
+border-bottom-color: #111111;
+}
+.navbar .nav-collapse .nav.pull-right {
+float: none;
+margin-left: 0;
+}
+.nav-collapse,
+.nav-collapse.collapse {
+overflow: hidden;
+height: 0;
+}
+.navbar .btn-navbar {
+display: block;
+}
+.navbar-static .navbar-inner {
+padding-left: 10px;
+padding-right: 10px;
+}
+}
+@media (min-width: 980px) {
+.nav-collapse.collapse {
+height: auto !important;
+overflow: visible !important;
+}
+}
+
+.doc-title { float: left; display: block; padding: 10px 20px 10px; margin-left: -20px;
+font-size: 20px; font-weight: 200; color: #777777; text-shadow: 0 1px 0 #ffffff; }
+.doc-info .navbar-text { padding: 0 15px; }
+h1 a { color: #333; } h2 a { color: #333; } h3 a { color: #333; }
+h4 a { color: #333; } h5 a { color: #333; } h6 a { color: #333; }
+h1:hover a { color: #333; } h2:hover a { color: #333; } h3:hover a { color: #333; }
+h4:hover a { color: #333; } h5:hover a { color: #333; } h6:hover a { color: #333; }
+.toc { margin-top: 10px; }
+.toc, .toc ul { padding: 0; }
+.toc ul { margin-left: 0; margin-bottom: 20px; list-style: none; }
+.toc ul > li > a { display: block; }
+.toc ul > li > a:hover,
+.toc ul > li > a:focus { text-decoration: none; background-color: #eeeeee; }
+.toc ul { margin-bottom: 0; }
+.toc ul > li > a, .toc ul > li > a { padding: 3px 15px; }</style>
+</head>
+<body>
+    <div class="container">
+    <div class="row">
+            <div id="TOC" class="span3">
+        <div class="well toc">
+        <ul>
+          <li class="nav-header">Table of Contents</li>
+        </ul>
+        <ul>
+        <li><a href="#a-matrix-library"><span class="toc-section-number">1</span> A Matrix Library</a><ul>
+        <li><a href="#matrix-operations-in-c"><span class="toc-section-number">1.1</span> Matrix operations in C</a></li>
+        <li><a href="#the-matrix-class"><span class="toc-section-number">1.2</span> The Matrix class</a></li>
+        <li><a href="#unit-test"><span class="toc-section-number">1.3</span> Unit test</a></li>
+        <li><a href="#accessing-and-modifying-the-content-of-a-matrix"><span class="toc-section-number">1.4</span> Accessing and Modifying the Content of a Matrix</a></li>
+        <li><a href="#summing-matrices"><span class="toc-section-number">1.5</span> Summing matrices</a></li>
+        <li><a href="#printing-a-matrix"><span class="toc-section-number">1.6</span> Printing a matrix</a></li>
+        <li><a href="#vector"><span class="toc-section-number">1.7</span> Vector</a></li>
+        <li><a href="#factors"><span class="toc-section-number">1.8</span> Factors</a></li>
+        <li><a href="#dividing-a-matrix-by-a-factor"><span class="toc-section-number">1.9</span> Dividing a matrix by a factor</a></li>
+        <li><a href="#matrix-product"><span class="toc-section-number">1.10</span> Matrix product</a></li>
+        <li><a href="#matrix-substraction"><span class="toc-section-number">1.11</span> Matrix substraction</a></li>
+        <li><a href="#filling-the-matrix-with-random-numbers"><span class="toc-section-number">1.12</span> Filling the matrix with random numbers</a></li>
+        <li><a href="#summing-the-matrix-values"><span class="toc-section-number">1.13</span> Summing the matrix values</a></li>
+        <li><a href="#transpose"><span class="toc-section-number">1.14</span> Transpose</a></li>
+        <li><a href="#example"><span class="toc-section-number">1.15</span> Example</a></li>
+        <li><a href="#what-have-we-seen"><span class="toc-section-number">1.16</span> What have we seen?</a></li>
+        </ul></li>
+        </ul>
+        </div>
+      </div>
+            <div class="span9">
+            <h1 id="a-matrix-library"><span class="header-section-number">1</span> A Matrix Library</h1>
+<p>In the previous chapters we presented an implementation of a neural network made of layers and neurons (<em>i.e.,</em> instances of <code>NeuronLayer</code> and <code>Neuron</code>). Although instructive, our implementation does not reflects classical ways of implementing a neural network. A layer can be expressed as a matrix of weights and a vector of biases. This is actually how most libraries to build neural network (<em>e.g.,</em> TensorFlow and PyTorch) actually operate.</p>
+<p>This chapter lays out a small library to build and manipulate matrices. This chapter is important for the subsequent chapter which is about how networks can be implemented using matrices. Matrix are particular data structure for which operations cannot efficiently be implemented in Pharo. We will write such costly operations in C but make them accessible within Pharo.</p>
+<p>In addition to defining a matrix library, this chapters highlights one particular aspect of Pharo, which is the use of Foreign Function Interface (FFI). This is a relevant mechanism whenever one wishes to make Pharo use external libraries written using the C or C++ languages. For example, TensorFlow is written in C++, which may be accessed from Pharo using the very same technique presented in this chapter.</p>
+<p>This chapter is long and contains many inter-dependent methods. The chapter needs to be fully implemented before being functional.</p>
+<h2 id="matrix-operations-in-c"><span class="header-section-number">1.1</span> Matrix operations in C</h2>
+<p>Pharo does not provide built-in features to manipulate matrices. Although we could implement them in Pharo, it would suffer from very poor performances. Instead, we will code a small library in C to support the elementary C operations.</p>
+<p>Create a file named <code>matrix.c</code> with the following C code:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb1-1" title="1"><span class="dt">void</span> dot(<span class="dt">double</span> *m1, <span class="dt">int</span> m1_nb_rows, <span class="dt">int</span> m1_nb_columns, <span class="dt">double</span> *m2,</a>
+<a class="sourceLine" id="cb1-2" title="2">            <span class="dt">int</span> m2_nb_rows, <span class="dt">int</span> m2_nb_columns, <span class="dt">double</span> *res) { </a>
+<a class="sourceLine" id="cb1-3" title="3">              </a>
+<a class="sourceLine" id="cb1-4" title="4">    <span class="dt">int</span> col, row, k; </a>
+<a class="sourceLine" id="cb1-5" title="5">    <span class="cf">for</span> (col = <span class="dv">0</span>; col &lt; m2_nb_columns; col++) { </a>
+<a class="sourceLine" id="cb1-6" title="6">        <span class="cf">for</span> (row = <span class="dv">0</span>; row &lt; m1_nb_rows; row++) { </a>
+<a class="sourceLine" id="cb1-7" title="7">            <span class="dt">double</span> tmp = <span class="dv">0</span>;</a>
+<a class="sourceLine" id="cb1-8" title="8">            <span class="cf">for</span> (k = <span class="dv">0</span>; k &lt; m2_nb_rows; k++) </a>
+<a class="sourceLine" id="cb1-9" title="9">                tmp += m1[row * m1_nb_columns + k] * m2[k * m2_nb_columns + col];</a>
+<a class="sourceLine" id="cb1-10" title="10">                res[row * m2_nb_columns + col] = tmp;</a>
+<a class="sourceLine" id="cb1-11" title="11">} } } </a>
+<a class="sourceLine" id="cb1-12" title="12"><span class="dt">void</span> sub(<span class="dt">double</span> *m1, <span class="dt">int</span> nb_rows, <span class="dt">int</span> nb_columns, </a>
+<a class="sourceLine" id="cb1-13" title="13">            <span class="dt">double</span> *m2, <span class="dt">double</span> *res) {</a>
+<a class="sourceLine" id="cb1-14" title="14">   <span class="dt">int</span> col, row; </a>
+<a class="sourceLine" id="cb1-15" title="15">   <span class="cf">for</span> (col = <span class="dv">0</span>; col &lt; nb_columns; col++) { </a>
+<a class="sourceLine" id="cb1-16" title="16">        <span class="cf">for</span> (row = <span class="dv">0</span>; row &lt; nb_rows; row++) { </a>
+<a class="sourceLine" id="cb1-17" title="17">            res[row * nb_columns + col] = </a>
+<a class="sourceLine" id="cb1-18" title="18">                  m1[row * nb_columns + col] - m2[row * nb_columns + col];</a>
+<a class="sourceLine" id="cb1-19" title="19">} } } </a>
+<a class="sourceLine" id="cb1-20" title="20"><span class="dt">void</span> add(<span class="dt">double</span> *m1, <span class="dt">int</span> nb_rows, <span class="dt">int</span> nb_columns, </a>
+<a class="sourceLine" id="cb1-21" title="21">            <span class="dt">double</span> *m2, <span class="dt">double</span> *res) {</a>
+<a class="sourceLine" id="cb1-22" title="22">   <span class="dt">int</span> col, row; </a>
+<a class="sourceLine" id="cb1-23" title="23">    <span class="cf">for</span> (col = <span class="dv">0</span>; col &lt; nb_columns; col++) { </a>
+<a class="sourceLine" id="cb1-24" title="24">        <span class="cf">for</span> (row = <span class="dv">0</span>; row &lt; nb_rows; row++) { </a>
+<a class="sourceLine" id="cb1-25" title="25">               res[row * nb_columns + col] = </a>
+<a class="sourceLine" id="cb1-26" title="26">                  m1[row * nb_columns + col] + m2[row * nb_columns + col];</a>
+<a class="sourceLine" id="cb1-27" title="27">} } } </a></code></pre></div>
+<p>This small libraries is composed of three C functions: - <code>dot</code> to perform the multiplication of matrices; - <code>sub</code> to subtract one matrix from another; - <code>add</code> to sum two matrices.</p>
+<p>We will not go into details about this C file. It simply applies some basic matrix operations.</p>
+<p>The library has to be compiled. We can use the gcc standard compiler for this:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="fu">gcc</span> -dynamiclib -o matrix.dylib matrix.c</a></code></pre></div>
+<p>Our matrix file is compiled as a dynamic library, loadable within Pharo. The compilation produces the <code>matrix.dylib</code> file. Note that the <code>matrix.dylib</code> file should be located next to the <code>.image</code> file.</p>
+<h2 id="the-matrix-class"><span class="header-section-number">1.2</span> The Matrix class</h2>
+<p>We can now write the Pharo class <code>MMatrix</code> which will use our C-library. Note that Pharo 7 contains a deprecated class <code>Matrix</code> not really useful for our purpose, which is why our class is prefixed with an additional <code>M</code> character. In a new package called <code>Matrix</code>, we define the class:</p>
+<pre class="smalltalk"><code>Object subclass: #MMatrix
+    instanceVariableNames: &#39;nbRows nbColumns array&#39;
+    classVariableNames: &#39;&#39;
+    package: &#39;Matrix&#39;</code></pre>
+<p>The two first variables describe the shape of the matrix while the variable <code>array</code> will refer to an array containing the actual values of the matrix, in a linear fashion. This array will have to be accessible both from Pharo and from our C library.</p>
+<p>On the class side of the class <code>MMatrix</code> we define a number of useful methods to create matrices. You need to switch the class browser to the class mode to define class methods. The method <code>newFromArrays:</code> creates a matrix from a collection of arrays:</p>
+<pre class="smalltalk"><code>MMatrix class&gt;&gt;newFromArrays: arrays
+    &quot;Create a matrix from an array containing the structured 
+    values of the matrix.
+    Example of matrix creations:
+    MMatrix newFromArrays: #(#(1 2 3) #(4 5 6))
+    MMatrix newFromArrays: #(#(1 2 3))
+    MMatrix newFromArrays: #(#(1) #(2) #(3))
+    &quot;
+    ^ self basicNew
+        initializeRows: arrays size columns: arrays first size;
+        fromContents: (arrays flatCollect: #yourself);
+        yourself</code></pre>
+<p>We also need a lower level to create a matrix, simply by providing the shape of the matrix. This assumes that the matrix content is set later. Consider this new class method:</p>
+<pre class="smalltalk"><code>MMatrix class&gt;&gt;newRows: numRows columns: numColumns
+    &quot;Create a matrix with a given shape&quot;
+    ^ self basicNew
+        initializeRows: numRows columns: numColumns;
+        yourself</code></pre>
+<p>We then define a method to initialize a matrix:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;initializeRows: numRows columns: numColumns
+    self initialize.
+    nbRows := numRows.
+    nbColumns := numColumns.
+    array := self newArray</code></pre>
+<p>The array is useful to keep the matrix content is defined using <code>newArray</code>:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;newArray
+    &quot;Create an array used to contains the store the matrix content&quot;
+    ^ FFIExternalArray 
+        newType: &#39;double&#39; 
+        size: nbColumns * nbRows</code></pre>
+<p>The class <code>FFIExternalArray</code> represents an array for which its elements are values of some external type. In our case, we will encode matrix values as a <code>double</code>, which is a float value encoded on 64 bits. The array has to be accessed from other objects:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;array
+    &quot;The array containing matrix&#39; values&quot;
+    ^ array</code></pre>
+<p>Foreign objects, living within the Pharo memory space, need to be accessible from our external library. A handle represents the memory address that is used by the C library. The class <code>FFIExternalArray</code> offers the method <code>getHandle</code> for accessing the memory location:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;getHandle
+    &quot;Return the handle of the foreign object. 
+    This allows the array to be accessed from C&quot;
+    ^ array getHandle</code></pre>
+<p>An handy method useful in the testing is <code>asArray</code>. We will use it when verifying that matrix are properly created:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;asArray
+    &quot;Return a linear array of the matrix values&quot;
+    ^ array asArray</code></pre>
+<p>In some situations, an handle has to be provided when a matrix is created. The following method address this:</p>
+<pre class="smalltalk"><code>MMatrix class&gt;&gt;newHandle: aHandle rows: numRows columns: numColumns
+    &quot;Create a matrix with a provided content. Useful when creating a matrix after an FFI operation&quot;
+    ^ self basicNew
+        initializeHandle: aHandle rows: numRows columns: numColumns;
+        yourself</code></pre>
+<p>The method <code>initializeHandle:rows:columns:</code> initializes a matrix with an handle and a particular shape:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;initializeHandle: aHandle rows: numRows columns: numColumns
+    &quot;Initialize the matrix&quot;
+    self initialize.
+    nbRows := numRows.
+    nbColumns := numColumns.
+    array := self newArrayFromHandle: aHandle</code></pre>
+<p>The following factory method creates an external array using a given handle:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;newArrayFromHandle: aHandle
+    &quot;Create an external array using an handle&quot;
+    ^ FFIExternalArray 
+        fromHandle: aHandle 
+        type: &#39;double&#39; 
+        size: nbColumns * nbRows</code></pre>
+<p>We need a few utility methods to access the shape of the matrix:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;nbRows
+    &quot;Number of rows defined in the matrix&quot;
+    ^ nbRows</code></pre>
+<p>and</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;nbColumns
+    &quot;Number of columns defined in the matrix&quot;
+    ^ nbColumns</code></pre>
+<p>The number of values of the matrix is accessed using <code>size</code>:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;size
+    &quot;The number of values contained in the matrix&quot;
+    ^ nbColumns * nbRows </code></pre>
+<p>A matrix may be <em>filled</em> with a linear set of values:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;fromContents: content
+    &quot;Initialize the matrix with a linear content&quot;
+    self assert: [ content size = (nbColumns * nbRows) ] description: &#39;size mismatch&#39;.
+    content doWithIndex: [ :v :i | array at: i put: v ]</code></pre>
+<h2 id="unit-test"><span class="header-section-number">1.3</span> Unit test</h2>
+<p>We can now write a unit test. The class <code>MMatrixTest</code> will contains all out tests of <code>MMatrix</code>:</p>
+<pre class="smalltalk"><code>TestCase subclass: #MMatrixTest
+    instanceVariableNames: &#39;&#39;
+    classVariableNames: &#39;&#39;
+    package: &#39;Matrix&#39;</code></pre>
+<p>We can tests the creation and initialization methods we defined on <code>MMatrix</code>:</p>
+<pre class="smalltalk"><code>MMatrixTest&gt;&gt;testCreation
+    | m |
+    m := MMatrix newFromArrays: #(#(1 2) #(3 4)).
+    self assert: m asArray equals: #(1.0 2.0 3.0 4.0)</code></pre>
+<h2 id="accessing-and-modifying-the-content-of-a-matrix"><span class="header-section-number">1.4</span> Accessing and Modifying the Content of a Matrix</h2>
+<p>Being able to easily update the matrix content is the first initial step we should consider. The content of a matrix may be accessed using the <code>at:</code> message. This method takes as argument a point.</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;at: aPoint
+    &quot;Access an element of the matrix&quot;
+    ^ array at: ((aPoint x - 1) * nbColumns + (aPoint y - 1)) + 1</code></pre>
+<p>We can test the <code>at:</code> method:</p>
+<pre class="smalltalk"><code>MMatrixTest&gt;&gt;testAt
+    | m |
+    m := MMatrix newFromArrays: #(#(1 2) #(3 4)).
+    self assert: (m at: 1 @ 1) equals: 1.
+    self assert: (m at: 1 @ 2) equals: 2.
+    self assert: (m at: 2 @ 1) equals: 3.
+    self assert: (m at: 2 @ 2) equals: 4.</code></pre>
+<p>Similarly, we need to provide a way to modify the content of a matrix. The method <code>at:put:</code> inserts a value at a given position:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;at: aPoint put: aNumber
+    &quot;Modify an element of the matrix&quot;
+    array at: ((aPoint x - 1) * nbColumns + (aPoint y - 1)) + 1 put: aNumber asFloat</code></pre>
+<p>To ease the testing, we add a convenient conversion method:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;asStructuredArray
+    &quot;Return a structured array that describe the matrix&quot;
+    ^ (1 to: nbRows) collect: [ :i | self atRow: i ] as: Array</code></pre>
+<p>The method <code>atRow:</code> returns the horizontal values for a given index.</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;atRow: rowNumber
+    &quot;Return a particular row&quot;
+    (rowNumber between: 1 and: rowNumber)
+        ifFalse: [ self error: &#39;index out of range&#39; ].
+    ^ (1 to: nbColumns) collect: [ :x | self at: rowNumber @ x ] </code></pre>
+<p>A simple test illustrates the use of <code>at:put:</code>:</p>
+<pre class="smalltalk"><code>MMatrixTest&gt;&gt;testAtPut
+    | m |
+    m := MMatrix newFromArrays: #(#(1 2) #(3 4)).
+    m at: 2 @ 1 put: 10.0.
+    self assert: (m at: 2 @ 1) equals: 10.0.
+    self assert: m asStructuredArray equals: #(#(1 2) #(10 4))</code></pre>
+<p>Note that we refer to an element using a coordinate <code>row @ column</code>. This way to access a matrix element is close to the mathematical notation traditionally used in linear algebra.</p>
+<p>We have laid out the necessary infrastructure to define some operations. The following sections will covers the operations we will employ in our neural network.</p>
+<h2 id="summing-matrices"><span class="header-section-number">1.5</span> Summing matrices</h2>
+<p>Two matrices may be summed up. The operation assumes that the two matrices have exactly the same dimensions. We can define the sum with the <code>+</code> method. This method accepts another matrix of the same size than the receiver, or a vertical vector (<em>i.e.,</em> matrix with only one column):</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;+ matrixOrVector
+    &quot;Add either a matrix or a vector to the receiver. The argument could either be a matrix of the same size than me, or a vector
+    A new matrix is returned as result&quot;
+    | m |
+    ((nbRows = matrixOrVector nbRows) and: [ nbColumns = matrixOrVector nbColumns ])
+        ifTrue: [ ^ self add: matrixOrVector ].
+        
+    matrixOrVector nbColumns ~= 1 ifTrue: [ self error: &#39;not a n * 1 vector&#39; ].
+    m := matrixOrVector stretchToColumns: nbColumns.
+    ^ self + m</code></pre>
+<p>The addition involves several steps due to the complexity of the operation. We define the <code>add:</code> method:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;add: aMatrix
+    &quot;Add two matrices, the receiver and the argument, and produces a new matrix&quot;
+    | result resultArray |
+    nbColumns = aMatrix nbColumns ifFalse: [self error: &#39;dimensions do not conform&#39;].
+    nbRows = aMatrix nbRows ifFalse: [self error: &#39;dimensions do not conform&#39;].
+    
+    resultArray := ByteArray new: (nbRows * aMatrix nbColumns * 8).
+
+    self assert: [ nbRows * nbColumns = array size ].
+    self assert: [ aMatrix nbRows * aMatrix nbColumns = aMatrix size ].
+    self assert: [ nbRows * aMatrix nbColumns * 8 = resultArray size ].
+    
+    self 
+        add: self getHandle with: nbRows with: nbColumns with: aMatrix getHandle
+        in: resultArray.
+    result := MMatrix newHandle: resultArray rows: nbRows columns: nbColumns.
+    ^ result</code></pre>
+<p>The method <code>add:</code> creates a new matrix, and invokes the <code>add</code> function from our C library:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;add: m1 with: nb_rows with: nb_columns with: m2 in: res
+    ^ self 
+        ffiCall: #(void add(double *m1, int nb_rows, int nb_columns, 
+                double *m2, 
+                double *res)) 
+        module: &#39;matrix.dylib&#39;</code></pre>
+<p>Elements of a matrix may be horizontally summed up. As we will see in the next chapter, this operation is important when we will implement the backpropagation algorithm. Consider the method <code>sumHorizontal</code>:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;sumHorizontal
+    &quot;Horizontal summing&quot;
+    | result sum |
+    result := MMatrix newRows: nbRows columns: 1.
+    1 to: nbRows do: [ :y |
+        sum := 0.
+        1 to: nbColumns do: [ :x |
+            sum := sum + (self at: y @ x)
+        ].
+        result at: y @ 1 put: sum
+    ].
+    ^ result</code></pre>
+<p>An example of <code>sumHorizontal</code> is provided in the following test method:</p>
+<pre class="smalltalk"><code>MMatrixTest&gt;&gt;testSumHorizontal
+    | m expectedResult |
+    m := MMatrix newFromArrays: #(#(1.0 2.0) #(3.0 4.0) #(5.0 6.0)).
+    expectedResult := MMatrix newFromArrays: #(#(3.0) #(7.0) #(11.0)).
+    self assert: m sumHorizontal asStructuredArray equals: expectedResult asStructuredArray</code></pre>
+<h2 id="printing-a-matrix"><span class="header-section-number">1.6</span> Printing a matrix</h2>
+<p>Being able to print a matrix is essential to see how the matrix is made of. The method <code>printOn:</code> returns a textual representation of the object that received the corresponding message. We will therefore redefine it in our class <code>MMatrix</code>:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;printOn: aStream
+    &quot;Print the matrix in the stream, with 4 decimal for each value&quot;
+    self printOn: aStream round: 4</code></pre>
+<p>We will handle matrices with 64 bit float values. To make the printing effective, we need to limit the number of decimals:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;printOn: aStream round: nbDecimals
+    &quot;Print the receiver matrix into a stream. All numerical value are truncated to a fixed number of decimals&quot;
+    aStream nextPutAll: &#39;(&#39;.
+    (1 to: nbRows) 
+        do: [ :r | 
+                (self atRow: r) 
+                    do: [ :each | aStream nextPutAll: (each round: nbDecimals) printString ] 
+                    separatedBy: [ aStream space ]]
+        separatedBy: [ aStream cr ].
+    aStream nextPutAll: &#39; )&#39;.</code></pre>
+<p>We can now test our code in a playground. Consider the following code snippet:</p>
+<pre class="smalltalk"><code>m := MMatrix newFromArrays: #(#(1 2 3) #(4 5 6)). 
+m + m</code></pre>
+<p>Printing the code above should produce:</p>
+<pre><code>(2.0 4.0 6.0
+8.0 10.0 12.0)</code></pre>
+<pre class="smalltalk"><code>MMatrixTest&gt;&gt;testAddition
+    | m |
+    m := MMatrix newFromArrays: #(#(1 2 3) #(4 5 6)). 
+    self assert: (m + m) asStructuredArray equals: #(#(2.0 4.0 6.0) #(8.0 10.0 12.0))</code></pre>
+<pre class="smalltalk"><code>MMatrixTest&gt;&gt;testAddition2
+    | m1 m2 |
+    m1 := MMatrix newFromArrays: #(#(1 2 3) #(4 5 6)). 
+    m2 := MMatrix newFromArrays: #(#(4 5 6) #(1 2 3)).
+    self assert: (m1 + m2) asStructuredArray equals: #(#(5.0 7.0 9.0) #(5.0 7.0 9.0))</code></pre>
+<h2 id="vector"><span class="header-section-number">1.7</span> Vector</h2>
+<p>Vector are a matrix with only one column. For example, the expression <code>MMatrix newFromArrays: #(#(1) #(2) #(3))</code> creates a vector of three elements. We provide a utility method to define vector:</p>
+<pre class="smalltalk"><code>MMatrix class&gt;&gt;newFromVector: array
+    &quot;Create a Nx1 matrix from an array of numbers (N = array size)&quot;
+    ^ self basicNew
+        initializeRows: array size columns: 1;
+        fromContents: array;
+        yourself</code></pre>
+<p>The method <code>newFromVector:</code> expect a flat Pharo array. Here is an example</p>
+<pre class="smalltalk"><code>MMatrixTest&gt;&gt;testVectorCreation
+    | v |
+    v := MMatrix newFromVector: #(1 2 3).
+    self assert: v nbColumns equals: 1.
+    self assert: v nbRows equals: 3.
+    self assert: v asStructuredArray equals: #(#(1) #(2) #(3))</code></pre>
+<p>The back-propagation algorithm requires to stretch a vector into a matrix. It converts a vector into a matrix by juxtaposing several times the vector. We define the following method:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;stretchToColumns: nbOfColumns
+    &quot;Stretch a vertical vector in a column.&quot;
+    | content result |
+    content := OrderedCollection new.
+    1 to: nbRows do: [ :row |
+        1 to: nbOfColumns do: [ :columns |
+            content add: (self at: row @ 1)
+        ]
+    ].
+    result := MMatrix newRows: nbRows columns: nbOfColumns.
+    result fromContents: content.
+    ^ result</code></pre>
+<p>Printing the expression <code>(MMatrix newFromVector: #(1 2 3 4)) stretchToColumns: 5</code> results in:</p>
+<pre><code>(1.0 1.0 1.0 1.0 1.0
+2.0 2.0 2.0 2.0 2.0
+3.0 3.0 3.0 3.0 3.0
+4.0 4.0 4.0 4.0 4.0 )</code></pre>
+<p>A test can be defined as:</p>
+<pre class="smalltalk"><code>MMatrixTest&gt;&gt;testStretching
+    | m |
+    m := (MMatrix newFromVector: #(1 2 3 4)) stretchToColumns: 5. 
+    self assert: m nbRows equals: 4.
+    self assert: m nbColumns equals: 5.
+    self assert: (m atRow: 1) equals: #(1 1 1 1 1).
+    self assert: (m atRow: 3) equals: #(3 3 3 3 3).</code></pre>
+<h2 id="factors"><span class="header-section-number">1.8</span> Factors</h2>
+<p>Being able to transform a matrix and multiply matrices is essential in several parts of the back-propagation algorithm. We will first define a generic way to transform a matrix:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;collect: aOneArgBlock
+    &quot;Return a new matrix, for which each matrix element is transformed.&quot;
+    | result |
+    result := MMatrix newRows: nbRows columns: nbColumns.
+    1 to: nbRows do: [ :y |
+        1 to: nbColumns do: [ :x |
+            result at: y @ x put: (aOneArgBlock value: (self at: y @ x))
+        ] 
+    ].
+    ^ result</code></pre>
+<pre class="smalltalk"><code>MMatrixTest&gt;&gt;testCollect
+    | m expectedMatrix |
+    m := MMatrix newFromArrays: #(#(1 2 3) #(4 5 6)).
+    expectedMatrix := MMatrix newFromArrays: #(#(2 3 4) #(5 6 7)).
+    self assert: (m collect: [ :v | v + 1]) asStructuredArray equals: expectedMatrix asStructuredArray</code></pre>
+<p>Elements of a matrix may be multiplied by a numerical factor. For that purpose, we define the method <code>*</code>:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;* aFactor
+    &quot;Multiply each element of the matrix by a factor&quot;
+    ^ self collect: [ :v | v * aFactor ]</code></pre>
+<p>We can test this method when applied to a vector:</p>
+<pre class="smalltalk"><code>MMatrixTest&gt;&gt;testMultiplicationOnVector
+    | x |
+    x := MMatrix newFromVector: #(1 2 3 4).
+    self assert: (x * 5) asStructuredArray equals: #(#(5.0) #(10.0) #(15.0) #(20.0))</code></pre>
+<p>Similarly, we can test the multiplication on a matrix:</p>
+<pre class="smalltalk"><code>MMatrixTest&gt;&gt;testMultiplicationOnMatrix
+    | x |
+    x := MMatrix newFromArrays: #(#(1 2 3 4) #(10 20 30 40)).
+    self assert: (x * 5) asStructuredArray 
+            equals: #(#(5.0 10.0 15.0 20.0) #(50.0 100.0 150.0 200.0))</code></pre>
+<p>Another relevant operation is to multiply two matrices element-wise:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;multiplyPerElement: mat
+    &quot;Multiply two matrices element-wise&quot;
+    | r |
+    self assert: [ nbRows = mat nbRows ].
+    self assert: [ nbColumns = mat nbColumns ].
+    r := MMatrix newRows: nbRows columns: nbColumns.
+    r fromContents: (self asArray with: mat array asArray collect: [ :a :b | a * b ]).
+    ^ r</code></pre>
+<p>The method could be tested as follows:</p>
+<pre class="smalltalk"><code>MMatrixTest&gt;&gt;testMultiplicationPerElement
+    | v1 v2 expectedVector |
+    v1 := MMatrix newFromVector: #(1 2 3).
+    v2 := MMatrix newFromVector: #(10 20 30).
+    expectedVector := MMatrix newFromVector: #(10 40 90).
+    self assert: (v1 multiplyPerElement: v2) asArray 
+            equals: expectedVector asArray</code></pre>
+<h2 id="dividing-a-matrix-by-a-factor"><span class="header-section-number">1.9</span> Dividing a matrix by a factor</h2>
+<p>Similarly, we can divide a matrix by a particular factor:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;/ value
+    &quot;Divide each element of the matrix by a value&quot;
+    ^ self collect: [ :v | v / value ]</code></pre>
+<p>This method can be tested using:</p>
+<pre class="smalltalk"><code>MMatrixTest&gt;&gt;testDivision
+    | m |
+    m := MMatrix newFromArrays: #(#(1 2 3) #(4 5 6)). 
+    self assert: (m / 2) asStructuredArray equals: #(#(0.5 1.0 1.5) #(2.0 2.5 3.0))</code></pre>
+<h2 id="matrix-product"><span class="header-section-number">1.10</span> Matrix product</h2>
+<p>We defined the matrix product using two methods <code>+*</code> and <code>dot:</code>. The first being a shortcut to the latter:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;+* anotherMatrix
+    &quot;Shortcut for the dot operator between matrices&quot;
+    ^ self dot: anotherMatrix </code></pre>
+<p>The method <code>dot:</code> is defined as:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;dot: anotherMatrix
+    &quot;Compute the dot product between the receiving matrix and the argument&quot;
+    | result resultArray |
+    nbColumns = anotherMatrix nbRows ifFalse: [self error: &#39;dimensions do not conform&#39;].
+    self assert: [ nbRows * nbColumns = array size ].
+    self assert: [ anotherMatrix nbRows * anotherMatrix nbColumns = anotherMatrix  size ].
+    resultArray := ByteArray new: (nbRows * anotherMatrix nbColumns * 8).
+    
+    self 
+        dot: self getHandle with: nbRows with: nbColumns 
+        with: anotherMatrix getHandle
+        with: anotherMatrix nbRows with: anotherMatrix nbColumns in: resultArray.
+
+    result := MMatrix 
+        newHandle: resultArray 
+        rows: nbRows 
+        columns: anotherMatrix nbColumns.
+    ^ result</code></pre>
+<p>The connection between the Pharo code and C library is defined in the following method:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;dot: array1 with: m1_nb_rows with: m1_nb_columns with: array2 with: m2_nb_rows with: m2_nb_columns in: res
+
+    ^ self 
+        ffiCall: #(void dot(
+            void *array1, int m1_nb_rows, int m1_nb_columns, 
+            void *array2, int m2_nb_rows, int m2_nb_columns, void *res) ) 
+        module: &#39;matrix.dylib&#39;
+</code></pre>
+<p>We can test our code using the following test method:</p>
+<pre class="smalltalk"><code>MMatrixTest&gt;&gt;testMatrixProduct
+    | m1 m2 |
+    m1 := MMatrix newFromArrays: #(#(1 2 3 4) #(5 6 7 8)).
+    m2 := MMatrix newFromArrays: #(#(1 2) #(3 4) #(5 6) #(7 8)).
+    self assert: (m1 +* m2) asStructuredArray equals: #(#(50.0 60.0) #(114.0 140.0))</code></pre>
+<h2 id="matrix-substraction"><span class="header-section-number">1.11</span> Matrix substraction</h2>
+<p>Substracting matrices is another relevant operation in machine learning in general.</p>
+<p>We define the following shortcut:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;- anotherMatrix
+    &quot;Substract a matrix from the receiver matrix&quot;
+    ^ self sub: anotherMatrix</code></pre>
+<p>This shortcut calls the <code>sub:</code> method:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;sub: anotherMatrix
+    | result resultArray |
+    nbColumns = anotherMatrix nbColumns ifFalse: [self error: &#39;dimensions do not conform&#39;].
+    nbRows = anotherMatrix nbRows ifFalse: [self error: &#39;dimensions do not conform&#39;].
+    
+    resultArray := ByteArray new: (nbRows * anotherMatrix nbColumns * 8).
+    
+    self assert: [ nbRows * nbColumns = array size ].
+    self assert: [ anotherMatrix nbRows * anotherMatrix nbColumns = anotherMatrix  size ].
+    self assert: [ nbRows * anotherMatrix nbColumns * 8 = resultArray size ].
+    
+    self 
+        sub: self getHandle with: nbRows with: nbColumns with: anotherMatrix getHandle
+        in: resultArray.
+    result := MMatrix newHandle: resultArray rows: nbRows columns: nbColumns.
+    ^ result</code></pre>
+<p>The use of our C library is made using the following method:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;sub: m1 with: nb_rows with: nb_columns with: m2 in: res
+    ^ self 
+        ffiCall: #(void sub(double *m1, int nb_rows, int nb_columns, 
+                double *m2, double *res)) 
+        module: &#39;matrix.dylib&#39;</code></pre>
+<p>A simple test illustrates the behavior of matrix substraction:</p>
+<pre class="smalltalk"><code>MMatrixTest&gt;&gt;testSub
+    | m1 m2 |
+    m1 := MMatrix newFromArrays: #(#(1 2 3 4) #(5 6 7 8)).
+    m2 := MMatrix newFromArrays: #(#(4 2 1 3) #(7 6 8 5)).
+    self assert: (m1 - m2) asStructuredArray equals: #(#(-3 0 2 1) #(-2 0 -1 3))</code></pre>
+<h2 id="filling-the-matrix-with-random-numbers"><span class="header-section-number">1.12</span> Filling the matrix with random numbers</h2>
+<p>The initial state of a neural network is mostly random. We therefore need a way to randomly initialize a matrix. Consider the method:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;random
+    &quot;Fill the matrix with random numbers&quot;
+    ^ self random: Random new</code></pre>
+<p>It could be convenient to provide a random generator for the initialization:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;random: randomNumberGenerator
+    &quot;Fill the matrix with random numbers. Takes a random number generator as argument&quot;
+    self fromContents: ((1 to: nbRows * nbColumns) collect: [ :vv | randomNumberGenerator next ])
+</code></pre>
+<p>Executing the expression <code>(MMatrix newRows: 4 columns: 5) random</code> illustrates its usage:</p>
+<pre><code>(0.2073 0.7154 0.3008 0.06 0.0865
+0.3493 0.6396 0.7285 0.4873 0.1947
+0.7951 0.3034 0.6066 0.8358 0.1445
+0.5454 0.2504 0.2012 0.9086 0.5719 )</code></pre>
+<h2 id="summing-the-matrix-values"><span class="header-section-number">1.13</span> Summing the matrix values</h2>
+<p>Values contained in a matrix may be summed up. This will be useful to evaluate the cost function when a network will has to learn:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;sum
+    &quot;Return the sum of the matrix values&quot;
+    | sum |
+    sum := 0.
+    1 to: nbRows do: [ :y |
+        1 to: nbColumns do: [ :x |
+            sum := sum + (self at: y @ x)
+        ] 
+    ].
+    ^ sum</code></pre>
+<p>The use of <code>sum</code> is illustrates in the test:</p>
+<pre class="smalltalk"><code>MMatrixTest&gt;&gt;testSum
+    | m |
+    m := MMatrix newFromArrays: #(#(1 2 3 4) #(5 6 7 8)).
+    self assert: m sum equals: (1 to: 8) sum</code></pre>
+<h2 id="transpose"><span class="header-section-number">1.14</span> Transpose</h2>
+<p>The transpose of a matrix is an operation that consist in flipping a matrix along its diagonal. We can define the operation as follows:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;transposed
+    &quot;Transpose the matrix&quot;
+    | result |
+    result := MMatrix newRows: nbColumns columns: nbRows.
+    1 to: nbRows do: [ :row |
+        1 to: nbColumns do: [ :column |
+            result at: column @ row put: (self at: row @ column)
+        ]
+    ].
+    ^ result</code></pre>
+<p>The following test illustrates the behavior of the <code>transposed</code> method:</p>
+<pre class="smalltalk"><code>MMatrixTest&gt;&gt;testTransposedOnMatrix
+    | m expectedResult |
+    m := MMatrix newFromArrays: #(#(1 2 3 4) #(5 6 7 8)).
+    expectedResult := MMatrix newFromArrays: #(#(1 5) #(2 6) #(3 7) #(4 8)).
+    self assert: m transposed asStructuredArray equals: expectedResult asStructuredArray</code></pre>
+<p>Transposing a vector produce a matrix of one row, as illustrates with the following test method:</p>
+<pre class="smalltalk"><code>MMatrixTest&gt;&gt;testTransposedOnVector
+    | m expectedResult |
+    m := MMatrix newFromVector: #(1 2 3).
+    self assert: m transposed asStructuredArray equals: #(#(1 2 3))</code></pre>
+<h2 id="example"><span class="header-section-number">1.15</span> Example</h2>
+<p>We can illustrate the use of matrices in the backpropagation mechanism. The following script creates two random set of values and train a neural network to maps the input values to the output values. It illustrates the “essence” of forward and backward propagation:</p>
+<pre class="smalltalk"><code>n := 8.         &quot;Number of examples&quot;
+din := 10.      &quot;Number of input values&quot;
+h := 20.        &quot;Size of the hidden layer&quot;
+dout := 5.      &quot;Number of output values&quot;
+
+r := Random seed: 42.
+x := (MMatrix newRows: n columns: din) random.
+y := (MMatrix newRows: n columns: dout) random.
+w1 := (MMatrix newRows: din columns: h) random.
+w2 := (MMatrix newRows: h columns: dout) random.
+
+learningRate := 1e-6.
+losses := OrderedCollection new.
+1500 timesRepeat: [ 
+    hh := x +* w1.
+    hrelu := hh collect: [ :v | v max: 0 ].
+    ypred := hrelu +* w2.
+    
+    &quot;Compute and print loss&quot;
+    loss := ((ypred - y) collect: [:vv | vv * vv ]) sum.
+    losses add: loss.
+    
+    &quot;Backprop to compute gradients of w2 and w2 with respect to loss&quot;
+    gradYPred := (ypred - y) * 2.0.
+    gradW2 := hrelu transposed +* gradYPred.
+    gradHRelu := gradYPred +* w2 transposed.
+    gradH := gradHRelu collect: [ :v | v max: 0 ].
+    gradW1 := x transposed +* gradH.
+    
+    w1 := w1 - (gradW1 * learningRate).
+    w2 := w2 - (gradW2 * learningRate) 
+].
+
+g := RTGrapher new.
+d := RTData new.
+d points: losses.
+d y: #yourself.
+g add: d.
+g</code></pre>
+<p>The last part of the script uses <code>RTGrapher</code> to show a the evolution of the loss value along epochs.</p>
+<h2 id="what-have-we-seen"><span class="header-section-number">1.16</span> What have we seen?</h2>
+<p>This was a long chapter, pretty dense regarding the amount of provided code. The chapter covers the following topics:</p>
+<ul>
+<li><em>Definition of a minimal C library.</em> Neural networks, and deep learning in general, employ matrices to performs its computation.</li>
+<li><em>Definition of the class <code>MMatrix</code>.</em> This class models the mathematical notion of matrix. Note that we designed our class to offers relevant operations for neural networks. It is by no means a definitive generic implementation.</li>
+</ul>
+<p>Modern libraries to build neural networks employ matrices to carry out the numerical computation. However, the GPU is traditionally used instead of the CPU, as we are doing here. We could have used CUDA or OpenCL to perform the matrix operations on the GPU. However, it would have considerably lengthen the amount of code. This is the reason why we simply restrict ourselves to computation carry out by the CPU.</p>
+<p>The next chapter will rewrite our neural network implementation to use the matrix.</p>
+            </div>
+    </div>
+  </div>
+</body>
+</html>

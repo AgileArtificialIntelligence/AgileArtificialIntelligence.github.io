@@ -222,7 +222,7 @@ TestCase subclass: #MMatrixTest
 	package: 'Matrix'
 ```
 
-We can tests some creation and initialization methods.
+We can tests the creation and initialization methods we defined on ``MMatrix``:
 
 ```Smalltalk
 MMatrixTest>>testCreation
@@ -233,12 +233,13 @@ MMatrixTest>>testCreation
 
 ## Accessing and Modifying the Content of a Matrix
 
-The content of a matrix may be accessed using the `at:` message. It takes as argument a point.
+Being able to easily update the matrix content is the first initial step we should consider.
+The content of a matrix may be accessed using the `at:` message. This method takes as argument a point.
 
 ```Smalltalk
 MMatrix>>at: aPoint
 	"Access an element of the matrix"
-	^ array at: ((aPoint y - 1) * nbColumns + (aPoint x - 1)) + 1
+	^ array at: ((aPoint x - 1) * nbColumns + (aPoint y - 1)) + 1
 ```
 
 We can test the `at:` method:
@@ -259,10 +260,26 @@ Similarly, we need to provide a way to modify the content of a matrix. The metho
 ```Smalltalk
 MMatrix>>at: aPoint put: aNumber
 	"Modify an element of the matrix"
-	array at: ((aPoint y - 1) * nbColumns + (aPoint x - 1)) + 1 put: aNumber asFloat
+	array at: ((aPoint x - 1) * nbColumns + (aPoint y - 1)) + 1 put: aNumber asFloat
+```
+To ease the testing, we add a convenient conversion method:
+
+```Smalltalk
+MMatrix>>asStructuredArray
+	"Return a structured array that describe the matrix"
+	^ (1 to: nbRows) collect: [ :i | self atRow: i ] as: Array
+```
+The method `atRow:` returns the horizontal values for a given index.
+
+```Smalltalk
+MMatrix>>atRow: rowNumber
+	"Return a particular row"
+	(rowNumber between: 1 and: rowNumber)
+		ifFalse: [ self error: 'index out of range' ].
+	^ (1 to: nbColumns) collect: [ :x | self at: rowNumber @ x ] 
 ```
 
-A simple test illustrates its usage:
+A simple test illustrates the use of `at:put:`:
 
 ```Smalltalk
 MMatrixTest>>testAtPut
@@ -270,9 +287,13 @@ MMatrixTest>>testAtPut
 	m := MMatrix newFromArrays: #(#(1 2) #(3 4)).
 	m at: 2 @ 1 put: 10.0.
 	self assert: (m at: 2 @ 1) equals: 10.0.
+	self assert: m asStructuredArray equals: #(#(1 2) #(10 4))
 ```
 
+Note that we refer to an element using a coordinate `row @ column`. This way to access a matrix element is close to the mathematical notation traditionally used in linear algebra.
+
 We have laid out the necessary infrastructure to define some operations. The following sections will covers the operations we will employ in our neural network.
+
 
 ## Summing matrices
 
@@ -328,15 +349,15 @@ Elements of a matrix may be horizontally summed up. As we will see in the next c
 
 ```Smalltalk
 MMatrix>>sumHorizontal
-	"Vertical summing"
+	"Horizontal summing"
 	| result sum |
 	result := MMatrix newRows: nbRows columns: 1.
 	1 to: nbRows do: [ :y |
 		sum := 0.
 		1 to: nbColumns do: [ :x |
-			sum := sum + (self at: x @ y)
+			sum := sum + (self at: y @ x)
 		].
-		result at: 1 @ y put: sum
+		result at: y @ 1 put: sum
 	].
 	^ result
 ```
@@ -376,16 +397,6 @@ MMatrix>>printOn: aStream round: nbDecimals
 	aStream nextPutAll: ' )'.
 ```
 
-The method `atRow:` returns 
-
-```Smalltalk
-MMatrix>>atRow: rowNumber
-	"Return a particular row"
-	(rowNumber between: 1 and: rowNumber)
-		ifFalse: [ self error: 'index out of range' ].
-	^ (1 to: nbColumns) collect: [ :x | self at: x @ rowNumber ] 
-```
-
 We can now test our code in a playground. Consider the following code snippet: 
 
 ```Smalltalk
@@ -398,16 +409,6 @@ Printing the code above should produce:
 (2.0 4.0 6.0
 8.0 10.0 12.0)
 ```
-
-To ease the testing, we add a convenient conversion method:
-
-```Smalltalk
-MMatrix>>asStructuredArray
-	"Return a structured array that describe the matrix"
-	^ (1 to: nbRows) collect: [ :i | self atRow: i ] as: Array
-```
-
-
 
 ```Smalltalk
 MMatrixTest>>testAddition
@@ -425,16 +426,18 @@ MMatrixTest>>testAddition2
 
 ## Vector
 
-Vector may be created using:
+Vector are a matrix with only one column. For example, the expression `MMatrix newFromArrays: #(#(1) #(2) #(3))` creates a vector of three elements. We provide a utility method to define vector:
 
 ```Smalltalk
 MMatrix class>>newFromVector: array
-	"Create a Nx1 matrix from an array of numbers"
+	"Create a Nx1 matrix from an array of numbers (N = array size)"
 	^ self basicNew
 		initializeRows: array size columns: 1;
 		fromContents: array;
 		yourself
 ```
+
+The method `newFromVector:` expect a flat Pharo array. Here is an example 
 
 ```Smalltalk
 MMatrixTest>>testVectorCreation
@@ -442,9 +445,10 @@ MMatrixTest>>testVectorCreation
 	v := MMatrix newFromVector: #(1 2 3).
 	self assert: v nbColumns equals: 1.
 	self assert: v nbRows equals: 3.
+	self assert: v asStructuredArray equals: #(#(1) #(2) #(3))
 ```
 
-During the back-propagation algorithm, a column vector has to be stretched into a matrix. we therefore define the method:
+The back-propagation algorithm requires to stretch a vector into a matrix. It converts a vector into a matrix by juxtaposing several times the vector. We define the following method:
 
 ```Smalltalk
 MMatrix>>stretchToColumns: nbOfColumns
@@ -453,13 +457,24 @@ MMatrix>>stretchToColumns: nbOfColumns
 	content := OrderedCollection new.
 	1 to: nbRows do: [ :row |
 		1 to: nbOfColumns do: [ :columns |
-			content add: (self at: 1 @ row)
+			content add: (self at: row @ 1)
 		]
 	].
 	result := MMatrix newRows: nbRows columns: nbOfColumns.
 	result fromContents: content.
 	^ result
 ```
+
+Printing the expression `(MMatrix newFromVector: #(1 2 3 4)) stretchToColumns: 5` results in: 
+
+```
+(1.0 1.0 1.0 1.0 1.0
+2.0 2.0 2.0 2.0 2.0
+3.0 3.0 3.0 3.0 3.0
+4.0 4.0 4.0 4.0 4.0 )
+```
+
+A test can be defined as:
 
 ```Smalltalk
 MMatrixTest>>testStretching
@@ -473,7 +488,7 @@ MMatrixTest>>testStretching
 
 ## Factors
 
-Elements of a matrix may be multiplied by a factor. 
+Being able to transform a matrix and multiply matrices is essential in several parts of the back-propagation algorithm. We will first define a generic way to transform a matrix:
 
 ```Smalltalk
 MMatrix>>collect: aOneArgBlock
@@ -482,25 +497,53 @@ MMatrix>>collect: aOneArgBlock
 	result := MMatrix newRows: nbRows columns: nbColumns.
 	1 to: nbRows do: [ :y |
 		1 to: nbColumns do: [ :x |
-			result at: x @ y put: (aOneArgBlock value: (self at: x @ y))
+			result at: y @ x put: (aOneArgBlock value: (self at: y @ x))
 		] 
 	].
 	^ result
 ```
+
+```Smalltalk
+MMatrixTest>>testCollect
+	| m expectedMatrix |
+	m := MMatrix newFromArrays: #(#(1 2 3) #(4 5 6)).
+	expectedMatrix := MMatrix newFromArrays: #(#(2 3 4) #(5 6 7)).
+	self assert: (m collect: [ :v | v + 1]) asStructuredArray equals: expectedMatrix asStructuredArray
+```
+
+Elements of a matrix may be multiplied by a numerical factor. For that purpose, we define the method `*`:
+
+
 ```Smalltalk
 MMatrix>>* aFactor
 	"Multiply each element of the matrix by a factor"
 	^ self collect: [ :v | v * aFactor ]
 ```
 
+We can test this method when applied to a vector:
+
+```Smalltalk
+MMatrixTest>>testMultiplicationOnVector
+	| x |
+	x := MMatrix newFromVector: #(1 2 3 4).
+	self assert: (x * 5) asStructuredArray equals: #(#(5.0) #(10.0) #(15.0) #(20.0))
+```
+
+Similarly, we can test the multiplication on a matrix:
+
+```Smalltalk
+MMatrixTest>>testMultiplicationOnMatrix
+	| x |
+	x := MMatrix newFromArrays: #(#(1 2 3 4) #(10 20 30 40)).
+	self assert: (x * 5) asStructuredArray 
+			equals: #(#(5.0 10.0 15.0 20.0) #(50.0 100.0 150.0 200.0))
+```
+
+Another relevant operation is to multiply two matrices element-wise:
+
 ```Smalltalk
 MMatrix>>multiplyPerElement: mat
-	"
-	| v1 v2 |
-	v1 := MMatrix newFromVector: #(1 2 3).
-	v2 := MMatrix newFromVector: #(10 20 30).
-	v1 multiplyPerElement: v2	
-	"
+	"Multiply two matrices element-wise"
 	| r |
 	self assert: [ nbRows = mat nbRows ].
 	self assert: [ nbColumns = mat nbColumns ].
@@ -509,27 +552,48 @@ MMatrix>>multiplyPerElement: mat
 	^ r
 ```
 
+The method could be tested as follows:
+
 ```Smalltalk
-MMatrixTest>>testMultiplication
-	| x |
-	x := MMatrix newFromVector: #(1 2 3 4).
-	self assert: (x * 5) asStructuredArray equals: #(#(5.0) #(10.0) #(15.0) #(20.0))
+MMatrixTest>>testMultiplicationPerElement
+	| v1 v2 expectedVector |
+	v1 := MMatrix newFromVector: #(1 2 3).
+	v2 := MMatrix newFromVector: #(10 20 30).
+	expectedVector := MMatrix newFromVector: #(10 40 90).
+	self assert: (v1 multiplyPerElement: v2) asArray 
+			equals: expectedVector asArray
 ```
+
+## Dividing a matrix by a factor
+
+Similarly, we can divide a matrix by a particular factor:
+
 ```Smalltalk
-MMatrixTest>>testMultiplication2
-	| x |
-	x := MMatrix newFromArrays: #(#(1 2 3 4) #(10 20 30 40)).
-	self assert: (x * 5) asStructuredArray 
-			equals: #(#(5.0 10.0 15.0 20.0) #(50.0 100.0 150.0 200.0))
+MMatrix>>/ value
+	"Divide each element of the matrix by a value"
+	^ self collect: [ :v | v / value ]
+```
+
+This method can be tested using:
+
+```Smalltalk
+MMatrixTest>>testDivision
+	| m |
+	m := MMatrix newFromArrays: #(#(1 2 3) #(4 5 6)). 
+	self assert: (m / 2) asStructuredArray equals: #(#(0.5 1.0 1.5) #(2.0 2.5 3.0))
 ```
 
 ## Matrix product
+
+We defined the matrix product using two methods `+*` and `dot:`. The first being a shortcut to the latter:
 
 ```Smalltalk
 MMatrix>>+* anotherMatrix
 	"Shortcut for the dot operator between matrices"
 	^ self dot: anotherMatrix 
 ```
+
+The method `dot:` is defined as:
 
 ```Smalltalk
 MMatrix>>dot: anotherMatrix
@@ -552,25 +616,23 @@ MMatrix>>dot: anotherMatrix
 	^ result
 ```
 
-The use of the C library is done using the following method:
+The connection between the Pharo code and C library is defined in the following method:
+
 ```Smalltalk
 MMatrix>>dot: array1 with: m1_nb_rows with: m1_nb_columns with: array2 with: m2_nb_rows with: m2_nb_columns in: res
 
 	^ self 
 		ffiCall: #(void dot(
-			void *array1, 
-			int m1_nb_rows, 
-			int m1_nb_columns, 
-         void *array2, 
-			int m2_nb_rows, 
-			int m2_nb_columns, 
-			void *res) ) 
+			void *array1, int m1_nb_rows, int m1_nb_columns, 
+         	void *array2, int m2_nb_rows, int m2_nb_columns, void *res) ) 
 		module: 'matrix.dylib'
 
 ```
 
+We can test our code using the following test method:
+
 ```Smalltalk
-MMatrixTest>>testDotProduct
+MMatrixTest>>testMatrixProduct
 	| m1 m2 |
 	m1 := MMatrix newFromArrays: #(#(1 2 3 4) #(5 6 7 8)).
 	m2 := MMatrix newFromArrays: #(#(1 2) #(3 4) #(5 6) #(7 8)).
@@ -579,11 +641,17 @@ MMatrixTest>>testDotProduct
 
 ## Matrix substraction
 
+Substracting matrices is another relevant operation in machine learning in general. 
+
+We define the following shortcut:
+
 ```Smalltalk
 MMatrix>>- anotherMatrix
 	"Substract a matrix from the receiver matrix"
 	^ self sub: anotherMatrix
 ```
+
+This shortcut calls the `sub:` method:
 
 ```Smalltalk
 MMatrix>>sub: anotherMatrix
@@ -598,44 +666,43 @@ MMatrix>>sub: anotherMatrix
 	self assert: [ nbRows * anotherMatrix nbColumns * 8 = resultArray size ].
 	
 	self 
-		sub: self getHandle 
-		with: nbRows 
-		with: nbColumns 
-		with: anotherMatrix getHandle
+		sub: self getHandle with: nbRows with: nbColumns with: anotherMatrix getHandle
 		in: resultArray.
-	
-	result := MMatrix 
-		newHandle: resultArray 
-		rows: nbRows 
-		columns: nbColumns.
-	
+	result := MMatrix newHandle: resultArray rows: nbRows columns: nbColumns.
 	^ result
 ```
+
+The use of our C library is made using the following method:
+
 ```Smalltalk
 MMatrix>>sub: m1 with: nb_rows with: nb_columns with: m2 in: res
 	^ self 
 		ffiCall: #(void sub(double *m1, int nb_rows, int nb_columns, 
-              	double *m2, 
-              	double *res)) 
+              	double *m2, double *res)) 
 		module: 'matrix.dylib'
 ```
 
-## Divide a matrix by a factor
+A simple test illustrates the behavior of matrix substraction:
 
 ```Smalltalk
-MMatrix>>/ value
-	"Divide each element of the matrix by a value"
-	^ self collect: [ :v | v / value ]
+MMatrixTest>>testSub
+	| m1 m2 |
+	m1 := MMatrix newFromArrays: #(#(1 2 3 4) #(5 6 7 8)).
+	m2 := MMatrix newFromArrays: #(#(4 2 1 3) #(7 6 8 5)).
+	self assert: (m1 - m2) asStructuredArray equals: #(#(-3 0 2 1) #(-2 0 -1 3))
 ```
 
-
-```Smalltalk
-MMatrixTest>>testDivision
-	| m |
-	m := MMatrix newFromArrays: #(#(1 2 3) #(4 5 6)). 
-	self assert: (m / 2) asStructuredArray equals: #(#(0.5 1.0 1.5) #(2.0 2.5 3.0))
-```
 ## Filling the matrix with random numbers
+
+The initial state of a neural network is mostly random. We therefore need a way to randomly initialize a matrix. Consider the method:
+
+```Smalltalk
+MMatrix>>random
+	"Fill the matrix with random numbers"
+	^ self random: Random new
+```
+
+It could be convenient to provide a random generator for the initialization:
 
 ```Smalltalk
 MMatrix>>random: randomNumberGenerator
@@ -644,13 +711,20 @@ MMatrix>>random: randomNumberGenerator
 
 ```
 
-```Smalltalk
-MMatrix>>random
-	"Fill the matrix with random numbers"
-	^ self random: Random new
+Executing the expression `(MMatrix newRows: 4 columns: 5) random` illustrates its usage:
+
+```
+(0.2073 0.7154 0.3008 0.06 0.0865
+0.3493 0.6396 0.7285 0.4873 0.1947
+0.7951 0.3034 0.6066 0.8358 0.1445
+0.5454 0.2504 0.2012 0.9086 0.5719 )
 ```
 
-## Summing 
+
+## Summing the matrix values
+
+Values contained in a matrix may be summed up. This will be useful to evaluate the cost function when a network will has to learn:
+
 ```Smalltalk
 MMatrix>>sum
 	"Return the sum of the matrix values"
@@ -658,13 +732,24 @@ MMatrix>>sum
 	sum := 0.
 	1 to: nbRows do: [ :y |
 		1 to: nbColumns do: [ :x |
-			sum := sum + (self at: x @ y)
+			sum := sum + (self at: y @ x)
 		] 
 	].
 	^ sum
 ```
 
+The use of `sum` is illustrates in the test:
+
+```Smalltalk
+MMatrixTest>>testSum
+	| m |
+	m := MMatrix newFromArrays: #(#(1 2 3 4) #(5 6 7 8)).
+	self assert: m sum equals: (1 to: 8) sum
+```
+
 ## Transpose
+
+The transpose of a matrix is an operation that consist in flipping a matrix along its diagonal. We can define the operation as follows:
 
 ```Smalltalk
 MMatrix>>transposed
@@ -673,8 +758,89 @@ MMatrix>>transposed
 	result := MMatrix newRows: nbColumns columns: nbRows.
 	1 to: nbRows do: [ :row |
 		1 to: nbColumns do: [ :column |
-			result at: row @ column put: (self at: column @ row)
+			result at: column @ row put: (self at: row @ column)
 		]
 	].
 	^ result
 ```
+
+The following test illustrates the behavior of the `transposed` method:
+
+```Smalltalk
+MMatrixTest>>testTransposedOnMatrix
+	| m expectedResult |
+	m := MMatrix newFromArrays: #(#(1 2 3 4) #(5 6 7 8)).
+	expectedResult := MMatrix newFromArrays: #(#(1 5) #(2 6) #(3 7) #(4 8)).
+	self assert: m transposed asStructuredArray equals: expectedResult asStructuredArray
+```
+
+Transposing a vector produce a matrix of one row, as illustrates with the following test method:
+
+
+```Smalltalk
+MMatrixTest>>testTransposedOnVector
+	| m expectedResult |
+	m := MMatrix newFromVector: #(1 2 3).
+	self assert: m transposed asStructuredArray equals: #(#(1 2 3))
+```
+
+
+## Example
+
+We can illustrate the use of matrices in the backpropagation mechanism. The following script creates two random set of values and train a neural network to maps the input values to the output values. It illustrates the "essence" of forward and backward propagation:
+
+```Smalltalk
+n := 8. 		"Number of examples"
+din := 10. 		"Number of input values"
+h := 20. 		"Size of the hidden layer"
+dout := 5. 		"Number of output values"
+
+r := Random seed: 42.
+x := (MMatrix newRows: n columns: din) random.
+y := (MMatrix newRows: n columns: dout) random.
+w1 := (MMatrix newRows: din columns: h) random.
+w2 := (MMatrix newRows: h columns: dout) random.
+
+learningRate := 1e-6.
+losses := OrderedCollection new.
+1500 timesRepeat: [ 
+	hh := x +* w1.
+	hrelu := hh collect: [ :v | v max: 0 ].
+	ypred := hrelu +* w2.
+	
+	"Compute and print loss"
+	loss := ((ypred - y) collect: [:vv | vv * vv ]) sum.
+	losses add: loss.
+	
+	"Backprop to compute gradients of w2 and w2 with respect to loss"
+	gradYPred := (ypred - y) * 2.0.
+	gradW2 := hrelu transposed +* gradYPred.
+	gradHRelu := gradYPred +* w2 transposed.
+	gradH := gradHRelu collect: [ :v | v max: 0 ].
+	gradW1 := x transposed +* gradH.
+	
+	w1 := w1 - (gradW1 * learningRate).
+	w2 := w2 - (gradW2 * learningRate) 
+].
+
+g := RTGrapher new.
+d := RTData new.
+d points: losses.
+d y: #yourself.
+g add: d.
+g
+```
+
+The last part of the script uses `RTGrapher` to show a the evolution of the loss value along epochs.
+
+## What have we seen?
+
+This was a long chapter, pretty dense regarding the amount of provided code. The chapter covers the following topics:
+
+- _Definition of a minimal C library._ Neural networks, and deep learning in general, employ matrices to performs its computation.
+- _Definition of the class `MMatrix`._ This class models the mathematical notion of matrix. Note that we designed our class to offers relevant operations for neural networks. It is by no means a definitive generic implementation.
+
+Modern libraries to build neural networks employ matrices to carry out the numerical computation. However, the GPU is traditionally used instead of the CPU, as we are doing here. We could have used CUDA or OpenCL to perform the matrix operations on the GPU. However, it would have considerably lengthen the amount of code. This is the reason why we simply restrict ourselves to computation carry out by the CPU.
+
+The next chapter will rewrite our neural network implementation to use the matrix.
+
