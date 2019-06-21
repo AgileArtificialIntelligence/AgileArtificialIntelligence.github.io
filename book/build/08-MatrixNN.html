@@ -3065,63 +3065,85 @@ h4:hover a { color: #333; } h5:hover a { color: #333; } h6:hover a { color: #333
     classVariableNames: &#39;&#39;
     package: &#39;NeuralNetwork-Matrix&#39;</code></pre>
 <p>The class <code>NMLayer</code> does not contains neurons, as we have seen in our first implementation. Instead, a matrix describing weights is used, kept in the <code>w</code> variable, and another matrix to keep the bias vector, kept in the <code>b</code> variable.</p>
-<p>The initialization of a layer set the value of the learning rate:</p>
+<p>The initialization of a layer simply set the value of the learning rate:</p>
 <pre class="smalltalk"><code>NMLayer&gt;&gt;initialize
     super initialize.
     lr := 0.1</code></pre>
-<p>Some</p>
+<p>The class <code>NMLayer</code> contains many accessors and mutator methods. First, a layer contains a matrix for the weight. It is set using <code>w:</code>:</p>
+<pre class="smalltalk"><code>NMLayer&gt;&gt;w: matrixForWeights
+    &quot;Take a MMatrix as argument&quot;
+    w := matrixForWeights</code></pre>
+<p>The weight matrix is accessible using <code>w</code>:</p>
+<pre class="smalltalk"><code>NMLayer&gt;&gt;w
+    &quot;Return a MMatrix&quot;
+    ^ w</code></pre>
+<p>Similarly, the bias vector is set using <code>b:</code>:</p>
 <pre class="smalltalk"><code>NMLayer&gt;&gt;b: biasVector
+    &quot;Set a vector, instance of MMatrix, as the bias vector&quot;
     b := biasVector</code></pre>
+<p>The bias vector is accessible using:</p>
 <pre class="smalltalk"><code>NMLayer&gt;&gt;b
+    &quot;Return the bias vector&quot;
     ^ b</code></pre>
+<p>The delta matrix is stored in the variable <code>delta</code>:</p>
 <pre class="smalltalk"><code>NMLayer&gt;&gt;delta: deltaMatrix
     delta := deltaMatrix</code></pre>
+<p>It is read using an accessor:</p>
 <pre class="smalltalk"><code>NMLayer&gt;&gt;delta
     ^ delta</code></pre>
+<p>The learning rate, a very small positive number, is globally set of a layer:</p>
 <pre class="smalltalk"><code>NMLayer&gt;&gt;lr: aLearningRate
     lr := aLearningRate</code></pre>
-<pre class="smalltalk"><code>NMLayer&gt;&gt;lr
-    ^ lr</code></pre>
+<p>Layers are chained each other. We use the classical representation of layers: the network is fed from the left-most layer, the input layer. Output is produced from the right-most layer, the output layer. For a given layer <code>l</code>, the next layer of <code>l</code> is the layer on the right of <code>l</code>, and the previous is the layer on the left of <code>l</code>. The next layer is set using:</p>
 <pre class="smalltalk"><code>NMLayer&gt;&gt;next: aLayer
+    &quot;Set the next layer&quot;
     next := aLayer</code></pre>
+<p>The next layer is retrieved using:</p>
 <pre class="smalltalk"><code>NMLayer&gt;&gt;next
+    &quot;Return the next layer&quot;
     ^ next</code></pre>
-<pre class="smalltalk"><code>NMLayer&gt;&gt;nbInputs: nbOfNeurons nbOutputs: nbOfInputs random: random
-   w := MMatrix newRows: nbOfNeurons columns: nbOfInputs.
-    w random: random.
-    b := MMatrix newRows: nbOfNeurons columns: 1.
-    b random: random.
-    </code></pre>
+<p>Similarly, the previous layer is set using:</p>
+<pre class="smalltalk"><code>NMLayer&gt;&gt;previous: aLayer
+    &quot;Set the previous layer&quot;
+    previous := aLayer</code></pre>
+<p>The previous layer is obtained using:</p>
+<pre class="smalltalk"><code>NMLayer&gt;&gt;previous
+    &quot;Return the previous layer&quot;
+    ^ previous</code></pre>
+<p>The output of the layer is obtained using its accessor:</p>
+<pre class="smalltalk"><code>NMLayer&gt;&gt;output
+    &quot;Return the output matrix, computed during the feed forward phase&quot;
+    ^ output</code></pre>
+<p>The number of examples needs to be accessible to compute the cost derivative. It is set using the method <code>numberOfExamples:</code>:</p>
+<pre class="smalltalk"><code>NMLayer&gt;&gt;numberOfExamples: aNumber
+    numberOfExamples := aNumber</code></pre>
+<p>The number of example is read using its corresponding accessor:</p>
 <pre class="smalltalk"><code>NMLayer&gt;&gt;numberOfExamples
     ^ numberOfExamples</code></pre>
-<pre class="smalltalk"><code>NMLayer&gt;&gt;numberOfExamples: anObject
-    numberOfExamples := anObject</code></pre>
-<pre class="smalltalk"><code>NMLayer&gt;&gt;output
-    ^ output</code></pre>
-<pre class="smalltalk"><code>NMLayer&gt;&gt;previous
-    ^ previous</code></pre>
-<pre class="smalltalk"><code>NMLayer&gt;&gt;previous: aLayer
-    previous := aLayer</code></pre>
+<p>The layer is initialized by providing the number of neurons it should contains and the number of outputs. The random number generator is also provided to initialize the weight and bias matrices. We defining the method:</p>
+<pre class="smalltalk"><code>NMLayer&gt;&gt;nbInputs: nbOfNeurons nbOutputs: nbOfInputs random: random
+    &quot;Initialize the layer&quot;
+    w := MMatrix newRows: nbOfNeurons columns: nbOfInputs.
+    w random: random.
+    b := MMatrix newRows: nbOfNeurons columns: 1.
+    b random: random.</code></pre>
+<p>Feed forwarding a layer is carried out using the <code>feed:</code> method:</p>
 <pre class="smalltalk"><code>NMLayer&gt;&gt;feed: inputMatrix
     &quot;Feed the layer with the input matrix&quot;
     output := (w +* inputMatrix + b) collect: [ :v | 1 / (1 + v negated exp) ].
     ^ output</code></pre>
-<pre class="smalltalk"><code>NMLayer&gt;&gt;</code></pre>
-<pre class="smalltalk"><code>NMLayer&gt;&gt;</code></pre>
-<pre class="smalltalk"><code>NMLayer&gt;&gt;</code></pre>
+<p>Once the error are backpropated, weights and biases can be updated using:</p>
 <pre class="smalltalk"><code>NMLayer&gt;&gt;update
     w := w - ((delta +* previous output transposed) * lr / numberOfExamples ).
     b := b - (delta sumHorizontal * lr / numberOfExamples).
     next ifNotNil: [ next update ]</code></pre>
+<p>The very first layer uses the input vector to actually update its parameters:</p>
 <pre class="smalltalk"><code>NMLayer&gt;&gt;update: input
     w := w - ((delta +* input transposed) * lr / numberOfExamples).
     b := b - (delta sumHorizontal * lr / numberOfExamples).
     next update
 </code></pre>
-<pre class="smalltalk"><code>NMLayer&gt;&gt;w: matrixForWeights
-    w := matrixForWeights</code></pre>
-<pre class="smalltalk"><code>NMLayer&gt;&gt;w
-    ^ w</code></pre>
+<p>Our definition of layer is now complete. We can lay out the necessary to hook layers together using the class <code>NMNetwork</code>.</p>
 <h2 id="neural-network"><span class="header-section-number">1.2</span> Neural network</h2>
 <pre class="smalltalk"><code>Object subclass: #NMNetwork
     instanceVariableNames: &#39;random errors layers precisions&#39;
