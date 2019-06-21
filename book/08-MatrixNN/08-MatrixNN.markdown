@@ -17,87 +17,134 @@ Object subclass: #NMLayer
 The class `NMLayer` does not contains neurons, as we have seen in our first implementation. Instead, a matrix describing weights is used, kept in the `w` variable, and another matrix to keep the bias vector, kept in the `b` variable. 
 
 
-The initialization of a layer set the value of the learning rate:
+The initialization of a layer simply set the value of the learning rate:
+
 ```Smalltalk
 NMLayer>>initialize
 	super initialize.
 	lr := 0.1
 ```
 
-Some 
+The class `NMLayer` contains many accessors and mutator methods. First, a layer contains a matrix for the weight. It is set using `w:`:
+
+
+```Smalltalk
+NMLayer>>w: matrixForWeights
+	"Take a MMatrix as argument"
+	w := matrixForWeights
+```
+
+The weight matrix is accessible using `w`:
+
+```Smalltalk
+NMLayer>>w
+	"Return a MMatrix"
+	^ w
+```
+
+Similarly, the bias vector is set using `b:`:
+
 ```Smalltalk
 NMLayer>>b: biasVector
+	"Set a vector, instance of MMatrix, as the bias vector"
 	b := biasVector
 ```
 
+The bias vector is accessible using:
+
 ```Smalltalk
 NMLayer>>b
+	"Return the bias vector"
 	^ b
 ```
+
+The delta matrix is stored in the variable `delta`:
 
 ```Smalltalk
 NMLayer>>delta: deltaMatrix
 	delta := deltaMatrix
 ```
 
+It is read using an accessor:
+
 ```Smalltalk
 NMLayer>>delta
 	^ delta
 ```
+
+The learning rate, a very small positive number, is globally set of a layer:
 
 ```Smalltalk
 NMLayer>>lr: aLearningRate
 	lr := aLearningRate
 ```
 
-```Smalltalk
-NMLayer>>lr
-	^ lr
-```
+Layers are chained each other. We use the classical representation of layers: the network is fed from the left-most layer, the input layer. Output is produced from the right-most layer, the output layer. For a given layer `l`, the next layer of `l` is the layer on the right of `l`, and the previous is the layer on the left of `l`. The next layer is set using:
 
 ```Smalltalk
 NMLayer>>next: aLayer
+	"Set the next layer"
 	next := aLayer
 ```
 
+The next layer is retrieved using:
+
 ```Smalltalk
 NMLayer>>next
+	"Return the next layer"
 	^ next
 ```
 
+Similarly, the previous layer is set using:
+
 ```Smalltalk
-NMLayer>>nbInputs: nbOfNeurons nbOutputs: nbOfInputs random: random
-   w := MMatrix newRows: nbOfNeurons columns: nbOfInputs.
-	w random: random.
-	b := MMatrix newRows: nbOfNeurons columns: 1.
-	b random: random.
-	
+NMLayer>>previous: aLayer
+	"Set the previous layer"
+	previous := aLayer
 ```
+
+The previous layer is obtained using:
+
+```Smalltalk
+NMLayer>>previous
+	"Return the previous layer"
+	^ previous
+```
+
+The output of the layer is obtained using its accessor:
+
+```Smalltalk
+NMLayer>>output
+	"Return the output matrix, computed during the feed forward phase"
+	^ output
+```
+
+The number of examples needs to be accessible to compute the cost derivative. It is set using the method `numberOfExamples:`:
+
+```Smalltalk
+NMLayer>>numberOfExamples: aNumber
+	numberOfExamples := aNumber
+```
+
+The number of example is read using its corresponding accessor:
 
 ```Smalltalk
 NMLayer>>numberOfExamples
 	^ numberOfExamples
 ```
 
-```Smalltalk
-NMLayer>>numberOfExamples: anObject
-	numberOfExamples := anObject
-```
+The layer is initialized by providing the number of neurons it should contains and the number of outputs. The random number generator is also provided to initialize the weight and bias matrices. We defining the method:
 
 ```Smalltalk
-NMLayer>>output
-	^ output
+NMLayer>>nbInputs: nbOfNeurons nbOutputs: nbOfInputs random: random
+	"Initialize the layer"
+	w := MMatrix newRows: nbOfNeurons columns: nbOfInputs.
+	w random: random.
+	b := MMatrix newRows: nbOfNeurons columns: 1.
+	b random: random.
 ```
 
-```Smalltalk
-NMLayer>>previous
-	^ previous
-```
-
-```Smalltalk
-NMLayer>>previous: aLayer
-	previous := aLayer
-```
+Feed forwarding a layer is carried out using the `feed:` method:
 
 ```Smalltalk
 NMLayer>>feed: inputMatrix
@@ -106,17 +153,7 @@ NMLayer>>feed: inputMatrix
 	^ output
 ```
 
-```Smalltalk
-NMLayer>>
-```
-
-```Smalltalk
-NMLayer>>
-```
-
-```Smalltalk
-NMLayer>>
-```
+Once the error are backpropated, weights and biases can be updated using:
 
 ```Smalltalk
 NMLayer>>update
@@ -124,6 +161,8 @@ NMLayer>>update
 	b := b - (delta sumHorizontal * lr / numberOfExamples).
 	next ifNotNil: [ next update ]
 ```
+
+The very first layer uses the input vector to actually update its parameters:
 
 ```Smalltalk
 NMLayer>>update: input
@@ -133,15 +172,7 @@ NMLayer>>update: input
 
 ```
 
-```Smalltalk
-NMLayer>>w: matrixForWeights
-	w := matrixForWeights
-```
-
-```Smalltalk
-NMLayer>>w
-	^ w
-```
+Our definition of layer is now complete. We can lay out the necessary to hook layers together using the class `NMNetwork`.
 
 ## Neural network
 
