@@ -14,7 +14,7 @@ A _loss function_ is a measure of the amount of error made by a particular model
 We consider a set of 4 points:
 
 ```Smalltalk
-points :={(1@3.0). (3@5.2). (2@4.1). (4@7.5)}.
+points :={(1 @ 3.0). (3 @ 5.2). (2 @ 4.1). (4 @ 7.5)}.
 
 g := RTGrapher new.
 d := RTData new.
@@ -31,8 +31,8 @@ Figure @fig:plottingSomePoints shows the plot of these four points. Identifying 
 
 Let's pick some arbitrary `a` and `b` and draw a line:
 
-~~~~~~
-points :={(1@3.0). (3@5.2). (2@4.1). (4@7.5)}.
+```Smalltalk
+points :={(1 @ 3.0). (3 @ 5.2). (2 @ 4.1). (4 @ 7.5)}.
 
 a := 0.5.
 b := 3.
@@ -54,7 +54,7 @@ d y: f.
 g add: d.
 
 g
-~~~~~~
+```
 
 ![Points and a line.](05-Learning/figures/pointsAndLine.png){#fig:pointsAndLine width=400px}
 
@@ -69,19 +69,19 @@ $$J(a,b) = \frac{1}{n} \sum_{i=1}^{n}(y_i - f(x_i))^2$$
 Note that $J$ is always positive. The $J$ function indicates how close the $f$ function is to the points $(x_i, y_i)$, for two given values of $a$ and $b$. Note that the variables $x_1, ..., x_n, y_1, ..., y_n$ represent the data for which we would like to tune our model for. 
 We can compute the value of $J$ as follows:
 
-~~~~~~
-points :={(1@3.0) . (3@5.2) . (2@4.1) . (4@7.5)}.
+```Smalltalk
+points :={(1 @ 3.0) . (3 @ 5.2) . (2 @ 4.1) . (4 @ 7.5)}.
 a := 0.5.
 b := 3.
 f := [ :x | a * x + b ].
 j := (points collect: [ :p | (p y - (f value: p x)) raisedTo: 2 ]) sum / points size.
-~~~~~~
+```
 
-The script return the value `1.75`. If we change `a` for `2` and `b` for `-0.5`, `j` equals to `0.67`. If you draw the line with `a := 2` and `b := -0.5`, you will see that the blue line is closer to the red dots. 
+The script returns the value `1.75`. If we change `a` for `2` and `b` for `-0.5`, `j` equals to `0.67`. If you draw the line with `a := 2` and `b := -0.5`, you will see that the blue line is closer to the red dots. 
 
 We are here highlighting an important use of the loss function. Changing parameters (`a` and `b` in our case) may increase or decrease the MSE. A decrease of the MSE indicates that our parameters are better since our model makes less error. 
 
-How this simple line relate to the fact that neural network are learning? The backpropagation algorithm is directly based on this mechanism but at a larger scale. In this example we look for two values (`a` and `b`), in a neural networks we could look for thousands of values, which correspond to the weights and biases. 
+How does this simple line relate to the fact that neural network are learning? The backpropagation algorithm is directly based on this mechanism but at a larger scale. In this example we look for two values (`a` and `b`), in a neural networks we could look for thousands or millions of values, which correspond to the weights and biases. 
 
 Let's come back to the points and lines example. Our original problem is to find the straight line that is the closest to the red point. This problem can therefore be translated into looking for `a` and `b` that minimize the MSE value. Looking for these two values manually is rather tedious and laborious. The natural next step is automatically finding the `a` and `b` that minimize the loss function.
 
@@ -111,7 +111,7 @@ The $\alpha$ value is the learning rate, indicating how fast the `a` and `b` sho
 Repeating the update of `a` and `b` will reduce the $J$ loss function, which indicates that our model is improving. The following script demonstrates the whole process (we name $\alpha$ as `learningRate`):
 
 ```Smalltalk
-points :={(1@3.0) . (3@5.2) . (2@4.1) . (4@7.5)}.
+points :={(1 @ 3.0) . (3 @ 5.2) . (2 @ 4.1) . (4 @ 7.5)}.
 
 a := 0.5.
 b := 3.
@@ -174,7 +174,7 @@ $$
 f(x_0 - \alpha f'(x_0)) < f(x_0)
 $$
 
-If we now consider $f$ as our cost function, then updating the variable $x_0$ by $x_0 - \alpha f'(x_0)$ reduce the value $f(x_0)$. To conclude:
+If we now consider $f$ as our cost function, then updating the variable $x_0$ by $x_0 - \alpha f'(x_0)$ reduces the value $f(x_0)$. To conclude, the following expression:
 
 $$
 x_0 := x_0 - \alpha f'(x_0)
@@ -185,7 +185,7 @@ reduces the value of $f(x_0)$, if $f'(x_0) \neq 0$. Fortunately, we took care of
 Consider the following script:
 
 ```Smalltalk
-points := {(1@3.0) . (3@5.2) . (2@4.1) . (4@7.5)}.
+points := {(1 @ 3.0) . (3 @ 5.2) . (2 @ 4.1) . (4 @ 7.5)}.
 
 a := 0.5.
 b := 3.
@@ -215,11 +215,11 @@ g
 
 ![Variation of the MSE cost function](05-Learning/figures/gradientDescent2.png){#fig:gradientDescent2 width=400px}
 
-Figure @fig:gradientDescent2 gives the variation of the cost function at each update of the `a` and `b` values. You can see that it gets closer to 0, but still remains far away. The reason is that since the points we used are not perfectly lined up, there is no `a` and `b` that makes the cost value equals to 0. If you pick points that are perfectly lined up, (_e.g.,_ `{(4@6.5). (2@3.5). (2@3.5). (2@3.5)}`), then the cost function is asymptotic to 0.
+Figure @fig:gradientDescent2 gives the variation of the cost function at each update of the `a` and `b` values. You can see that it gets closer to 0, but still remains far away. The reason is that since the points we used are not perfectly lined up, there is no `a` and `b` that makes the cost value equals to 0. If you pick points that are perfectly lined up, (_e.g.,_ `{(4 @ 6.5). (2 @ 3.5). (2 @ 3.5). (2 @ 3.5)}`), then the cost function is asymptotic to 0.
 
 ## Stochastic Gradient Descent
 
-The gradient descent computes the gradient of the loss function from the whole dataset. This is often impracticable because minimum local points and saddle points may be found on our way to search for the global minimum. Furthermore, gradient descent adjust the parameters based on the sum of the accumulated errors over all samples. This means that parameters are updated only after a prediction is made after predicting each point of the whole dataset. This is largely impracticable as soon as the dataset is large.
+The gradient descent computes the gradient of the loss function from the whole dataset. This is often impracticable because minimum local points and saddle points may be found on our way to search for the global minimum. Furthermore, gradient descent adjusts the parameters based on the sum of the accumulated errors over all samples. This means that parameters are updated only after predicting each point of the whole dataset. This is largely impracticable as soon as the dataset is large.
 You can see this in the previous section where we used `sum` when computing `deriMSEa` and `deriMSEb`. 
 
 An alternative to _gradient descent_ is called _stochastic gradient descent_ (SGD). With SCG, the parameters are updated incrementally, with a single training sample. Such an example is randomly chosen.
@@ -283,7 +283,11 @@ $$
 E(y, y') = \frac{1}{2}||y - y'||^2
 $$
 
-The expression $|| ... ||$ represents the magnitude of the vector enclosed between the sets of double vertical bars. For example, if $v$ is a vector of length three with elements $v_1$, $v_2$, $v_4$, then $||v|| = \sqrt{v_1^2+v_3^2+v_3^2}$.
+The expression $|| ... ||$ represents the magnitude of the vector enclosed between the sets of double vertical bars. 
+
+<!---
+For example, if $v$ is a vector of length three with the elements $v_1$, $v_2$, $v_3$, then $||v|| = \sqrt{v_1^2+v_3^2+v_3^2}$.)
+-->
 
 For example, considering elements of $\mathbb{R}^2$, if $y = (1, 0)$ and $y' = (0.5, 0.5)$, then $E(y, y') = \frac{1}{2}\sqrt{(1 - 0.5)^2 + (0 - 0.5)^2} = 0.353$. 
 

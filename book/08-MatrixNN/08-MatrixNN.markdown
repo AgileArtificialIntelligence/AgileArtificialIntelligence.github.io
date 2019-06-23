@@ -3,9 +3,8 @@
 
 This chapter revises the implementation of our neural network. However, it uses matrices to compute the forward and backward propagation algorithm. Overall, our matrix-based implementation is composed of two classes, `NMLayer` and `NMNetwork`.
 
-## Layer
-
-A layer may be described with the class `NMLayer`:
+## Defining a matrix-based layer
+A neural network is composed of matrices. We describe a layer as an instance of the class `NMLayer`, defined as such:
 
 ```Smalltalk
 Object subclass: #NMLayer
@@ -17,7 +16,7 @@ Object subclass: #NMLayer
 The class `NMLayer` does not contains neurons, as we have seen in our first implementation. Instead, a matrix describing weights is used, kept in the `w` variable, and another matrix to keep the bias vector, kept in the `b` variable. 
 
 
-The initialization of a layer simply set the value of the learning rate:
+The initialization of a layer simply consists in setting a default learning rate:
 
 ```Smalltalk
 NMLayer>>initialize
@@ -136,11 +135,11 @@ NMLayer>>numberOfExamples
 The layer is initialized by providing the number of neurons it should contains and the number of outputs. The random number generator is also provided to initialize the weight and bias matrices. We defining the method:
 
 ```Smalltalk
-NMLayer>>nbInputs: nbOfNeurons nbOutputs: nbOfInputs random: random
+NMLayer>>nbInputs: nbOfInputs nbOutputs: nbOfOutputs random: random
 	"Initialize the layer"
-	w := MMatrix newRows: nbOfNeurons columns: nbOfInputs.
+	w := MMatrix newRows: nbOfOutputs columns: nbOfInputs.
 	w random: random.
-	b := MMatrix newRows: nbOfNeurons columns: 1.
+	b := MMatrix newRows: nbOfOutputs columns: 1.
 	b random: random.
 ```
 
@@ -153,7 +152,7 @@ NMLayer>>feed: inputMatrix
 	^ output
 ```
 
-Once the error are backpropated, weights and biases can be updated using:
+Once the error are backpropagated, weights and biases can be updated using:
 
 ```Smalltalk
 NMLayer>>update
@@ -174,34 +173,45 @@ NMLayer>>update: input
 
 Our definition of layer is now complete. We can lay out the necessary to hook layers together using the class `NMNetwork`.
 
-## Neural network
+## Defining a matrix-based neural network
+
+We will call `NMNetwork` the class describing a matrix-based neural network. Here is its definition:
 
 ```Smalltalk
 Object subclass: #NMNetwork
-	instanceVariableNames: 'random errors layers precisions'
+	instanceVariableNames: 'random errors layers'
 	classVariableNames: ''
 	package: 'NeuralNetwork-Matrix'
 ```
 
+The variables are similar than in our first version of the neural network. The variable `random` contains a random number generator, which is useful to initialize the layers. The `errors` variable contains the errors values during the training. The `layers` contains instances of `NMLayer`. 
+
+The network is initialized with no layers and a random number generator:
+
 ```Smalltalk
 NMNetwork>>initialize
+	"Initialize the network with no layers and a proper random generator"
 	super initialize.
 	layers := OrderedCollection new.
 	random := Random seed: 42.
 ```
 
+When a layer is added to the network, a chain of layers has to be maintained:
+
 ```Smalltalk
 NMNetwork>>addLayer: aLayer
+	"Add a layer to the network. Note that layers form a bidirectional chain."
 	layers ifNotEmpty: [
 		layers last next: aLayer. 
 		aLayer previous: layers last ].
 	layers add: aLayer
 ```
 
-
+A central method to the learning is `backwardX:y:`, which computes the error and backpropagate it to the layers:
 
 ```Smalltalk
 NMNetwork>>backwardX: x y: y
+	"Compute and backpropagate the error"
 	| lastLayer dz currentLayer |
 	lastLayer := layers last.
 	dz := lastLayer output - y.	
@@ -216,51 +226,47 @@ NMNetwork>>backwardX: x y: y
 
 ```
 
+The cost function is computed for two given vectors:
+
 ```Smalltalk
-NMNetwork>>computeCost: mat and: y
-	^ ((mat - y) collect: [ :v | v * v ]) sum
+NMNetwork>>computeCost: v1 and: v2
+	"Compute the cost function for two provided vectors"
+	^ ((v1 - v2) collect: [ :v | v * v ]) sum
 ```
 
-
+The configuration of the network is performed through a number of utility methods. The following method configures a network with one hidden layer:
 
 ```Smalltalk
 NMNetwork>>configure: nbOfInputs hidden: nbOfNeurons nbOfOutputs: nbOfOutputs
     "Configure the network with the given parameters
     The network has only one hidden layer"
-	self addLayer: (NMLayer new nbInputs: nbOfNeurons nbOutputs: nbOfInputs random: random).
-	self addLayer: (NMLayer new nbInputs: nbOfOutputs nbOutputs: nbOfNeurons random: random).
+	self addLayer: (NMLayer new nbInputs: nbOfInputs nbOutputs: nbOfNeurons random: random).
+	self addLayer: (NMLayer new nbInputs: nbOfNeurons nbOutputs: nbOfOutputs random: random).
 ```
 
-
+Similarly, two hidden layers may be configured using the following method:
 
 ```Smalltalk
 NMNetwork>>configure: nbOfInputs hidden: nbOfNeurons1 hidden: nbOfNeurons2 nbOfOutputs: nbOfOutputs
     "Configure the network with the given parameters. The network has two hidden layers"
-	self addLayer: (NMLayer new nbInputs: nbOfNeurons1 nbOutputs: nbOfInputs random: random).
-	self addLayer: (NMLayer new nbInputs: nbOfNeurons2 nbOutputs: nbOfNeurons1 random: random).
-	self addLayer: (NMLayer new nbInputs: nbOfOutputs nbOutputs: nbOfNeurons2 random: random).
+	self addLayer: (NMLayer new nbInputs: nbOfInputs nbOutputs: nbOfNeurons1 random: random).
+	self addLayer: (NMLayer new nbInputs: nbOfNeurons1 nbOutputs: nbOfNeurons2 random: random).
+	self addLayer: (NMLayer new nbInputs: nbOfNeurons2 nbOutputs: nbOfOutputs random: random).
 ```
 
-```Smalltalk
-NMNetwork>>configure: nbOfInputs hidden: nbOfNeurons nbOfOutputs: nbOfOutputs
-    "Configure the network with the given parameters. The network has only one hidden layer"
-	self addLayer: (NMLayer new nbInputs: nbOfNeurons nbOutputs: nbOfInputs random: random).
-	self addLayer: (NMLayer new nbInputs: nbOfOutputs nbOutputs: nbOfNeurons random: random).
-	
-```
-
-
+The forward feeding is simply done using the method `feed:`:
 
 ```Smalltalk
 NMNetwork>>feed: inputs
-	"Feed the network with the provided inputs vector"
+	"Feed the network with the provided inputs vector
+	Return the output value as a matrix"
 	| mat |
 	mat := inputs.
 	layers do: [ :l | mat := l feed: mat ].
 	^ mat
 ```
 
-
+The learning rate of the network is defined using a dedicated method:
 
 ```Smalltalk
 NMNetwork>>lr: aLearningRateAsFloat
@@ -268,16 +274,15 @@ NMNetwork>>lr: aLearningRateAsFloat
 	layers do: [ :l | l lr: aLearningRateAsFloat ]
 ```
 
-
+The training is performed using the following method:
 
 ```Smalltalk
-NMNetwork>>modelX: x y: y nbOfEpochs: nbEpochs
+NMNetwork>>trainX: x y: y nbOfEpochs: nbEpochs
+	"Train the network with a set of inputs against the expected values"
 	| cost output |
 	"We need to tell to each layer the number of examples they have"
 	layers do: [ :l | l numberOfExamples: y nbColumns ].
-	
 	errors := OrderedCollection new.
-	precisions := OrderedCollection new.
 	nbEpochs timesRepeat: [ 
 		output := self feed: x.
 		cost := self computeCost: output and: y.
@@ -288,24 +293,33 @@ NMNetwork>>modelX: x y: y nbOfEpochs: nbEpochs
 	^ cost
 ```
 
+The update of the weights and bias is done using the method:
 
-We can simply copy the predict method from our original implementation:
+```Smalltalk
+NMNetwork>>update: input
+	"Update the weights and bias using the provided input vector"
+	layers first update: input
+```
+
+Note that the layer performs the job of updating its parameters. Prediction can be achieved by simply copying the `predict:` method from our original implementation:
 
 ```Smalltalk
 NMNetwork>>predict: inputs
 	"Make a prediction. This method assume that the number of outputs is the same than the number of different values the network can output"
-	"The index of a collection begins at 1 in Pharo"
+	"The index of a collection begins at 1 in Pharo,
+	which is why we need to substrate 1"
 	| outputs |
 	outputs := self feed: inputs.
 	^ (outputs asArray indexOf: (outputs max)) - 1
 ```
 
-
+We define the `train:nbEpochs:` method, useful to train a model using a labeled dataset:
 
 
 ```Smalltalk
 NMNetwork>>train: data nbEpochs: nbEpochs
-	"Data is provided as a collection of arrays."
+	"Data is provided as a collection of arrays.
+	The example data need to be labeled using a numerical value"
 	| x y labels numberOfOutputs |
 	x := (MMatrix newFromArrays: (data collect: #allButLast)) transposed.
 	layers do: [ :l | l numberOfExamples: data size ].
@@ -318,20 +332,32 @@ NMNetwork>>train: data nbEpochs: nbEpochs
 		expectedOutput
 	].
 	y := (MMatrix newFromArrays: labels) transposed.
-	^ self modelX: x y: y nbOfEpochs: nbEpochs
+	^ self trainX: x y: y nbOfEpochs: nbEpochs
 
 ```
 
-
+At that stage, we have a matrix-based network which is able to learn from a labeled dataset. Consider the following example:
 
 ```Smalltalk
-NMNetwork>>update: input
-	"Update the weights and bias using the provided input vector"
-	layers first update: input
+xor := #(#(0 0 0)
+			#(0 1 1)
+			#(1 0 1)
+			#(1 1 0)).
+n := NMNetwork new.
+n configure: 2 hidden: 3 nbOfOutputs: 2. 
+n train: xor nbEpochs: 5000. 
+n predict: (MMatrix newFromVector: #(1 0)).
+"=> 1"
+
+n predict: (MMatrix newFromVector: #(1 1)).
+"=> 0"
 ```
 
+The following section presents a simple way to draw the error function.
 
 ## Visualization of the results
+
+We will extend the class `NMNetwork` to visualize the evolution of the error along the epochs. Simply the define the method:
 
 ```Smalltalk
 NMNetwork>>viewLearningCurve
@@ -361,6 +387,7 @@ NMNetwork>>viewLearningCurve
 	^ b
 ```
 
+The hook into the GTInspector framework is simply done using the following method:
 
 ```Smalltalk
 NMNetwork>>viewLearningCurveIn: composite
@@ -394,9 +421,16 @@ irisData := tLines collect: [ :row | |l|
 irisData.
 
 n := NMNetwork new.
-n configure: 4 hidden: 56 nbOfOutputs: 3. 
-n train: irisData nbEpochs: 1000. 
+n configure: 4 hidden: 6 nbOfOutputs: 3. 
+n train: irisData nbEpochs: 3000. 
 n
 ```
 
-The result is the same than we we previously seen
+The result is the same than we we previously seen.
+
+## What we have seen
+
+This chapter revises our previous implementation of neural network. The chapter employs matrices to model the state of the network, which brings some great simplification. However, it raises the level of abstractness. Matrices are a complex notion. The chapters explores:
+
+- The use of matrices to implement forward and backward propagation. It uses the matrix library presented in the previous chapter
+- It revisits the Iris classification example to illustrate the new neural network classes.

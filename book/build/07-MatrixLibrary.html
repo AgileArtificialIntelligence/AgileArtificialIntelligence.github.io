@@ -4,7 +4,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta http-equiv="Content-Style-Type" content="text/css" />
   <meta name="generator" content="pandoc" />
-  <title>07-Matrix</title>
+  <title>07-MatrixLibrary</title>
   <style type="text/css">code{white-space: pre;}</style>
   <style type="text/css">
 a.sourceLine { display: inline-block; line-height: 1.25; }
@@ -3305,6 +3305,15 @@ h4:hover a { color: #333; } h5:hover a { color: #333; } h6:hover a { color: #333
     self assert: (m at: 2 @ 1) equals: 10.0.
     self assert: m asStructuredArray equals: #(#(1 2) #(10 4))</code></pre>
 <p>Note that we refer to an element using a coordinate <code>row @ column</code>. This way to access a matrix element is close to the mathematical notation traditionally used in linear algebra.</p>
+<p>When we will do the prediction in a network, we will need to obtain the maximum value of a matrix. We can simply define:</p>
+<pre class="smalltalk"><code>MMatrix&gt;&gt;max
+    &quot;Return the maximum value of the matrix&quot;
+    ^ self asArray max</code></pre>
+<p>The corresponding test is:</p>
+<pre class="smalltalk"><code>MMatrixTest&gt;&gt;testMax
+    | m |
+    m := MMatrix newFromArrays: #(#(1 2) #(3 4)).
+    self assert: m max equals: 4.</code></pre>
 <p>We have laid out the necessary infrastructure to define some operations. The following sections will covers the operations we will employ in our neural network.</p>
 <h2 id="summing-matrices"><span class="header-section-number">1.5</span> Summing matrices</h2>
 <p>Two matrices may be summed up. The operation assumes that the two matrices have exactly the same dimensions. We can define the sum with the <code>+</code> method. This method accepts another matrix of the same size than the receiver, or a vertical vector (<em>i.e.,</em> matrix with only one column):</p>

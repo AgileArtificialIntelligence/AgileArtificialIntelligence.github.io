@@ -3051,6 +3051,7 @@ h4:hover a { color: #333; } h5:hover a { color: #333; } h6:hover a { color: #333
         <li><a href="#neural-network"><span class="toc-section-number">1.2</span> Neural network</a></li>
         <li><a href="#visualization-of-the-results"><span class="toc-section-number">1.3</span> Visualization of the results</a></li>
         <li><a href="#iris-dataset"><span class="toc-section-number">1.4</span> Iris Dataset</a></li>
+        <li><a href="#what-we-have-seen"><span class="toc-section-number">1.5</span> What we have seen</a></li>
         </ul></li>
         </ul>
         </div>
@@ -3121,18 +3122,18 @@ h4:hover a { color: #333; } h5:hover a { color: #333; } h6:hover a { color: #333
 <pre class="smalltalk"><code>NMLayer&gt;&gt;numberOfExamples
     ^ numberOfExamples</code></pre>
 <p>The layer is initialized by providing the number of neurons it should contains and the number of outputs. The random number generator is also provided to initialize the weight and bias matrices. We defining the method:</p>
-<pre class="smalltalk"><code>NMLayer&gt;&gt;nbInputs: nbOfNeurons nbOutputs: nbOfInputs random: random
+<pre class="smalltalk"><code>NMLayer&gt;&gt;nbInputs: nbOfInputs nbOutputs: nbOfOutputs random: random
     &quot;Initialize the layer&quot;
-    w := MMatrix newRows: nbOfNeurons columns: nbOfInputs.
+    w := MMatrix newRows: nbOfOutputs columns: nbOfInputs.
     w random: random.
-    b := MMatrix newRows: nbOfNeurons columns: 1.
+    b := MMatrix newRows: nbOfOutputs columns: 1.
     b random: random.</code></pre>
 <p>Feed forwarding a layer is carried out using the <code>feed:</code> method:</p>
 <pre class="smalltalk"><code>NMLayer&gt;&gt;feed: inputMatrix
     &quot;Feed the layer with the input matrix&quot;
     output := (w +* inputMatrix + b) collect: [ :v | 1 / (1 + v negated exp) ].
     ^ output</code></pre>
-<p>Once the error are backpropated, weights and biases can be updated using:</p>
+<p>Once the error are backpropagated, weights and biases can be updated using:</p>
 <pre class="smalltalk"><code>NMLayer&gt;&gt;update
     w := w - ((delta +* previous output transposed) * lr / numberOfExamples ).
     b := b - (delta sumHorizontal * lr / numberOfExamples).
@@ -3145,20 +3146,28 @@ h4:hover a { color: #333; } h5:hover a { color: #333; } h6:hover a { color: #333
 </code></pre>
 <p>Our definition of layer is now complete. We can lay out the necessary to hook layers together using the class <code>NMNetwork</code>.</p>
 <h2 id="neural-network"><span class="header-section-number">1.2</span> Neural network</h2>
+<p>We will call <code>NMNetwork</code> the class describing a matrix-based neural network. Here is its definition:</p>
 <pre class="smalltalk"><code>Object subclass: #NMNetwork
-    instanceVariableNames: &#39;random errors layers precisions&#39;
+    instanceVariableNames: &#39;random errors layers&#39;
     classVariableNames: &#39;&#39;
     package: &#39;NeuralNetwork-Matrix&#39;</code></pre>
+<p>The variables are similar than in our first version of the neural network. The variable <code>random</code> contains a random number generator, which is useful to initialize the layers. The <code>errors</code> variable contains the errors values during the training. The <code>layers</code> contains instances of <code>NMLayer</code>.</p>
+<p>The network is initialized with no layers and a random number generator:</p>
 <pre class="smalltalk"><code>NMNetwork&gt;&gt;initialize
+    &quot;Initialize the network with no layers and a proper random generator&quot;
     super initialize.
     layers := OrderedCollection new.
     random := Random seed: 42.</code></pre>
+<p>When a layer is added to the network, a chain of layers has to be maintained:</p>
 <pre class="smalltalk"><code>NMNetwork&gt;&gt;addLayer: aLayer
+    &quot;Add a layer to the network. Note that layers form a bidirectional chain.&quot;
     layers ifNotEmpty: [
         layers last next: aLayer. 
         aLayer previous: layers last ].
     layers add: aLayer</code></pre>
+<p>A central method to the learning is <code>backwardX:y:</code>, which computes the error and backpropagate it to the layers:</p>
 <pre class="smalltalk"><code>NMNetwork&gt;&gt;backwardX: x y: y
+    &quot;Compute and backpropagate the error&quot;
     | lastLayer dz currentLayer |
     lastLayer := layers last.
     dz := lastLayer output - y. 
@@ -3171,39 +3180,41 @@ h4:hover a { color: #333; } h5:hover a { color: #333; } h6:hover a { color: #333
         currentLayer := currentLayer previous.
     ].
 </code></pre>
-<pre class="smalltalk"><code>NMNetwork&gt;&gt;computeCost: mat and: y
-    ^ ((mat - y) collect: [ :v | v * v ]) sum</code></pre>
+<p>The cost function is computed for two given vectors:</p>
+<pre class="smalltalk"><code>NMNetwork&gt;&gt;computeCost: v1 and: v2
+    &quot;Compute the cost function for two provided vectors&quot;
+    ^ ((v1 - v2) collect: [ :v | v * v ]) sum</code></pre>
+<p>The configuration of the network is performed through a number of utility methods. The following method configures a network with one hidden layer:</p>
 <pre class="smalltalk"><code>NMNetwork&gt;&gt;configure: nbOfInputs hidden: nbOfNeurons nbOfOutputs: nbOfOutputs
     &quot;Configure the network with the given parameters
     The network has only one hidden layer&quot;
-    self addLayer: (NMLayer new nbInputs: nbOfNeurons nbOutputs: nbOfInputs random: random).
-    self addLayer: (NMLayer new nbInputs: nbOfOutputs nbOutputs: nbOfNeurons random: random).</code></pre>
+    self addLayer: (NMLayer new nbInputs: nbOfInputs nbOutputs: nbOfNeurons random: random).
+    self addLayer: (NMLayer new nbInputs: nbOfNeurons nbOutputs: nbOfOutputs random: random).</code></pre>
+<p>Similarly, two hidden layers may be configured using the following method:</p>
 <pre class="smalltalk"><code>NMNetwork&gt;&gt;configure: nbOfInputs hidden: nbOfNeurons1 hidden: nbOfNeurons2 nbOfOutputs: nbOfOutputs
     &quot;Configure the network with the given parameters. The network has two hidden layers&quot;
-    self addLayer: (NMLayer new nbInputs: nbOfNeurons1 nbOutputs: nbOfInputs random: random).
-    self addLayer: (NMLayer new nbInputs: nbOfNeurons2 nbOutputs: nbOfNeurons1 random: random).
-    self addLayer: (NMLayer new nbInputs: nbOfOutputs nbOutputs: nbOfNeurons2 random: random).</code></pre>
-<pre class="smalltalk"><code>NMNetwork&gt;&gt;configure: nbOfInputs hidden: nbOfNeurons nbOfOutputs: nbOfOutputs
-    &quot;Configure the network with the given parameters. The network has only one hidden layer&quot;
-    self addLayer: (NMLayer new nbInputs: nbOfNeurons nbOutputs: nbOfInputs random: random).
-    self addLayer: (NMLayer new nbInputs: nbOfOutputs nbOutputs: nbOfNeurons random: random).
-    </code></pre>
+    self addLayer: (NMLayer new nbInputs: nbOfInputs nbOutputs: nbOfNeurons1 random: random).
+    self addLayer: (NMLayer new nbInputs: nbOfNeurons1 nbOutputs: nbOfNeurons2 random: random).
+    self addLayer: (NMLayer new nbInputs: nbOfNeurons2 nbOutputs: nbOfOutputs random: random).</code></pre>
+<p>The forward feeding is simply done using the method <code>feed:</code>:</p>
 <pre class="smalltalk"><code>NMNetwork&gt;&gt;feed: inputs
-    &quot;Feed the network with the provided inputs vector&quot;
+    &quot;Feed the network with the provided inputs vector
+    Return the output value as a matrix&quot;
     | mat |
     mat := inputs.
     layers do: [ :l | mat := l feed: mat ].
     ^ mat</code></pre>
+<p>The learning rate of the network is defined using a dedicated method:</p>
 <pre class="smalltalk"><code>NMNetwork&gt;&gt;lr: aLearningRateAsFloat
     &quot;Globally set the learning rate&quot;
     layers do: [ :l | l lr: aLearningRateAsFloat ]</code></pre>
-<pre class="smalltalk"><code>NMNetwork&gt;&gt;modelX: x y: y nbOfEpochs: nbEpochs
+<p>The training is performed using the following method:</p>
+<pre class="smalltalk"><code>NMNetwork&gt;&gt;trainX: x y: y nbOfEpochs: nbEpochs
+    &quot;Train the network with a set of inputs against the expected values&quot;
     | cost output |
     &quot;We need to tell to each layer the number of examples they have&quot;
     layers do: [ :l | l numberOfExamples: y nbColumns ].
-    
     errors := OrderedCollection new.
-    precisions := OrderedCollection new.
     nbEpochs timesRepeat: [ 
         output := self feed: x.
         cost := self computeCost: output and: y.
@@ -3212,15 +3223,22 @@ h4:hover a { color: #333; } h5:hover a { color: #333; } h6:hover a { color: #333
         errors add: cost.
     ].
     ^ cost</code></pre>
-<p>We can simply copy the predict method from our original implementation:</p>
+<p>The update of the weights and bias is done using the method:</p>
+<pre class="smalltalk"><code>NMNetwork&gt;&gt;update: input
+    &quot;Update the weights and bias using the provided input vector&quot;
+    layers first update: input</code></pre>
+<p>Note that the layer performs the job of updating its parameters. Prediction can be achieved by simply copying the <code>predict:</code> method from our original implementation:</p>
 <pre class="smalltalk"><code>NMNetwork&gt;&gt;predict: inputs
     &quot;Make a prediction. This method assume that the number of outputs is the same than the number of different values the network can output&quot;
-    &quot;The index of a collection begins at 1 in Pharo&quot;
+    &quot;The index of a collection begins at 1 in Pharo,
+    which is why we need to substrate 1&quot;
     | outputs |
     outputs := self feed: inputs.
     ^ (outputs asArray indexOf: (outputs max)) - 1</code></pre>
+<p>We define the <code>train:nbEpochs:</code> method, useful to train a model using a labeled dataset:</p>
 <pre class="smalltalk"><code>NMNetwork&gt;&gt;train: data nbEpochs: nbEpochs
-    &quot;Data is provided as a collection of arrays.&quot;
+    &quot;Data is provided as a collection of arrays.
+    The example data need to be labeled using a numerical value&quot;
     | x y labels numberOfOutputs |
     x := (MMatrix newFromArrays: (data collect: #allButLast)) transposed.
     layers do: [ :l | l numberOfExamples: data size ].
@@ -3233,12 +3251,24 @@ h4:hover a { color: #333; } h5:hover a { color: #333; } h6:hover a { color: #333
         expectedOutput
     ].
     y := (MMatrix newFromArrays: labels) transposed.
-    ^ self modelX: x y: y nbOfEpochs: nbEpochs
+    ^ self trainX: x y: y nbOfEpochs: nbEpochs
 </code></pre>
-<pre class="smalltalk"><code>NMNetwork&gt;&gt;update: input
-    &quot;Update the weights and bias using the provided input vector&quot;
-    layers first update: input</code></pre>
+<p>At that stage, we have a matrix-based network which is able to learn from a labeled dataset. Consider the following example:</p>
+<pre class="smalltalk"><code>xor := #(#(0 0 0)
+            #(0 1 1)
+            #(1 0 1)
+            #(1 1 0)).
+n := NMNetwork new.
+n configure: 2 hidden: 3 nbOfOutputs: 2. 
+n train: xor nbEpochs: 5000. 
+n predict: (MMatrix newFromVector: #(1 0)).
+&quot;=&gt; 1&quot;
+
+n predict: (MMatrix newFromVector: #(1 1)).
+&quot;=&gt; 0&quot;</code></pre>
+<p>The following section presents a simple way to draw the error function.</p>
 <h2 id="visualization-of-the-results"><span class="header-section-number">1.3</span> Visualization of the results</h2>
+<p>We will extend the class <code>NMNetwork</code> to visualize the evolution of the error along the epochs. Simply the define the method:</p>
 <pre class="smalltalk"><code>NMNetwork&gt;&gt;viewLearningCurve
     | b ds |
     errors
@@ -3264,6 +3294,7 @@ h4:hover a { color: #333; } h5:hover a { color: #333; } h6:hover a { color: #333
         title: &#39;Epoch&#39;.
     b axisY title: &#39;Error&#39;.
     ^ b</code></pre>
+<p>The hook into the GTInspector framework is simply done using the following method:</p>
 <pre class="smalltalk"><code>NMNetwork&gt;&gt;viewLearningCurveIn: composite
     &lt;gtInspectorPresentationOrder: -10&gt;
     composite roassal2
@@ -3290,10 +3321,16 @@ irisData := tLines collect: [ :row | |l|
 irisData.
 
 n := NMNetwork new.
-n configure: 4 hidden: 56 nbOfOutputs: 3. 
-n train: irisData nbEpochs: 1000. 
+n configure: 4 hidden: 6 nbOfOutputs: 3. 
+n train: irisData nbEpochs: 3000. 
 n</code></pre>
-<p>The result is the same than we we previously seen</p>
+<p>The result is the same than we we previously seen.</p>
+<h2 id="what-we-have-seen"><span class="header-section-number">1.5</span> What we have seen</h2>
+<p>This chapter revises our previous implementation of neural network. The chapter employs matrices to model the state of the network, which brings some great simplification. However, it raises the level of abstractness. Matrices are a complex notion. The chapters explores:</p>
+<ul>
+<li>The use of matrices to implement forward and backward propagation. It uses the matrix library presented in the previous chapter</li>
+<li>It revisits the Iris classification example to illustrate the new neural network classes.</li>
+</ul>
             </div>
     </div>
   </div>

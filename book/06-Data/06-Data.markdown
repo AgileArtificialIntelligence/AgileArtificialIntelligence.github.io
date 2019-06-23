@@ -1,9 +1,9 @@
 
 # Application: Data Classification
 
-Neural networks have an incredibly large range of applications. Classifying data is a prominent one, and is the topic of this chapter.
+Neural networks have an incredible large range of applications. Classifying data is a prominent one, and is the topic of this chapter.
 
-## Support to easily train network
+## Easily train a network
 
 In the previous chapter, we have seen that we can obtain a trained neural network to express the XOR logical gate. In particular, we have seen the following script:
 

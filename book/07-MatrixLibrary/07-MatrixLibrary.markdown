@@ -292,8 +292,24 @@ MMatrixTest>>testAtPut
 
 Note that we refer to an element using a coordinate `row @ column`. This way to access a matrix element is close to the mathematical notation traditionally used in linear algebra.
 
-We have laid out the necessary infrastructure to define some operations. The following sections will covers the operations we will employ in our neural network.
+When we will do the prediction in a network, we will need to obtain the maximum value of a matrix. We can simply define:
 
+```Smalltalk
+MMatrix>>max
+	"Return the maximum value of the matrix"
+	^ self asArray max
+```
+
+The corresponding test is:
+
+```Smalltalk
+MMatrixTest>>testMax
+	| m |
+	m := MMatrix newFromArrays: #(#(1 2) #(3 4)).
+	self assert: m max equals: 4.
+```
+
+We have laid out the necessary infrastructure to define some operations. The following sections will covers the operations we will employ in our neural network.
 
 ## Summing matrices
 
