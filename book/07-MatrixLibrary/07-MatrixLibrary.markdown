@@ -1,19 +1,17 @@
 
 # A Matrix Library
 
-In the previous chapters we presented an implementation of a neural network made of layers and neurons (_i.e.,_ instances of `NeuronLayer` and `Neuron`). Although instructive, our implementation does not reflects classical ways of implementing a neural network. A layer can be expressed as a matrix of weights and a vector of biases. This is actually how most libraries to build neural network (_e.g.,_ TensorFlow and PyTorch) actually operate.
+In the previous chapters we presented an implementation of a neural network made of layers and neurons (_i.e.,_ instances of `NeuronLayer` and `Neuron`). Although instructive, our implementation does not reflects classical ways of implementing a neural network. A layer can be expressed as a matrix of weights and a vector of biases. This is actually how most libraries to build neural networks (_e.g.,_ TensorFlow and PyTorch) actually operate.
 
 This chapter lays out a small library to build and manipulate matrices. This chapter is important for the subsequent chapter which is about how networks can be implemented using matrices. Matrix are particular data structure for which operations cannot efficiently be implemented in Pharo. We will write such costly operations in C but make them accessible within Pharo.
 
-In addition to defining a matrix library, this chapters highlights one particular aspect of Pharo, which is the use of Foreign Function Interface (FFI). This is a relevant mechanism whenever one wishes to make Pharo use external libraries written using the C or C++ languages. For example, TensorFlow is written in C++, which may be accessed from Pharo using the very same technique presented in this chapter.
+In addition to defining a matrix library, this chapters highlights one particular aspect of Pharo, which is the use of Foreign Function Interface (FFI). This is a relevant mechanism whenever one wishes to make Pharo use external libraries written using the C or C++ programming languages. For example, TensorFlow is written in C++, which may be accessed from Pharo using the very same technique presented in this chapter.
 
 This chapter is long and contains many inter-dependent methods. The chapter needs to be fully implemented before being functional.
 
 ## Matrix operations in C
 
-Pharo does not provide built-in features to manipulate matrices. Although we could implement them in Pharo, it would suffer from very poor performances. Instead, we will code a small library in C to support the elementary C operations. 
-
-Create a file named `matrix.c` with the following C code:
+Pharo does not provide built-in features to manipulate matrices. Although we could implement them in Pharo, it would suffer from very poor performances. Instead, we will code a small library in C to support the elementary C operations. Create a file named `matrix.c` with the following C code:
 
 ```C
 void dot(double *m1, int m1_nb_rows, int m1_nb_columns, double *m2,
@@ -45,21 +43,19 @@ void add(double *m1, int nb_rows, int nb_columns,
 } } } 
 ```
 
-This small libraries is composed of three C functions: 
+This small libraries is composed of three C functions:
+
 - `dot` to perform the multiplication of matrices;
 - `sub` to subtract one matrix from another;
 - `add` to sum two matrices.
 
-We will not go into details about this C file. It simply applies some basic matrix operations. 
-
-The library has to be compiled. We can use the gcc standard compiler for this:
+We will not go into details about this C file. It simply applies some basic matrix operations. Each function takes as argument a pointer to somes matrices along with their shape. The library has to be compiled. We can use the gcc standard compiler for this. Assuming you have `gcc` installed, in a terminal you should type:
 
 ```bash
 gcc -dynamiclib -o matrix.dylib matrix.c
-
 ```
 
-Our matrix file is compiled as a dynamic library, loadable within Pharo. The compilation produces the `matrix.dylib` file. Note that the `matrix.dylib` file should be located next to the `.image` file.
+Our matrix file is compiled as a dynamic library, loadable within Pharo. The compilation produces a dynamic library. On OSX, the generated file is named `matrix.dylib`. The `matrix.dylib` file _has to be_ located next to the `.image` file, within the same folder.
 
 ## The Matrix class
 
@@ -79,8 +75,7 @@ On the class side of the class `MMatrix` we define a number of useful methods to
 ```Smalltalk
 MMatrix class>>newFromArrays: arrays
 	"Create a matrix from an array containing the structured 
-	values of the matrix.
-	Example of matrix creations:
+	values of the matrix. Example of matrix creations:
 	MMatrix newFromArrays: #(#(1 2 3) #(4 5 6))
 	MMatrix newFromArrays: #(#(1 2 3))
 	MMatrix newFromArrays: #(#(1) #(2) #(3))
@@ -129,7 +124,7 @@ MMatrix>>array
 	^ array
 ```
 
-Foreign objects, living within the Pharo memory space, need to be accessible from our external library. A handle represents the memory address that is used by the C library. The class `FFIExternalArray` offers the method `getHandle` for accessing the memory location:
+Foreign objects, living within the Pharo memory space, need to be accessible from our external library. A handle represents the memory address that is used by the C library. The class `FFIExternalArray` offers the method `getHandle` to access the memory location:
 
 ```Smalltalk
 MMatrix>>getHandle
@@ -138,7 +133,7 @@ MMatrix>>getHandle
 	^ array getHandle
 ```
 
-An handy method useful in the testing is `asArray`. We will use it when verifying that matrix are properly created:
+A handy method useful in the test is `asArray`. We will use it when verifying that a matrix is properly created:
 
 ```Smalltalk
 MMatrix>>asArray
@@ -146,7 +141,7 @@ MMatrix>>asArray
 	^ array asArray
 ```
 
-In some situations, an handle has to be provided when a matrix is created. The following method address this:
+In some situations, a handle has to be provided when a matrix is created. The following method address this:
 
 ```Smalltalk
 MMatrix class>>newHandle: aHandle rows: numRows columns: numColumns
@@ -156,7 +151,7 @@ MMatrix class>>newHandle: aHandle rows: numRows columns: numColumns
 		yourself
 ```
 
-The method `initializeHandle:rows:columns:` initializes a matrix with an handle and a particular shape:
+The method `initializeHandle:rows:columns:` initializes a matrix with a handle and a particular shape:
 
 ```Smalltalk
 MMatrix>>initializeHandle: aHandle rows: numRows columns: numColumns
@@ -171,7 +166,7 @@ The following factory method creates an external array using a given handle:
 
 ```Smalltalk
 MMatrix>>newArrayFromHandle: aHandle
-	"Create an external array using an handle"
+	"Create an external array using a handle"
 	^ FFIExternalArray 
 		fromHandle: aHandle 
 		type: 'double' 
@@ -211,9 +206,11 @@ MMatrix>>fromContents: content
 	content doWithIndex: [ :v :i | array at: i put: v ]
 ```
 
-## Unit test
+These methods will be properly tested in the following subsections.
 
-We can now write a unit test. The class `MMatrixTest` will contains all out tests of `MMatrix`:
+## Creating the unit test
+
+We can now write a unit test. The class `MMatrixTest` will contains all out tests about `MMatrix`. Consider the class:
 
 ```Smalltalk
 TestCase subclass: #MMatrixTest
@@ -222,7 +219,7 @@ TestCase subclass: #MMatrixTest
 	package: 'Matrix'
 ```
 
-We can tests the creation and initialization methods we defined on ``MMatrix``:
+As a first test, we can very the proper behavior of the creation method, defined on `MMatrix`:
 
 ```Smalltalk
 MMatrixTest>>testCreation
@@ -231,10 +228,12 @@ MMatrixTest>>testCreation
 	self assert: m asArray equals: #(1.0 2.0 3.0 4.0)
 ```
 
+In the remaining of the chapter we will expand the `MMatrixTest` class.
+
 ## Accessing and Modifying the Content of a Matrix
 
 Being able to easily update the matrix content is the first initial step we should consider.
-The content of a matrix may be accessed using the `at:` message. This method takes as argument a point.
+The content of a matrix may be accessed using the `at:` message. This method takes as argument a point:
 
 ```Smalltalk
 MMatrix>>at: aPoint
@@ -317,12 +316,12 @@ Two matrices may be summed up. The operation assumes that the two matrices have 
 
 ```Smalltalk
 MMatrix>>+ matrixOrVector
-	"Add either a matrix or a vector to the receiver. The argument could either be a matrix of the same size than me, or a vector
+	"Add either a matrix or a vector to the receiver. 
+	The argument could either be a matrix of the same size or a vector
 	A new matrix is returned as result"
 	| m |
 	((nbRows = matrixOrVector nbRows) and: [ nbColumns = matrixOrVector nbColumns ])
 		ifTrue: [ ^ self add: matrixOrVector ].
-		
 	matrixOrVector nbColumns ~= 1 ifTrue: [ self error: 'not a n * 1 vector' ].
 	m := matrixOrVector stretchToColumns: nbColumns.
 	^ self + m
@@ -338,11 +337,9 @@ MMatrix>>add: aMatrix
 	nbRows = aMatrix nbRows ifFalse: [self error: 'dimensions do not conform'].
 	
 	resultArray := ByteArray new: (nbRows * aMatrix nbColumns * 8).
-
 	self assert: [ nbRows * nbColumns = array size ].
 	self assert: [ aMatrix nbRows * aMatrix nbColumns = aMatrix size ].
 	self assert: [ nbRows * aMatrix nbColumns * 8 = resultArray size ].
-	
 	self 
 		add: self getHandle with: nbRows with: nbColumns with: aMatrix getHandle
 		in: resultArray.
@@ -361,6 +358,25 @@ MMatrix>>add: m1 with: nb_rows with: nb_columns with: m2 in: res
 		module: 'matrix.dylib'
 ```
 
+We can test summing two matrices:
+
+```Smalltalk
+MMatrixTest>>testAddition1
+	| m1 m2 |
+	m1 := MMatrix newFromArrays: #(#(1 2 3) #(4 5 6)). 
+	m2 := MMatrix newFromArrays: #(#(4 5 6) #(1 2 3)).
+	self assert: (m1 + m2) asStructuredArray equals: #(#(5.0 7.0 9.0) #(5.0 7.0 9.0))
+```
+
+We can also try summing a matrix with itself:
+
+```Smalltalk
+MMatrixTest>>testAddition2
+	| m |
+	m := MMatrix newFromArrays: #(#(1 2 3) #(4 5 6)). 
+	self assert: (m + m) asStructuredArray equals: #(#(2.0 4.0 6.0) #(8.0 10.0 12.0))
+```
+
 Elements of a matrix may be horizontally summed up. As we will see in the next chapter, this operation is important when we will implement the backpropagation algorithm. Consider the method `sumHorizontal`:
 
 ```Smalltalk
@@ -371,10 +387,8 @@ MMatrix>>sumHorizontal
 	1 to: nbRows do: [ :y |
 		sum := 0.
 		1 to: nbColumns do: [ :x |
-			sum := sum + (self at: y @ x)
-		].
-		result at: y @ 1 put: sum
-	].
+			sum := sum + (self at: y @ x) ].
+		result at: y @ 1 put: sum ].
 	^ result
 ```
 
@@ -426,23 +440,9 @@ Printing the code above should produce:
 8.0 10.0 12.0)
 ```
 
-```Smalltalk
-MMatrixTest>>testAddition
-	| m |
-	m := MMatrix newFromArrays: #(#(1 2 3) #(4 5 6)). 
-	self assert: (m + m) asStructuredArray equals: #(#(2.0 4.0 6.0) #(8.0 10.0 12.0))
-```
-```Smalltalk
-MMatrixTest>>testAddition2
-	| m1 m2 |
-	m1 := MMatrix newFromArrays: #(#(1 2 3) #(4 5 6)). 
-	m2 := MMatrix newFromArrays: #(#(4 5 6) #(1 2 3)).
-	self assert: (m1 + m2) asStructuredArray equals: #(#(5.0 7.0 9.0) #(5.0 7.0 9.0))
-```
-
 ## Vector
 
-Vector are a matrix with only one column. For example, the expression `MMatrix newFromArrays: #(#(1) #(2) #(3))` creates a vector of three elements. We provide a utility method to define vector:
+A vector is a matrix with only one column. For example, the expression `MMatrix newFromArrays: #(#(1) #(2) #(3))` creates a vector of three elements. We provide a utility method to define vector:
 
 ```Smalltalk
 MMatrix class>>newFromVector: array
@@ -453,7 +453,7 @@ MMatrix class>>newFromVector: array
 		yourself
 ```
 
-The method `newFromVector:` expect a flat Pharo array. Here is an example 
+The method `newFromVector:` expects a flat Pharo array. Here is an example:
 
 ```Smalltalk
 MMatrixTest>>testVectorCreation
@@ -464,7 +464,7 @@ MMatrixTest>>testVectorCreation
 	self assert: v asStructuredArray equals: #(#(1) #(2) #(3))
 ```
 
-The back-propagation algorithm requires to stretch a vector into a matrix. It converts a vector into a matrix by juxtaposing several times the vector. We define the following method:
+The backpropagation algorithm requires to stretch a vector into a matrix. It converts a vector into a matrix by juxtaposing several times the vector. We define the following method:
 
 ```Smalltalk
 MMatrix>>stretchToColumns: nbOfColumns
@@ -473,9 +473,7 @@ MMatrix>>stretchToColumns: nbOfColumns
 	content := OrderedCollection new.
 	1 to: nbRows do: [ :row |
 		1 to: nbOfColumns do: [ :columns |
-			content add: (self at: row @ 1)
-		]
-	].
+			content add: (self at: row @ 1) ] ].
 	result := MMatrix newRows: nbRows columns: nbOfColumns.
 	result fromContents: content.
 	^ result
@@ -504,20 +502,21 @@ MMatrixTest>>testStretching
 
 ## Factors
 
-Being able to transform a matrix and multiply matrices is essential in several parts of the back-propagation algorithm. We will first define a generic way to transform a matrix:
+Being able to transform a matrix and multiply matrices is essential in several parts of the backpropagation algorithm. We will first define a generic way to transform a matrix:
 
 ```Smalltalk
 MMatrix>>collect: aOneArgBlock
-	"Return a new matrix, for which each matrix element is transformed."
+	"Return a new matrix, for which each matrix element is transformed using the provided block"
 	| result |
 	result := MMatrix newRows: nbRows columns: nbColumns.
 	1 to: nbRows do: [ :y |
 		1 to: nbColumns do: [ :x |
 			result at: y @ x put: (aOneArgBlock value: (self at: y @ x))
-		] 
-	].
+		] ].
 	^ result
 ```
+
+A simple test that add a value to each matrix element:
 
 ```Smalltalk
 MMatrixTest>>testCollect
@@ -582,7 +581,7 @@ MMatrixTest>>testMultiplicationPerElement
 
 ## Dividing a matrix by a factor
 
-Similarly, we can divide a matrix by a particular factor:
+In the same fashion than seen in the previous section, we can divide a matrix by a factor:
 
 ```Smalltalk
 MMatrix>>/ value
@@ -636,7 +635,7 @@ The connection between the Pharo code and C library is defined in the following 
 
 ```Smalltalk
 MMatrix>>dot: array1 with: m1_nb_rows with: m1_nb_columns with: array2 with: m2_nb_rows with: m2_nb_columns in: res
-
+	"Invoke the C library to perform the dot operator"
 	^ self 
 		ffiCall: #(void dot(
 			void *array1, int m1_nb_rows, int m1_nb_columns, 
@@ -657,9 +656,7 @@ MMatrixTest>>testMatrixProduct
 
 ## Matrix substraction
 
-Substracting matrices is another relevant operation in machine learning in general. 
-
-We define the following shortcut:
+Substracting matrices is another relevant operation in machine learning in general. We define the following shortcut:
 
 ```Smalltalk
 MMatrix>>- anotherMatrix
@@ -739,7 +736,7 @@ Executing the expression `(MMatrix newRows: 4 columns: 5) random` illustrates it
 
 ## Summing the matrix values
 
-Values contained in a matrix may be summed up. This will be useful to evaluate the cost function when a network will has to learn:
+Values contained in a matrix may be summed up. This will be useful to evaluate the cost function when training a neural network:
 
 ```Smalltalk
 MMatrix>>sum
@@ -765,7 +762,7 @@ MMatrixTest>>testSum
 
 ## Transpose
 
-The transpose of a matrix is an operation that consist in flipping a matrix along its diagonal. We can define the operation as follows:
+The transpose of a matrix is an operation that consists in flipping a matrix along its diagonal. We can define the operation as follows:
 
 ```Smalltalk
 MMatrix>>transposed
@@ -803,13 +800,13 @@ MMatrixTest>>testTransposedOnVector
 
 ## Example
 
-We can illustrate the use of matrices in the backpropagation mechanism. The following script creates two random set of values and train a neural network to maps the input values to the output values. It illustrates the "essence" of forward and backward propagation:
+We can illustrate the use of matrices in a simple backpropagation implementation. The following script creates two random set of values and train a neural network to maps the input values to the output values. It illustrates the "essence" of forward and backward propagation:
 
 ```Smalltalk
-n := 8. 		"Number of examples"
-din := 10. 		"Number of input values"
-h := 20. 		"Size of the hidden layer"
-dout := 5. 		"Number of output values"
+n := 8.         "Number of examples"
+din := 10.      "Number of input values"
+h := 20.        "Size of the hidden layer"
+dout := 5.      "Number of output values"
 
 r := Random seed: 42.
 x := (MMatrix newRows: n columns: din) random.
@@ -820,41 +817,48 @@ w2 := (MMatrix newRows: h columns: dout) random.
 learningRate := 1e-6.
 losses := OrderedCollection new.
 1500 timesRepeat: [ 
-	hh := x +* w1.
-	hrelu := hh collect: [ :v | v max: 0 ].
-	ypred := hrelu +* w2.
-	
-	"Compute and print loss"
-	loss := ((ypred - y) collect: [:vv | vv * vv ]) sum.
-	losses add: loss.
-	
-	"Backprop to compute gradients of w2 and w2 with respect to loss"
-	gradYPred := (ypred - y) * 2.0.
-	gradW2 := hrelu transposed +* gradYPred.
-	gradHRelu := gradYPred +* w2 transposed.
-	gradH := gradHRelu collect: [ :v | v max: 0 ].
-	gradW1 := x transposed +* gradH.
-	
-	w1 := w1 - (gradW1 * learningRate).
-	w2 := w2 - (gradW2 * learningRate) 
+    hh := x +* w1.
+    hrelu := hh collect: [ :v | v max: 0 ].
+    ypred := hrelu +* w2.
+    
+    "Compute and print loss"
+    loss := ((ypred - y) collect: [:vv | vv * vv ]) sum.
+    losses add: loss.
+    
+    "Backprop to compute gradients of w2 and w2 with respect to loss"
+    gradYPred := (ypred - y) * 2.0.
+    gradW2 := hrelu transposed +* gradYPred.
+    gradHRelu := gradYPred +* w2 transposed.
+    gradH := gradHRelu collect: [ :v | v max: 0 ].
+    gradW1 := x transposed +* gradH.
+    
+    w1 := w1 - (gradW1 * learningRate).
+    w2 := w2 - (gradW2 * learningRate) 
 ].
 
 g := RTGrapher new.
 d := RTData new.
+d noDot; connectColor: Color blue.
 d points: losses.
 d y: #yourself.
 g add: d.
+g axisX title: 'Epoch'.
+g axisY title: 'Error'.
 g
 ```
 
-The last part of the script uses `RTGrapher` to show a the evolution of the loss value along epochs.
+![A simple implementation of backpropagation.](07-MatrixLibrary/figures/simpleBackpropagation.png){#fig:simpleBackpropagation}
+
+The last part of the script uses `RTGrapher` to show a the evolution of the loss value along epochs (Figure @fig:simpleBackpropagation).
 
 ## What have we seen?
 
-This was a long chapter, pretty dense regarding the amount of provided code. The chapter covers the following topics:
+The chapter covers the following topics:
 
 - _Definition of a minimal C library._ Neural networks, and deep learning in general, employ matrices to performs its computation.
-- _Definition of the class `MMatrix`._ This class models the mathematical notion of matrix. Note that we designed our class to offers relevant operations for neural networks. It is by no means a definitive generic implementation.
+- _Definition of the class `MMatrix`._ This class models the mathematical notion of matrix. Note that we designed our class to offer relevant operations for neural networks. Note that it is by no means a definitive generic matrix implementation.
+
+This was a long dense chapter. However, the matrix library we have seen will greatly simply the revised version of our neural network in the next chapter. 
 
 Modern libraries to build neural networks employ matrices to carry out the numerical computation. However, the GPU is traditionally used instead of the CPU, as we are doing here. We could have used CUDA or OpenCL to perform the matrix operations on the GPU. However, it would have considerably lengthen the amount of code. This is the reason why we simply restrict ourselves to computation carry out by the CPU.
 
