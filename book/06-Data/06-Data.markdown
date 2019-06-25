@@ -1,7 +1,7 @@
 
 # Application: Data Classification
 
-Neural networks have an incredible large range of applications. Classifying data is a prominent one, and is the topic of this chapter.
+Neural networks have an incredible large range of applications. Classifying data is a prominent one, and this chapter is devoted to it.
 
 ## Easily train a network
 
@@ -58,7 +58,7 @@ NNetwork>>predict: inputs
 ```
 
 
-These two methods make the network training significantly less verbose. The script that trains a network with XOR logical gate can now be written:
+These two methods make the network training significantly less verbose. The script that trains a network with XOR logical gate may now be written:
 
 ```Smalltalk
 n := NNetwork new.
@@ -93,6 +93,7 @@ n train: data nbEpochs: 1000.
 The code above builds a neural network trained to convert binary numbers into a decimal number. The binary number is encoded using 3 bits, we therefore need a neural network with 3 inputs. Since the decimal value ranges from 0 to 7, we need 8 output neurons of the network. As an example, the conversion of the binary number you can evaluate the following:
 
 ```Smalltalk
+...
 n predict: #(0 1 1)
 "==> 3"
 ```
@@ -102,7 +103,7 @@ The way `train:nbEpochs:` and `predict:` are implemented enforces the training d
 
 ## Neural network as a Hashmap
 
-Let's step back a bit. We have spent six chapters motivating, describing, incrementally building neural networks. But we are using a neural network pretty much the way we would use a regular hash map. Consider the following example:
+Let's step back a bit. We have spent six chapters to motivate, describe, and incrementally build neural networks. But we are using a neural network pretty much the way we would use a regular hash map. Consider the following example:
 
 ```Smalltalk
 data := {#(0 0 0 0).
@@ -125,16 +126,16 @@ The variable `d` is a dictionary filled with the example data. The values we use
 
 However, a hash map requires the exact same key (or at least adequately answers to the message `=`). A neural network does not requires the exact same input values. Consider the following expression:
 
-```Smalltalk
+~~~~~~~~
 n predict: #(0.4 0.7 0.6)
 "==> 3"
-```
+~~~~~~~~
 
 The network somehow matches the input values `#(0.4 0.7 0.6)` to `#(0 1 1)`, which returns the value `3`. A hashmap is not able to do such a connection without the programmer to explicitly doing so, and that is the whole point of neural networks: establishing connections between input data and identifying the most relevant data, without any intervention of the programmer.
 
 ## Visualizing the error and the topology
 
-We have seen that the first step of the backpropagation is to actually evaluate the network with the provided inputs. The output values are then compared with the expected output values. The difference between the actual output and the expected output is then used to adjust the weights and biases by back-propagating this difference to the network. 
+We have seen that the first step of the backpropagation is to actually evaluate the network with the provided inputs. The output values are then compared with the expected output values. The difference between the actual output and the expected output is then used to adjust the weights and biases by backpropagating this difference to the network. 
 
 The method `NNetwork>>train:nbEpochs:` contains the statements `errors add: sumError` and `precisions add: (epochPrecision / train size) asFloat`. These two lines of code have the effect to record the value of `sumError`, indicating how well the network has performed for the provided example, and the value of precision per epoch. These two collections of numbers can be visualized as a helper to characterize the overall learning process for a given network and example set.
 
@@ -142,19 +143,22 @@ We define the method `viewLearningCurve` on the class `NNetwork`:
 
 ```Smalltalk
 NNetwork>>viewLearningCurve
+	"Draw the error and precision curve"
 	| b ds |
-	errors
-		ifEmpty: [ ^ RTView new
+	"No need to draw anything if the network has not been run"
+	errors ifEmpty: [ ^ RTView new
 				add: (RTLabel elementOn: 'Should first run the network');
 				yourself ].
+
 	b := RTDoubleGrapher new.
 
 	"We define the size of the charting area"
 	b extent: 500 @ 300.
 	ds := RTData new.
+	"A simple optimization that Roassal offers"
 	ds samplingIfMoreThan: 2000.
-	ds noDot.
-	ds connectColor: Color blue.
+	"No need of dots, simply a curve"
+	ds noDot; connectColor: Color blue.
 	ds points: (errors collectWithIndex: [ :y :i | i -> y ]).
 	ds x: #key.
 	ds y: #value.
@@ -169,24 +173,20 @@ NNetwork>>viewLearningCurve
 	ds y: #value.
 	ds dotShape rectangle color: Color blue.
 	b addRight: ds.
-	b axisX
-		noDecimal;
-		title: 'Epoch'.
+	b axisX noDecimal; title: 'Epoch'.
 	b axisY title: 'Error'.
-	b axisYRight
-		title: 'Precision';
-		color: Color red.
+	b axisYRight title: 'Precision'; color: Color red.
 	^ b
 ```
 
 The following method defines a visualization of the `errors` and `precisions` variables:
+
 ```Smalltalk
 NNetwork>>viewLearningCurveIn: composite
 	<gtInspectorPresentationOrder: -10>
 	composite roassal2
 		title: 'Learning';
-		initializeView: [
-			self viewLearningCurve ]
+		initializeView: [ self viewLearningCurve ]
 ```
 
 The method `NNetwork>>viewLearningCurveIn:` uses the GTInspector framework to add particularized tab in the inspector.
@@ -235,7 +235,7 @@ NNetwork>>viewNetwork
 	^ b view
 ```
 
-Defining the helper method as:
+We need to define the helper method:
 
 ```Smalltalk
 NNetwork>>numberOfInputs
@@ -258,19 +258,18 @@ NNetwork>>viewNetworkIn: composite
 	<gtInspectorPresentationOrder: -5>
 	composite roassal2
 		title: 'Network';
-		initializeView: [
-			self viewNetwork ]
+		initializeView: [ self viewNetwork ]
 ```
 
 ![Visualizing the network topology.](06-Data/figures/networkTopology.png){#fig:networkTopology}
 
-Note that by clicking on a neural reveals its weights and bias.
+You can click on a neuron to reveals its weights and bias.
 
 ## Contradictory data
 
-The blue error curve quantifies the error made by the network during the learning phase. It may happens that the error has some plateaus. In such a case, increasing the number of epochs may have the effect to lower the error curve. 
+The blue error curve quantifies the error made by the network during the learning phase. It may happens that the error has some plateaux. In such a case, increasing the number of epochs may have the effect to lower the error curve. 
 
-In some case, the error curve may indicates a contradiction in the data. Consider the following example:
+In some case, if the error curve cannot get close to 0 then it may indicate a contradiction in the data. Consider the following example:
 
 ```Smalltalk
 n := NNetwork new.
@@ -287,7 +286,7 @@ The script trains a neural network with two contradictory examples. The first ex
 
 Figure @fig:contradictionInData illustrates the error and precision curves in presence of contradicting data. The script given above makes the neural network learn two different outputs for exactly the same input values. As a consequence, the network will have to make mistake during the learning phase. 
 
-Using a real and non-trivial dataset it is likely that this situation will happens. In case that the contradictory occurrences is low, then the network will handle the dataset properly.
+In a real and non-trivial dataset it is likely that this situation will happen. In case that the contradictory occurrences is low, then the network will consider this contradiction as pure noise and will has tendency to diminish it.
 
 ## Classifying data & one hot encoding
 
@@ -295,7 +294,7 @@ Classification can be defined as grouping elements based on their features. Elem
 
 Have you noticed that when we introduced the `train:nbEpochs:` when we have to define a neural network with two outputs for the XOR dataset? The reason is that we encode the output value using the _one-hot encoding_. 
 
-One hot encoding is a simple mechanism that converts a categorical variable into a numerical form, eligible to be fed into a neural network. Consider the variable $v$ which represents a word within the set { _"hello", "bonjour", "Buenos dias"_ }. Applying one-hot encoding would assign to each word a unique number. For example, _"hello"_ is associated to the index 0, _"bonjour"_ associated to index 1, and _"Buenos dias"_ to 2. The value of $v$ can then be encoded with 3 different bits, since the dataset has 3 different words. We can then encode the word
+One hot encoding is a simple mechanism that converts a categorical variable into a numerical form, eligible to be fed into a neural network. Consider the variable $v$ which represents a word within the set { _"hello", "bonjour", "Buenos dias"_ }. Applying one-hot encoding would assign to each word a unique number. For example, _"hello"_ is associated to the index 0, _"bonjour"_ associated to index 1, and _"Buenos dias"_ to 2. The value of $v$ can then be encoded with 3 different bits, since the dataset has 3 different words. We can then encode the words:
 
 - _"hello"_ = [1, 0, 0]
 - _"bonjour"_ = [0, 1, 0] 
@@ -322,9 +321,7 @@ Now that we explained the one-hot encoding, we can proceed with a larger dataset
 
 ## Iris Dataset
 
-The Iris flower dataset is a popular dataset used by the machine learning community (http://archive.ics.uci.edu/ml/datasets/Iris). This dataset was collected in 1936 by Ronald Fisher and presented in the seminal paper _The use of multiple measurements in taxonomic problems_.
-
-The data set contains 50 samples of three families of Iris, called _Iris setosa_, _Iris virginica_ and _Iris versicolor_. We refer to these families as _classes_.
+The Iris flower dataset is a popular dataset used by the machine learning community (http://archive.ics.uci.edu/ml/datasets/Iris). This dataset was collected in 1936 by Ronald Fisher and presented in the seminal paper _The use of multiple measurements in taxonomic problems_. The data set contains 50 samples of three families of Iris, called _Iris setosa_, _Iris virginica_ and _Iris versicolor_. We refer to these families as _classes_.
 
 We provide a copy of this dataset on https://agileartificialintelligence.github.io/Datasets/iris.csv. Within Pharo, you can fetch the dataset using the expression:
 
@@ -337,14 +334,14 @@ The code above fetches the file `iris.csv` and returns its content. The file str
 sepal_length,sepal_width,petal_length,petal_width,species
 ```
 
-However, fetching the file is just the first small step toward making the file processable by a neural networks. For example, we need to convert each row of the file into a set of numerical values. 
+However, fetching the file is just the first small step toward making the file processable by a neural networks. For example, we need to convert each row of the file into a set of numerical values (remember that neural network can only accept numbers as input?). 
 
 In order to feed a network with the iris data set, we need to perform the following steps:
 
-1. Fetch the file from the net;
-2. Cut the file content, represented as a very long string, into lines;
+1. Fetch the file from internet net;
+2. Cut the file content, represented as a very long text, into textual lines;
 3. Ignore the first line of the file, since it contains the CSV header, which is not relevant for the network;
-4. Each row has 5 entries for which the first 4 ones are numerical values and the last one is the flower name. We need to extract subtrings of a row, each substring separated by a comma. The last column needs to be presented, which is processed in the next step;
+4. Each row has 5 entries for which the first 4 ones are numerical values and the last one is the flower name. We need to cut into pieces a row, each substring piece is separated by a comma. The last column needs to be presented, which is processed in the next step;
 5. We replace in the table each flower name by a numerical value, which could be 0, 1, or 2.
 
 The following script exactly performs these five steps:
@@ -360,7 +357,6 @@ tLines := lines collect: [ :l |
 		ss := l substrings: ','.
 		(ss allButLast collect: [ :w | w asNumber ]), (Array with: ss last) ].
 
-
 irisData := tLines collect: [ :row | 
 		| l |
 		row last = 'setosa' ifTrue: [ l := #( 0 ) ].
@@ -371,7 +367,7 @@ irisData := tLines collect: [ :row |
 irisData.
 ```
 
-To summarize, the script convert a very long string similar to:
+To summarize, the script converts a very long string similar to:
 
 ```
 'sepal_length,sepal_width,petal_length,petal_width,species
@@ -382,7 +378,8 @@ To summarize, the script convert a very long string similar to:
 '
 ```
 
-into 
+into collection of numbers:
+
 ```
 #(#(5.1 3.5 1.4 0.2 0) #(4.9 3.0 1.4 0.2 0) #(4.7 3.2 1.3 0.2 0) ...
 ```
@@ -400,13 +397,13 @@ n configure: 4 hidden: 6 nbOfOutputs: 3.
 n train: irisData nbEpochs: 1000.
 ```
 
-The code above builds a network with 4 input values, one hidden layer with 6 neurons, and the output layer has 3 neurons. The number of inputs represents the size of a row in the iris dataset minus 1, the expected output value which is not part of the input. We pick an arbitrary 6 as the size of the hidden layer. A general rule for the hidden layer size, is to contain 50% more neurons than the number of inputs. We have three neurons in the output layers since there are three different families of Iris.
+The code above builds a network with 4 input values, one hidden layer with 6 neurons, and the output layer has 3 neurons. The number of inputs represents the size of a row in the iris dataset minus 1, the expected output value which is not part of the input. We pick an arbitrary 6 as the size of the hidden layer. A general thumb-rule for the hidden layer size, is to contain 50% more neurons than the number of inputs. We have three neurons in the output layers since there are three different families of Iris.
 
 ![Learning the Iris dataset.](06-Data/figures/networkOnIris.png){#fig:networkOnIris}
 
 Figure @fig:networkOnIris represents the error curve of the network. The blue curve is very close to 0, which indicates that the network is learning and the dataset does not have contradiction. The red curve is very close to 1.0, which means that the network has an excellent precision. The network is able to learn and achieve a good precision during that learning process.
 
-The configuration of our network has two parameters: the number of neurons in the hidden layers, and the number of epochs to consider. There are no general rules on how to pick these parameters. Experiments and ad-hoc tries remain the easiest approach to configure a network.
+The configuration of our network has two parameters: the number of neurons in the hidden layers, and the number of epochs to consider. There are no general rules on how to pick these parameters. For now, experiments and ad-hoc tries remain the easiest approach to configure a network. The third part of the book, about neuroevolution, will cover the search of hyperparameters using genetic algorithm
 
 ## Effect of the learning curve
 
@@ -459,15 +456,15 @@ We run the script for each of the value 0.001, 0.01, 0.1, and 0.3. Results are p
 
 ![Effect of the learning rate for neural network on the Iris dataset.](06-Data/figures/learningRateNetwork.png){#fig:learningRateNetwork}
 
-We clearly see that for a low learning rate, the precision and error curves are rather stable. While for a high learning rate, we experience very frequent peaks. 
+We clearly see that for a low learning rate, the precision and error curves are rather stable. While for a relatively high learning rate, we experience very frequent peaks. 
 
-Unfortunately, there is no general methodology to identify the adequate learning rate or the architecture of the network. Manual tuning is the norm so far.
+Unfortunately, there is no general methodology to identify the adequate learning rate or the architecture of the network. Manual tuning is the norm so far. Some optimization algorithms, _e.g.,_ the Adam optimization algorithm, variates the learning rate. During the training the learning rate varies.  
 
 ## Test and Validation
 
 So far, we built a network trained on the whole iris dataset: we consider all the entries in the `.csv` file to train the network. The network seems to properly learn as the network does less error and the precision is increasing along the epochs (_i.e.,_ the error curve is getting very close to 0). 
 
-The error curve indicates how well the network is learning for the provided dataset. If we wish to know how well the network classifies data, it would not make much sense to test it on data it was trained with. Asking a network how well it performs in presence of the very same data used for the training is not much of a challenge. However, an important question is how well the network behaves in presence of data that it has never seen. Said in other word: _how well the network classifies unknown data?_
+The error curve indicates how well the network is learning for the provided dataset. If we wish to know how well the network classifies data, it would not make much sense to test it on data it was trained with. Asking a network how well it performs in presence of the very same data used for the training is not much of a challenge. However, an important question is how well does the network behave in presence of data that it has never seen. Said in other word: _how well the network classifies unknown data?_
 
 One way to answer this question, is to divide the iris dataset in two distinct parts: 
 
@@ -494,7 +491,7 @@ n train: trainingData nbEpochs: 1000.
 
 We see that the network is able to properly learn `trainingData`, as the error curve is close to 0, similarly than in Figure @fig:networkOnIris.
 
-Consider the script (it only assumes the variable `irisData`):
+Consider the script (it assumes the existence of the previously seen variable `irisData`):
 
 ```Smalltalk
 cut := 0.8.
@@ -511,7 +508,7 @@ n train: trainingData nbEpochs: 1000.
 ]) select: #yourself) size / testData size) asFloat round: 2 
 ```
 
-Evaluating the script produces a value of 0.9, which represents the accuracy of our network: 90% of the elements contained in `testData` are correctly predicted. 
+Evaluating the script returns 0.9, which represents the accuracy of our network: 90% of the elements contained in `testData` are correctly predicted. 
 
 We will now detail the last part of the script:
 ```
@@ -786,4 +783,4 @@ This chapter was like a long road exploring different aspects of data manipulati
 - The Iris dataset as a complete example of applying network network to classify data
 - The relevance of normalizing data before processing
 
-We invite the reader to explore different dataset. The website [https://archive.ics.uci.edu/ml/datasets.html](https://archive.ics.uci.edu/ml/datasets.html) gives many relevant dataset to be employed with a neural network or any other machine learning algorithm.
+We invite the reader to explore different dataset. The website [https://archive.ics.uci.edu/ml/datasets.html](https://archive.ics.uci.edu/ml/datasets.html) gives many relevant datasets to be employed with a neural network or any other machine learning algorithm.

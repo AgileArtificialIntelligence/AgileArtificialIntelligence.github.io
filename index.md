@@ -17,7 +17,8 @@ Part I: Neural Network
 Part II: Genetic Algorithm
 1. [Genetic Algorithm](./book/build/10-GeneticAlgorithm.html)
 1. [Genetic Algorithm in Action](./book/build/11-GAExamples.html)
-1. Travelling salesman problem
+1. Traveling salesman problem
+1. Robot looking for an exit
 1. Zoomorphic creature
 
 Part III: Neuroevolution
@@ -47,7 +48,7 @@ So, provide feedback! There are several ways to do so:
 
 # Big thanks!
 Since the announcement of the book many have encouraged us, provided feedback, and improved the writing. In no particular order, we are grateful to 
-CH Huang, Chris Thorgrimsson, Milton Mamani, Jhonny Cerezo, Oleks Zaytsev, Stéphane Ducasse, Torsten Bergmann, Serge Stinckwich, Alexandre Rousseau, Sean P. DeNigris, Julián Grigera, Cesar Rabak, Yvan Guemkam, John Borden, Sudhakar Krishnamachari, Leandro Caniglia, mldavis99, darth-cheney, Andy S., Jon Paynter, Esteban Lorenzano.
+CH Huang, Chris Thorgrimsson, Milton Mamani, Jhonny Cerezo, Oleks Zaytsev, Stéphane Ducasse, Torsten Bergmann, Serge Stinckwich, Alexandre Rousseau, Sean P. DeNigris, Julián Grigera, Cesar Rabak, Yvan Guemkam, John Borden, Sudhakar Krishnamachari, Leandro Caniglia, mldavis99, darth-cheney, Andy S., Jon Paynter, Esteban Lorenzano, Juan-Pablo Silva.
 
 We are also deeply grateful to 
 - Lam Research for sponsoring part of this work

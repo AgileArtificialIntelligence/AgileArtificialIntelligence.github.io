@@ -95,33 +95,33 @@ The character `^` returns the value of an expression, in this case the value of 
 
 Similarly, we need to define methods to assign a value to the `bias` variable and to read its content. The method `bias:` is defined as follow:
 
-~~~~~~~
+```Smalltalk
 Neuron>>bias: aNumber
 	bias := aNumber
-~~~~~~~
+```
 
 And reading the variable `bias` is provided by:
 
-~~~~~~~
+```Smalltalk
 Neuron>>bias
 	^ bias
-~~~~~~~
+```
 
 So far, we have defined the class `Neuron` which contains two variables (`weights` and `bias`), and 4 methods (`weights:`, `weights`, `bias:`, and `bias`). We now need to define the logic of our perceptron by applying a set of input values and obtaining the output value. Let's add a `feed:` method that does exactly this small computation:
 
-~~~~~~~
+```Smalltalk
 Neuron>>feed: inputs
 	| z |
 	z := (inputs with: weights collect: [ :x :w | x * w ]) sum + bias.
 	^ z > 0 ifTrue: [ 1 ] ifFalse: [ 0 ].
-~~~~~~~
+```
 
 The `feed:` method simply translates the mathematical perceptron activation formula previously discussed into the Pharo programming language.
 The expression `inputs with: weights collect: [ :x :w | x * w ]` transforms the `inputs` and `weights` collections using the supplied function. Consider the following example:
 
-~~~~~~~
+```Smalltalk
 #(1 2 3) with: #(10 20 30) collect: [ :a :b | a + b ]
-~~~~~~~
+```
 
 The above expression evaluates to `#(11 22 33)`. Syntactically, the expression means that the literal value `#(1 2 3)` receives a message called `with:collect:`, with two arguments, the literal array `#(10 20 30)` and the block `[ :a :b | a + b ]`.
 You can verify the value of that expression by opening a playground (accessible from the main Pharo menu). A playground is a kind of command terminal for Pharo (_e.g.,_ xterm in the Unix World). Figure @fig:playground illustrates the evaluation of the expression given above (evaluated either by choosing "Print It" from the right click menu, or using the adequate shortcut (Cmd + p on OSX or Alt + p on other operating systems).
@@ -130,12 +130,12 @@ You can verify the value of that expression by opening a playground (accessible 
 
 We can now play a little bit with a perceptron. Evaluate the following code in the playground we just opened:
 
-~~~~~~~
+```Smalltalk
 p := Neuron new.
 p weights: #(1 2).
 p bias: -2.
 p feed: #(5 2)
-~~~~~~~
+```
 
 This piece of code evaluates to `1` (since `(5*1 + 2*2)-2` equals to `7`, which is greater than `0`).
 
@@ -151,17 +151,17 @@ For example, above we defined a perceptron, and we informally tested it in a pla
 
 We now define a class called `PerceptronTest`:
 
-~~~~~~~
+```Smalltalk
 TestCase subclass: #PerceptronTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	package: 'NeuralNetwork'
-~~~~~~~
+```
 
 
 The class `TestCase` belongs to the built-in Pharo codebase. Subclassing it is the first step to create a unit test. Tests can now be added to our `PerceptronTest`. Define the following method:
 
-~~~~~~~
+```Smalltalk
 PerceptronTest>>testSmallExample
 	| p result |
 	p := Neuron new.
@@ -169,7 +169,7 @@ PerceptronTest>>testSmallExample
 	p bias: -2.
 	result := p feed: #(5 2).
 	self assert: result equals: 1.
-~~~~~~~
+```
 
 The method `testSmallExample` tests that the code snippet we previously gave returns the value `1`. 
 The test can be run by clicking on the gray circle located next to the method name. The gray circle turns green to indicate the test passes (Figure @fig:testingPerceptron01).
@@ -201,7 +201,7 @@ A | B | A  AND  B
 
 We could therefore verify this with a new test method:
 
-~~~~~~~
+```Smalltalk
 PerceptronTest>>testAND
 	| p |
 	p := Neuron new.
@@ -212,7 +212,7 @@ PerceptronTest>>testAND
 	self assert: (p feed: #(0 1)) equals: 0.
 	self assert: (p feed: #(1 0)) equals: 0.
 	self assert: (p feed: #(1 1)) equals: 1.
-~~~~~~~
+```
 
 Similarly, a perceptron can formulate the OR logical gate:
 
@@ -225,7 +225,7 @@ A | B | A OR B
 
 Consider the following test:
 
-~~~~~~~
+```Smalltalk
 PerceptronTest>>testOR
 	| p |
 	p := Neuron new.
@@ -236,11 +236,11 @@ PerceptronTest>>testOR
 	self assert: (p feed: #(0 1)) equals: 1.
 	self assert: (p feed: #(1 0)) equals: 1.
 	self assert: (p feed: #(1 1)) equals: 1.
-~~~~~~~~
+```
 
 Negating the weights and bias results in the negated logical gate:
 
-~~~~~~~
+```Smalltalk
 PerceptronTest>>testNOR
 	| p |
 	p := Neuron new.
@@ -251,11 +251,11 @@ PerceptronTest>>testNOR
 	self assert: (p feed: #(0 1)) equals: 0.
 	self assert: (p feed: #(1 0)) equals: 0.
 	self assert: (p feed: #(1 1)) equals: 0.
-~~~~~~~
+```
 
 So far we have built perceptrons with two inputs. The number of input values has to be the same than the number of weights. Therefore, if only one weight is provided, only one input is required. Consider the NOT logical gate:
 
-~~~~~~~
+```Smalltalk
 PerceptronTest>>testNOT
 	| p |
 	p := Neuron new.
@@ -264,7 +264,7 @@ PerceptronTest>>testNOT
 	
 	self assert: (p feed: #(1)) equals: 0.
 	self assert: (p feed: #(0)) equals: 1.
-~~~~~~~
+```
 
 ## Handling error
 
@@ -272,7 +272,7 @@ In `testNOT`, we have defined a perceptron with only one weight. The array provi
 
 We should also test this behavior to make sure errors are properly generated. Define the following test:
 
-~~~~~~~
+```Smalltalk
 PerceptronTest>>testWrongFeeding
 	| p |
 	p := Neuron new.
@@ -280,7 +280,7 @@ PerceptronTest>>testWrongFeeding
 	p bias: 0.5.
 	
 	self should: [ p feed: #(1 1) ] raise: Error
-~~~~~~~
+```
 
 The test `testWrongFeeding` passes only if the expression `p feed: #(1 1)` raises an error, which it does. 
 
@@ -312,7 +312,7 @@ A | B | A < B | A = B | A > B
 
 Figure @fig:digitalComparator illustrates the circuit. Three different logical gates are necessary: AND, NOT, and NOR. We then need to make the connection between these gates. As we previously did, some tests will drive our effort. The method `digitalComparator:`, defined in our unit test for convenience, models the digital comparator circuit:
 
-~~~~~~~
+```Smalltalk
 PerceptronTest>>digitalComparator: inputs
     "Return an array of three elements"
     | not and nor a b aGb aEb aLb notA notB |
@@ -330,7 +330,7 @@ PerceptronTest>>digitalComparator: inputs
     aGb := and feed: { a . notB }.
     aEb := nor feed: { aGb . aLb }.
     ^ { aGb . aEb . aLb }
-~~~~~~~
+```
 
 The method accepts a set of inputs as its argument. We begin by extracting the first and second elements of these inputs and assign them to the temporary variables `a` and `b`. 
 
@@ -340,13 +340,13 @@ We then compute `notA` and `notB`. Here, we use an alternative syntax to define 
 
 The method `digitalComparator:` returns the result of the circuit evaluation as an array. We can test it using the following test method:
 
-~~~~~~~
+```Smalltalk
 PerceptronTest>>testDigitalComparator
 	self assert: (self digitalComparator: #(0 0)) equals: #(0 1 0).
 	self assert: (self digitalComparator: #(0 1)) equals: #(0 0 1).
 	self assert: (self digitalComparator: #(1 0)) equals: #(1 0 0).
 	self assert: (self digitalComparator: #(1 1)) equals: #(0 1 0).
-~~~~~~~
+```
 
 The digital comparator circuit example shows how perceptrons may be "manually" combined. 
 The overall behavior is divided into parts, each referenced with a variable. These variables must then be combined to express the logical flow (_e.g.,_ the variable `notA` must be computed before computing an output). 
@@ -374,50 +374,50 @@ in which:
 
 We have $w_i(0)$ equals to a random number, usually within a narrow range centered on 0. The two equations given above can be translated into the following pseudocode:
 
-~~~~~~~
+~~~~~~~~~
 diff = desiredOutput - realOutput
 alpha = 0.1
 For all N:
    weightN = weightN + (alpha * inputN * diff)
 bias = bias + (alpha * diff)
-~~~~~~~
+~~~~~~~~~
 
 This pseudocode can be written in Pharo with the method `train:desiredOutput:`. But before that, we need to slightly adjust the definition of the class `Neuron` by adding the instance variable `learningRate`. The definition is:
 
-~~~~~~~
+```Smalltalk
 Object subclass: #Neuron
 	instanceVariableNames: 'weights bias learningRate'
 	classVariableNames: ''
 	package: 'NeuralNetwork'
-~~~~~~~
+```
 
 We can also provide the necessary methods to modify the variable `learningRate`:
 
-~~~~~~~
+```Smalltalk
 Neuron>>learningRate: aNumber
 	"Set the learning rate of the neuron"
 	learningRate := aNumber
-~~~~~~~
+```
 
 To obtain the value of the variable:
 
-~~~~~~~
+```Smalltalk
 Neuron>>learningRate
 	"Return the learning rate of the neuron"
 	^ learningRate
-~~~~~~~
+```
 
 The variable can be initialized in the constructor
 
-~~~~~~~
+```Smalltalk
 Neuron>>initialize
 	super initialize.
 	learningRate := 0.1
-~~~~~~~
+```
 
 We can now define the method `train:desiredOutput:` to make a perceptron learn.
 
-~~~~~~~
+```Smalltalk
 Neuron>>train: inputs desiredOutput: desiredOutput
 	| theError output newWeight |
 	output := self feed: inputs.
@@ -427,39 +427,39 @@ Neuron>>train: inputs desiredOutput: desiredOutput
 			newWeight := (weights at: index) + (learningRate * theError * anInput).
 			weights at: index put: newWeight ].
 	bias := bias + (learningRate * theError)
-~~~~~~~
+```
 
 Before doing any adjustment of the weights and bias, we need to know how well the perceptron evaluates the set of inputs. We therefore need to evaluate the perceptron with the argument `inputs`. The result is assigned to the variable `output`. The variable `theError` represents the difference between the desired output and the actual output. We also need to decide how fast the perceptron is supposed to learn. The `learningRate` value ranges between `0.0` and `1.0`. We arbitrarily picked the value `0.1`. 
 
 
 Let's see how to use the training in practice. Consider the perceptron `p` in the following example:
 
-~~~~~~~
+```Smalltalk
 p := Neuron new.
 p weights: #(-1 -1).
 p bias: 2.
 p feed: #(0 1).
-~~~~~~~
+```
 
 You can evaluate the code above in a playground. We have `p feed: #(0 1)` is equal to `1`. What if we wish the perceptron to actually output `0` for the input `#(0 1)`? We would need to train `p`. As we said, this training will adjust the weights and the bias. Let's try the following:
 
-~~~~~~~
+```Smalltalk
 p := Neuron new.
 p weights: #(-1 -1).
 p bias: 2.
 p train: #(0 1) desiredOutput: 0.
 p feed: #(0 1).
-~~~~~~~
+```
 
 Evaluating this expression still outputs `1`. Huh?! Were we not supposed to train our perceptron? A perceptron learns slowly. We therefore actually need to train the perceptron a few times on the desired output. We can repeatedly train the perceptron as follows:
 
-~~~~~~~
+```Smalltalk
 p := Neuron new.
 p weights: #(-1 -1).
 p bias: 2.
 10 timesRepeat: [ p train: #(0 1) desiredOutput: 0 ].
 p feed: #(0 1).
-~~~~~~~
+```
 
 Evaluating the code given above produces `0`, as we were hoping for (Figure @fig:playgroundWithLearningPerceptron). Our perceptron has learned!
 
@@ -467,7 +467,7 @@ Evaluating the code given above produces `0`, as we were hoping for (Figure @fig
 
 We can now train a perceptron to actually learn how to express the logical gates. Consider the following `testTrainingOR`:
 
-~~~~~~~
+```Smalltalk
 PerceptronTest>>testTrainingOR
 	| p |
 	p := Neuron new.
@@ -485,7 +485,7 @@ PerceptronTest>>testTrainingOR
 	self assert: (p feed: #(0 1)) equals: 1.
 	self assert: (p feed: #(1 0)) equals: 1.
 	self assert: (p feed: #(1 1)) equals: 1.
-~~~~~~~
+```
 
 The method `testTrainingOR` first creates a perceptron with some arbitrary weights and bias. We successfully train it with the four possible combinations of the OR logical gate. After the training, we verify whether the perceptron has properly learned.
 
@@ -493,7 +493,7 @@ In `testTrainingOR`, we train the perceptron 40 times on the complete set of exa
 
 Similarly, we can define a test that train a perceptron to model the NOT logical gate:
 
-~~~~~~~
+```Smalltalk
 PerceptronTest>>testTrainingNOT
 	| p |
 	p := Neuron new.
@@ -507,7 +507,7 @@ PerceptronTest>>testTrainingNOT
 	
 	self assert: (p feed: #(0)) equals: 1.
 	self assert: (p feed: #(1)) equals: 0.
-~~~~~~~
+```
 
 
 *EXERCISE:*
@@ -532,7 +532,7 @@ The coming section uses Roassal. Make sure you have it loaded, else part of the 
 
 Here is an example of drawing a simple graph (Figure @fig:exampleGraph):
 
-~~~~~~~
+```Smalltalk
 g := RTGrapher new.
 d := RTData new.
 d connectColor: Color blue.
@@ -540,7 +540,7 @@ d points: (1 to: 100).
 d y: [ :x | (x / 3.14) sin  ].
 g add: d.
 g
-~~~~~~~
+```
 
 ![Example of a graph.](02-Perceptron/figures/exampleGraph.png){#fig:exampleGraph}
 
@@ -563,7 +563,7 @@ Some questions arise:
 
 Let's pick a linear function, such as $f(x) = -2x - 3$. A given point $(x, y)$ is colored in red if $y > f(x)$, else it is blue. Consider the following script:
 
-~~~~~~~
+```Smalltalk
 somePoints := OrderedCollection new.
 500 timesRepeat: [ 
 	somePoints add: {(50 atRandom - 25) . (50 atRandom - 25)}
@@ -583,7 +583,7 @@ d x: #first.
 d y: #second.
 g add: d.
 g
-~~~~~~~
+```
 
 Inspecting this code snippet produces a graph with 500 colored dots (Figure @fig:simpleLine).
 
@@ -597,7 +597,7 @@ The remainder of the script uses Grapher to plot the points. A point `p` is red 
 
 We can add the actual line defined by `f` to our graph. Consider the small revision (Figure @fig:simpleLine2):
 
-~~~~~~~
+```Smalltalk
 somePoints := OrderedCollection new.
 500 timesRepeat: [ 
 	somePoints add: {(50 atRandom - 25) . (50 atRandom - 25)}
@@ -625,7 +625,7 @@ d2 y: f.
 d2 x: #yourself.
 g add: d2.
 g
-~~~~~~~
+```
 
 ![Adding a separation line.](02-Perceptron/figures/simpleLine2.png){#fig:simpleLine2}
 
@@ -633,7 +633,7 @@ g
 
 We will now add a perceptron to our script and see how well it guesses on which side of the line a point falls. Consider the following script (Figure @fig:dotColorPrediction):
 
-~~~~~~~
+```Smalltalk
 f := [ :x | (-2 * x) - 3 ].
 p := Neuron new.
 p weights: { 1 . 2 }.
@@ -674,7 +674,7 @@ d2 y: f.
 d2 x: #yourself.
 g add: d2.
 g
-~~~~~~~
+```
 
 ![Predicting the color of the dot.](02-Perceptron/figures/runningThePerceptron.png){#fig:dotColorPrediction}
 
@@ -682,23 +682,23 @@ Figure @fig:dotColorPrediction gives the result of the prediction. We can see th
 
 As in a previous script, the script begins with the definition of the block function `f`. It then creates a perceptron with some arbitrary weights and bias. Subsequently, a random number generator is created. In our previous scripts, to obtain a random value between 1 and 50, we simply wrote `50 atRandom`. Using a random number generator, we need to write:
 
-~~~~~~~
+```Smalltalk
 r := Random new seed: 42.
 r nextInt: 50.
-~~~~~~~
+```
 
 Why is this? First of all, being able to generate random numbers is necessary in all stochastic approaches, including neural networks. Although randomness is very important, we usually do not want to let such a random value create situations that cannot be reproduced. Imagine that our code behaves erratically, likely due to a random value. How can we track down the anomaly in our code? If we have truly random numbers, it means that executing the same piece of code twice may produce (even slightly) different behaviors. It may therefore be complicated to properly test. Instead, we will use a random generator with a known seed to produce a known sequence of random numbers. Consider the expression:
 
-~~~~~~~
+```Smalltalk
 (1 to: 5) collect: [ :i | 50 atRandom ]
-~~~~~~~
+```
 
 Each time you evaluate this expression, you will obtain a _new_ sequence of 5 random numbers. Using a generator you have:
 
-~~~~~~~
+```Smalltalk
 r := Random new seed: 42.
 (1 to: 5) collect: [ :i | r nextInt: 50 ]
-~~~~~~~
+```
 
 Evaluating this small script several times always produces the same sequence. This is the key to have reproducible and deterministic behavior. In the remainder of the book, we will frequently use random number generators.
 
@@ -717,7 +717,7 @@ We have seen that the accuracy of a perceptron in classifying points is very dep
 
 Consider the script:
 
-~~~~~~~
+```Smalltalk
 learningCurve := OrderedCollection new.
 f := [ :x | (-2 * x) - 3 ].
 
@@ -756,7 +756,7 @@ g add: d.
 g axisY title: 'Precision'.
 g axisX noDecimal; title: 'Training iteration'.
 g
-~~~~~~~
+```
 
 ![Precision of the dot classification task.](02-Perceptron/figures/perceptronPrecision.png){#fig:perceptronPrecision width=400px}
 

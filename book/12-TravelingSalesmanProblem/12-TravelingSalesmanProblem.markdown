@@ -1,11 +1,13 @@
 
 # Traveling Salesman Problem
 
-The Traveling Salesman Problem is a classical algorithm problem. It consists in visiting a number of cities using the shortest possible route. Each city has a 2D coordinate. Consider the example given in Figure @fig:TSPExample.
+The Traveling Salesman Problem is a classical algorithm problem. It consists in visiting a number of cities using the shortest possible route. 
+
+## Illustration
 
 ![Illustration of the Traveling Salesman Problem.](12-TravelingSalesmanProblem/figures/TSPExample.png){#fig:TSPExample}
 
-The figure shows three cities and the traveler. 
+Consider the example given in Figure @fig:TSPExample. The figure shows four cities located as an horizontal diamond. Each city has a 2D coordinate. Assuming the traveler begins its journey in city A, many paths are possible, for example ABCD, ABDC, ADBC, ACDB, or ADCB. What is the shortest path to visit all the cites? Since the distance between City B and City D is shorter than 
 
 ## Swap mutation operation
 
