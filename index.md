@@ -9,7 +9,7 @@ Part I: Neural Network
 1. [Artificial Neuron](./book/build/03-Neuron.html)
 1. [Neural Network](./book/build/04-NeuralNetwork.html)
 1. [Theory on Learning](./book/build/05-Learning.html)
-1. [Application: Data Classification](./book/build/06-Data.html)
+1. [Data Classification](./book/build/06-Data.html)
 1. [A Matrix Library](./book/build/07-MatrixLibrary.html)
 1. [Matrix-Based Neural Network](./book/build/08-MatrixNN.html)
 1. Using Keras from Pharo
