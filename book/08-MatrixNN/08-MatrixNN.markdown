@@ -1,10 +1,10 @@
 
 # Matrix-based Neural Network
 
-This chapter revises the implementation of our neural network. However, it uses matrices to compute the forward and backward propagation algorithm. Overall, our matrix-based implementation is composed of two classes, `NMLayer` and `NMNetwork`.
+This chapter revises the implementation of our neural network. In this revision, our network will use matrices to compute the forward and backward propagation algorithm. Overall, our matrix-based implementation is composed of two classes, `NMLayer` and `NMNetwork`. Since our most of the computation is delegated to the matrix library we defined in the previous chapter, our new version of the neural network is rather light in terms of amount of code.
 
 ## Defining a matrix-based layer
-A neural network is composed of matrices. We describe a layer as an instance of the class `NMLayer`, defined as such:
+A neural network is composed of layers. We describe a layer as an instance of the class `NMLayer`, defined as follows:
 
 ```Smalltalk
 Object subclass: #NMLayer
@@ -37,7 +37,7 @@ The weight matrix is accessible using `w`:
 
 ```Smalltalk
 NMLayer>>w
-	"Return a MMatrix"
+	"Return the MMatrix representing the weights"
 	^ w
 ```
 
@@ -132,7 +132,7 @@ NMLayer>>numberOfExamples
 	^ numberOfExamples
 ```
 
-The layer is initialized by providing the number of neurons it should contains and the number of outputs. The random number generator is also provided to initialize the weight and bias matrices. We defining the method:
+The layer is initialized by providing the number of neurons it should contains and the number of outputs. The random number generator is also provided to initialize the weight and bias matrices. We define the initialization method:
 
 ```Smalltalk
 NMLayer>>nbInputs: nbOfInputs nbOutputs: nbOfOutputs random: random
@@ -152,11 +152,12 @@ NMLayer>>feed: inputMatrix
 	^ output
 ```
 
-Once the error are backpropagated, weights and biases can be updated using:
+Once the error is backpropagated, weights and biases can be updated using:
 
 ```Smalltalk
 NMLayer>>update
-	w := w - ((delta +* previous output transposed) * lr / numberOfExamples ).
+	"Update the weights and biases using the delta value"
+	w := w - ((delta +* previous output transposed) * lr / numberOfExamples).
 	b := b - (delta sumHorizontal * lr / numberOfExamples).
 	next ifNotNil: [ next update ]
 ```
@@ -165,13 +166,14 @@ The very first layer uses the input vector to actually update its parameters:
 
 ```Smalltalk
 NMLayer>>update: input
+	"Update the weights and biases using the input value"
 	w := w - ((delta +* input transposed) * lr / numberOfExamples).
 	b := b - (delta sumHorizontal * lr / numberOfExamples).
 	next update
 
 ```
 
-Our definition of layer is now complete. We can lay out the necessary to hook layers together using the class `NMNetwork`.
+Our definition of layer is now complete. We can now propose a definition of the class `NMNetwork`.
 
 ## Defining a matrix-based neural network
 
@@ -184,13 +186,13 @@ Object subclass: #NMNetwork
 	package: 'NeuralNetwork-Matrix'
 ```
 
-The variables are similar than in our first version of the neural network. The variable `random` contains a random number generator, which is useful to initialize the layers. The `errors` variable contains the errors values during the training. The `layers` contains instances of `NMLayer`. 
+The variables are similar than in our first version of the neural network. The variable `random` contains a random number generator, which is useful to initialize the layers. The `errors` variable contains the errors values during the training. The `layers` variable contains instances of `NMLayer`. 
 
-The network is initialized with no layers and a random number generator:
+The network is initialized with no layer and a random number generator:
 
 ```Smalltalk
 NMNetwork>>initialize
-	"Initialize the network with no layers and a proper random generator"
+	"Initialize the network with no layer and a proper random generator"
 	super initialize.
 	layers := OrderedCollection new.
 	random := Random seed: 42.
@@ -207,7 +209,7 @@ NMNetwork>>addLayer: aLayer
 	layers add: aLayer
 ```
 
-A central method to the learning is `backwardX:y:`, which computes the error and backpropagate it to the layers:
+A central method to the learning is `backwardX:y:`, which computes the error and backpropagates it along the layers:
 
 ```Smalltalk
 NMNetwork>>backwardX: x y: y
@@ -293,7 +295,7 @@ NMNetwork>>trainX: x y: y nbOfEpochs: nbEpochs
 	^ cost
 ```
 
-The update of the weights and bias is done using the method:
+The update of the weights and biases is done using the method:
 
 ```Smalltalk
 NMNetwork>>update: input
@@ -367,7 +369,6 @@ NMNetwork>>viewLearningCurve
 				add: (RTLabel elementOn: 'Should first run the network');
 				yourself ].
 	b := RTGrapher new.
-
 	"We define the size of the charting area"
 	b extent: 500 @ 300.
 	ds := RTData new.
@@ -379,10 +380,7 @@ NMNetwork>>viewLearningCurve
 	ds y: #value.
 	ds dotShape rectangle color: Color blue.
 	b add: ds.
-
-	b axisX
-		noDecimal;
-		title: 'Epoch'.
+	b axisX noDecimal; title: 'Epoch'.
 	b axisY title: 'Error'.
 	^ b
 ```
@@ -394,9 +392,12 @@ NMNetwork>>viewLearningCurveIn: composite
 	<gtInspectorPresentationOrder: -10>
 	composite roassal2
 		title: 'Cost';
-		initializeView: [
-			self viewLearningCurve ]
+		initializeView: [ self viewLearningCurve ]
 ```
+
+![Visualizing the learning.](08-MatrixNN/figures/learningMatrixBased.png){#fig:learningMatrixBased}
+
+Evaluating the training instruction in the previous section should output the error curve showing in Figure @fig:learningMatrixBased.
 
 ## Iris Dataset
 
@@ -430,7 +431,7 @@ The result is the same than we we previously seen.
 
 ## What we have seen
 
-This chapter revises our previous implementation of neural network. The chapter employs matrices to model the state of the network, which brings some great simplification. However, it raises the level of abstractness. Matrices are a complex notion. The chapters explores:
+This chapter revises our previous implementation of neural network. Our revised implementation employs matrices to model the state of the network, which greatly simplify the implementation of it. However, it raises the level of abstractness since matrices are not at the core. The chapters explores:
 
 - The use of matrices to implement forward and backward propagation. It uses the matrix library presented in the previous chapter
 - It revisits the Iris classification example to illustrate the new neural network classes.

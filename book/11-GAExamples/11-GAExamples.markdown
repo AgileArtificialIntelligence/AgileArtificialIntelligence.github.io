@@ -34,8 +34,10 @@ Consider the following script:
 The fitness function contains the expression `genes inject: 1 into: [ :r :v | r * v ]` which returns the multiplication of the numbers contained in the `genes` temporary variable. For example, `#(3 5 23) inject: 1 into: [ :r :v | r * v ]` evaluates to `345`. 
 
 After the execution of the script, we can verify how it did go with the expression:
+
 ```Smalltalk
-g logs last fitness.
+...
+g logs last bestFitness.
 ```
 
 If the value is `0`, then we found the exact prime factors. If we did not found it, then we could increase the population size and / or increase the argument of `endIfNoImprovementFor:`. 
@@ -43,7 +45,8 @@ If the value is `0`, then we found the exact prime factors. If we did not found 
 The prime factors may be obtained using the expression:
 
 ```Smalltalk
-	g result copyWithout: 1.
+...
+g result copyWithout: 1.
 ```
 
 ![Identification prime factors of `345`.](11-GAExamples/figures/primeNumbers.png){#fig:primeNumbersOf345}
@@ -202,6 +205,12 @@ The fitness function computes the number of different room and the number of ove
 
 ## What have we seen in this chapter?
 
-The chapter presents three examples on how genetic algorithm can be efficiently employed to find a solution to some optimization problems. As we have said, the genetic algorithm does not guarantee that the result is actually the optimal solution.
+The chapter presents three examples on how genetic algorithm can be efficiently employed to find a solution to some optimization problems:
+
+- The fundamental theorem of arithmetic, which consists in finding for a given number $N$ a set of prime numbers that when multipled together is equals to $N$;
+- Two variants of the knapsack problem, namely the _unbounded_ and _0-1_ variants;
+- The room scheduling problem which consists in assigning meeting to rooms while avoiding overlapping.
+
+ As we have said, the genetic algorithm does not guarantee that the result is actually the optimal solution.
 
 The next chapter covers the 

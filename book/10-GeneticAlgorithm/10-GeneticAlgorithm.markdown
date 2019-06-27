@@ -34,7 +34,7 @@ The word _cow_ has exactly 1 letter in common with _cat_, the secret word. We th
 
 Since we have not found the solution (_i.e.,_ none of cow, poz, and gat are the secret word), we can produce a new generation of words by doing some combinations of the words we already have. In particular, _gat_ and _cow_ can be combined into _gaw_, _cot_, _gow_. From these three words, the word _cot_ has a score of 2 and is very close to the secret word. We say that this second generation of words is improving by being closer to the solution.
 
-This small example illustrates the overall idea of genetic algorithm: each individual in a set of random individuals is evaluated to compute a score value. Individual with a high score, which are the ones close to solving the problem, are recombined to form new individuals. Before detailling the algorith, we will define the vocabulary we will thouroughly use in the chapter.
+This small example illustrates the overall idea of genetic algorithm: each individual in a set of random individuals is evaluated to compute a score value. Individual with a high score, which are the ones close to solving the problem, are recombined to form new individuals. Before to detail the algorithm, we will define the vocabulary we will thoroughly use in the chapter.
 
 ## Vocabulary
 
@@ -350,7 +350,7 @@ We define an abstract method:
 
 ```Smalltalk
 GAAbstractCrossoverOperation>>pickCutPointFor: anIndividual
-	"Need to be overriden in subclasses"
+	"Need to be overridden in subclasses"
 	self subclassResponsibility 
 ```
 
@@ -823,7 +823,7 @@ Being able to monitor the execution of the algorithm is essential. For example, 
 
 ```Smalltalk
 Object subclass: #GALog
-	instanceVariableNames: 'generationNumber timeToProduceGeneration fittestIndividual'
+	instanceVariableNames: 'generationNumber timeToProduceGeneration fittestIndividual worseFitness averageFitness'
 	classVariableNames: ''
 	package: 'GeneticAlgorithm-Core'
 ```
@@ -850,13 +850,44 @@ GALog>>fittestIndividual: anIndividual
 The method `fitness` returns the fitness value of the best individual of the population:
 
 ```Smalltalk
-GALog>>fitness
+GALog>>bestFitness
 	"Return the best fitness value of a generation I am representing"
-	
 	^ fittestIndividual fitness
-```	
+```
 
-The number of generation has also to be tracked. The `generationNumber` indicates the number of the generation the log object is referring to:
+The average fitness of the population is set using the method `averageFitness`:
+
+```Smalltalk
+GALog>>averageFitness
+	"Return the average fitness value of a generation I am representing"
+	^ averageFitness
+```
+
+The average fitness may be set using:
+
+```Smalltalk
+GALog>>averageFitness: aNumber
+	"Set the average fitness value of a generation I am representing"
+	averageFitness := aNumber
+```
+
+Similarly, the lowest fitness score is obtained using:
+
+```Smalltalk
+GALog>>worseFitness
+	"Return the lowest fitness value of a generation I am representing"
+	^ worseFitness
+```
+
+The lowest fitness score is set by the engine using: 
+
+```Smalltalk
+GALog>>worseFitness: aNumber
+	"Set the lowest fitness value of a generation I am representing"
+	worseFitness := aNumber
+```
+
+The number of generations has also to be tracked. The `generationNumber` indicates the number of the generation the log object is referring to:
 
 ```Smalltalk
 GALog>>generationNumber
@@ -952,6 +983,15 @@ GAEngine>>fitnessBlock
 	"Return the fitness block used by the engine"
 	^ fitnessBlock
 ```
+
+We also provide an accessor of the variable `beforeCreatingInitialIndividual`:
+```Smalltalk
+GAEngine>>beforeCreatingInitialIndividual: aOneArgBlock
+	"Set the behavior to be executed before creating an individual.
+	The block takes a random number generator as argument."
+	beforeCreatingInitialIndividual := aOneArgBlock
+```
+:
 
 The mutation rate may be as using:
 
@@ -1098,8 +1138,7 @@ GAEngine>>initializePopulation
 			| ind |
 			beforeCreatingInitialIndividual value: random.
 			ind := GAIndividual new.
-			population
-				add:
+			population add:
 					(ind
 						random: random;
 						set: numberOfGenes genesUsing: createGeneBlock) ]
@@ -1148,6 +1187,8 @@ GAEngine>>run
                     log := GALog new.
                     log generationNumber: gen.
                     log fittestIndividual: selection fittest.
+                    log worseFitness: ((population collect: #fitness) inject: log bestFitness into: [ :wFit :current | (compareFitness value: wFit value: current) ifTrue: [ current ] ifFalse: [ wFit ] ]).
+					log averageFitness: (population collect: #fitness) average asFloat. 
                     log timeToProduceGeneration: Time now asSeconds - t.
                     logs add: log ] ]
 ```
@@ -1261,7 +1302,6 @@ GAEngineTest>>testExamples01
 	g createGeneBlock: [ :rand :index :ind | ($a to: $z) atRandom: rand ].
 	g fitnessBlock: [ :genes | (#($g $a $t $o) with: genes collect: [ :a :b | a = b 
 											ifTrue: [ 1 ] ifFalse: [ 0 ] ]) sum ].
-	
 	g run.
 	self assert: g logs first fittestIndividual fitness equals: 2.
 	self assert: g logs first fittestIndividual genes equals: #($g $l $t $s).
@@ -1269,7 +1309,93 @@ GAEngineTest>>testExamples01
 	self assert: g logs fourth fittestIndividual genes equals: #($g $a $t $o).
 ```
 
+## Visualizing the Evolution of the Population
+
+Visualizing the execution of the algorithm is an essential feature. We extend the class `GAEngine` to visualize the historical data kepts in the log objects.
+
+The method `visualize` uses Roassal to draw three curves. At each generation, the best, average, and lowest score is kept. Consider the following method definition:
+
+```Smalltalk
+GAEngine>>visualize
+	"Visualize the evolution of the population"
+	| g d |
+	g := RTGrapher new.
+	d := RTData new.
+	d label: 'Best fitness'.
+	d interaction popupText: [ :assoc | assoc value bestFitness ].
+	d connectColor: Color blue.
+	d noDot.
+	d points: self logs.
+	d y: #bestFitness.
+	d x: #generationNumber.
+	g add: d.
+	
+	d := RTData new.
+	d label: 'Worse fitness'.
+	d interaction popupText: [ :assoc | assoc value worseFitness ].
+	d connectColor: Color red.
+	d noDot.
+	d points: self logs.
+	d y: #worseFitness.
+	d x: #generationNumber.
+	g add: d.
+	
+	d := RTData new.
+	d label: 'Average fitness'.
+	d interaction popupText: [ :assoc | assoc value averageFitness ].
+	d connectColor: Color green.
+	d noDot.
+	d points: self logs.
+	d y: #averageFitness.
+	d x: #generationNumber.
+	g add: d.
+	g legend addText: 'Fitness evolution'.
+	g axisY title: 'Fitness'.
+	g axisX noDecimal; title: 'Generation'.
+	^ g
+```
+
+We make the class `GAEngine` friendly for the GTInspector framework:
+
+```Smalltalk
+GAEngine>>gtInspectorViewIn: composite
+	<gtInspectorPresentationOrder: -10>
+	composite roassal2
+		title: 'View';
+		initializeView: [ self visualize ]
+```
+
+Evaluate the script:
+
+```Smalltalk
+g := GAEngine new.
+g populationSize: 1000.
+g numberOfGenes: 4.
+g createGeneBlock: [ :rand :index :ind | ($a to: $z) atRandom: rand ].
+g fitnessBlock: [ :genes | 
+	(#($g $a $t $o) with: genes collect: [ :a :b | a = b 
+        ifTrue: [ 1 ] ifFalse: [ 0 ] ]) sum ].
+g run.
+```
+
+![Example of fitness evolution.](10-GeneticAlgorithm/figures/fitnessEvolutionSimple.png){#fig:fitnessEvolutionSimple}
+
+Figure @fig:fitnessEvolutionSimple illustrates the historical evolution of the fitness score. Such a graph is used as a means to interpret how went the algorithm execution.
+
+We can also easily give an access of the best individual:
+
+```Smalltalk
+GAEngine>>gtInspectorLogsIn: composite
+	<gtInspectorPresentationOrder: -5>
+	composite list
+		title: 'Logs';
+		display: [ self logs ]
+```
+
+When inspecting the result of the execution, a tab `Logs` accompanies the visualization.
+
 ## What have we seen in this chapter
+
 This chapter covers the following topics:
 
 - It presents the complete implementation of a genetic algorithm.

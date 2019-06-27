@@ -1,5 +1,5 @@
 
-# Application: Data Classification
+# Data Classification
 
 Neural networks have an incredible large range of applications. Classifying data is a prominent one, and this chapter is devoted to it.
 

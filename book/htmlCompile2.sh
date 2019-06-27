@@ -10,7 +10,7 @@
 
 
 FILES=`ls \
-	07-MatrixLibrary/*.markdown`
+	12-TravelingSalesmanProblem/*.markdown`
 
 
 #FILES=`ls 06-Data/*.markdown`
