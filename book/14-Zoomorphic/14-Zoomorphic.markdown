@@ -603,7 +603,7 @@ CMuscleGenerator>>random: randomNumberGenerator
 
 ## Creature
 
-A creature is an instance of the class `CCreature`:
+We define a creature as an instance of the class `CCreature`, defined as follow:
 
 ```Smalltalk
 Object subclass: #CCreature
@@ -613,9 +613,9 @@ Object subclass: #CCreature
 	category: 'Creature'
 ```
 
-A creature is essentially made of a set of nodes and a set of muscle. We will run our genetic algorithm on optimizing the configuration of the muscles. So, the initial configuration of our muscle is random, which is why we need a `random` number generator. Muscles are a complex structure which require a dedicated object to be built. Later on, the class `CMuscleGenerator` is a convenient way to build muscles.
+A creature is essentially made of a set of nodes and a set of muscle. We will run our genetic algorithm on optimizing the configuration of the muscles. So, the initial configuration of our muscle is random, which is why we need a `random` number generator. Muscles are a complex structure which require a dedicated object to be built. As we have seen, the class `CMuscleGenerator` is a convenient way to build muscles.
 
-
+A creature is initialized as follow:
 
 ```Smalltalk
 CCreature>>initialize
@@ -626,102 +626,101 @@ CCreature>>initialize
 	muscleGenerator := CMuscleGenerator new.
 ```
 
+Muscle and can be generated and added in a creature using the method:
 
 ```Smalltalk
 CCreature>>addMuscleFrom: aNode to: anotherNode
-
+	"Generate and add a muscle between two nodes"
 	muscles add: (muscleGenerator createMuscleFrom: aNode to: anotherNode)
 ```
 
-```Smalltalk
-CCreature>>addMuscleFromIndex: n1 toIndex: n2
-
-	muscles add: (muscleGenerator createMuscleFrom: (self nodes at: n1) to: (self nodes at: n2))
-```
+Each beat produces a beat for each node and each muscle. After, the physic rules have to be applied between the muscles and the nodes. The method `beat` is defined as:
 
 ```Smalltalk
 CCreature>>beat
+	"Execute a unit of behavior"
 	nodes do: #beat.
 	muscles do: #beat.
 	self reachStable
 ```
 
+Collision between a creature and the platforms is achieved using the method `checkForCollision:`, defined as follows:
+
 ```Smalltalk
 CCreature>>checkForCollision: platforms
-	"This is an optimized version of :
-	
-	
 	nodes do: [ :n | n checkForCollision: platforms ].
-	(nodes allSatisfy: [ :n | n position y = nodes first position y ]) ifTrue: [ 
-		nodes first translateBy: 0 @ -2.
-		nodes last translateBy: 0 @ -2 ]
-"
-	| allAtTheSameLevel tmpLevel |
-	allAtTheSameLevel := true.
-	tmpLevel := nil.
-	nodes doWithIndex: [ :n :index | 
-		n checkForCollision: platforms.
-		index = 1 
-			ifTrue: [ tmpLevel := n position y ]
-			ifFalse: [ n position y ~= tmpLevel ifTrue: [ allAtTheSameLevel ] ].
-		 ].
-	
-"	(nodes allSatisfy: #isOnPlatform) ifFalse: [ ^ self ]. "
-	allAtTheSameLevel ifFalse: [ ^ self ]. 
-	nodes first translateBy: 0 @ -2.
-	nodes last translateBy: 0 @ -2 
+	self simulateNoise.
 ```
+
+The physic engine we are implementing is minimal and is far from being complete. We need to add some noise in the way that the physical is simulated. For example, random noise accompanying the physic is not considered so far. However, such a noise is necessary to avoid singular situations, for example if all the nodes are exactly at the vertical level. We simply add some noise by moving a node randomly:
+
+```Smalltalk
+CCreature>>simulateNoise
+	"Produce noise in our simulation"
+	| direction |
+	direction := ((random nextInt: 3) - 2) @ ((random nextInt: 3) - 2). 
+	(nodes atRandom: random) translateBy: direction
+```
+
+All the necessary to model creature is now in place. The next section focuses on the creation of creature.
+
+## Creating Creature
+
+Even if we will produce creatures with simple shapes, manually creating creature is tedious. We define some dedicated methods. Adding nodes to a creature is achieved with the method `configureNodes:`:
+
+```Smalltalk
+CCreature>>configureNodes: nbNodes
+	"Add a number of nodes in our creature"
+	nbNodes timesRepeat: [ nodes add: CNode new createElement ]
+```
+
+
+A ball-like shape is created using:
 
 ```Smalltalk
 CCreature>>configureBall: numberOfNodes	
+	"Produce a ball-like creature"
+	muscleGenerator := CMuscleGenerator new
+		minStrength: 0.01;
+		deltaStrength: 0.5;
+		minLength: 10;
+		deltaLength: 80;
+		deltaTime: 200;
+		minTime: 20.
+
+	"Add some nodes nodes"
 	self configureNodes: numberOfNodes.
 
+	"Connect each node with all the other nodes"
 	nodes do: [ :n1 |
 		(nodes copyWithout: n1) do: [ :n2 |
-			self addMuscleFrom: n1 to: n2.
-		]
-	].
+			self addMuscleFrom: n1 to: n2. ] ].
 
+	"Create the visual elements"
 	self createElements.
 	self shuffleNodes
-
 ```
+
+The `configureBall:` takes as argument the number of nodes that will compose the ball. All the nodes are connected with all the other nodes. As a consequence, a ball creature will contains many muscles, which means that muscles should have a low strength.
+
+A more generic way of defining a creature is by specifying the number of nodes and the number of muscles. The method `configureNbNodes:nbMuscles:` is defined as follows:
 
 ```Smalltalk
 CCreature>>configureNbNodes: nbNodes nbMuscles: nbMuscle
-	| m n1 n2 tryNewNode1 tryNewNode2 |
-	"We want to avoid nodes to have more than one muscles between them.
-		We look for nodes if:
-			- there is less than 10 tries
-			- we look for another node if 
-				- the two nodes are the same, or 
-				- at least one muscle uses the two nodes"
-	"		[ (try <= 10 or: [ n2 == n1]) or: [ muscles anySatisfy: [ :mm | mm usesNodes: { n1 . n2 } ] ] ]  
-			whileTrue: [ try := try + 1. n2 := nodes atRandom: r ].
-"
+	"Configure a creature with a given number of nodes and muscles."
+	| n1 n2 tryNewNode1 tryNewNode2 |
 	self configureNodes: nbNodes.
 	nbMuscle
-		timesRepeat: [ m := CMuscle new.
+		timesRepeat: [ 
 			n1 := nodes atRandom: random.
 			n2 := n1.
 			tryNewNode1 := 0.
 			tryNewNode2 := 0.
 			[ tryNewNode1 < 10
-				and: [ n2 == n1
-						or: [ muscles
-								anySatisfy: [ :mm | 
-									mm
-										usesNodes:
-											{n1.
-											n2} ] ] ] ]
+				and: [ n2 == n1 or: [ muscles anySatisfy: [ :mm | mm usesNodes: { n1 . n2 } ] ] ] ]
 				whileTrue: [ [ tryNewNode2 < 10
 						and: [ n2 == n1
-								or: [ muscles
-										anySatisfy: [ :mm | 
-											mm
-												usesNodes:
-													{n1.
-													n2} ] ] ] ]
+								or: [ muscles anySatisfy: [ :mm |  mm usesNodes: { n1 . n2 } ] ] ] ]
 						whileTrue: [ tryNewNode2 := tryNewNode2 + 1.
 							n2 := nodes atRandom: random ].
 					tryNewNode2 = 10
@@ -734,11 +733,21 @@ CCreature>>configureNbNodes: nbNodes nbMuscles: nbMuscle
 	self shuffleNodes
 ```
 
-```Smalltalk
-CCreature>>configureNodes: nbNodes
-	"Add a number of nodes in our creature"
-	nbNodes timesRepeat: [ nodes add: CNode new createElement ]
-```
+The method first define some nodes. Some constraints need to be set on the nodes that are joined by a muscle. In particular, we cannot have more than one muscle between two nodes. The small algorithm used in the method picks a pair of nodes if:
+
+- there is less than 10 tries to look for nodes
+- if the
+
+	"We want to avoid nodes to have more than one muscles between them.
+		We look for nodes if:
+			- there is less than 10 tries
+			- we look for another node if 
+				- the two nodes are the same, or 
+				- at least one muscle uses the two nodes"
+	"		[ (try <= 10 or: [ n2 == n1]) or: [ muscles anySatisfy: [ :mm | mm usesNodes: { n1 . n2 } ] ] ]  
+			whileTrue: [ try := try + 1. n2 := nodes atRandom: r ].
+"
+
 
 ```Smalltalk
 CCreature>>configureWorm: length
@@ -963,6 +972,16 @@ GAConstrainedCrossoverOperation>>possibleCutpoints: indexes
 
 Note that we could have added bones in the way we model creature. Once we have the notion of bone, we could have build skeletons. Although appealing, it would have significantly increased the amount of source code.
 
+
+<!--
+```Smalltalk
+CCreature>>addMuscleFromIndex: n1 toIndex: n2
+
+	muscles add: (muscleGenerator createMuscleFrom: (self nodes at: n1) to: (self nodes at: n2))
+```
+-->
+
+
 <!--
 ~~~~~~
 CNode>>printOn: str
@@ -972,6 +991,36 @@ CNode>>printOn: str
 	str nextPut: $>.
 ~~~~~~
 -->
+
+
+<!--
+CCreature>>checkForCollision: platforms
+	"This is an optimized version of :
+	
+	
+	nodes do: [ :n | n checkForCollision: platforms ].
+	(nodes allSatisfy: [ :n | n position y = nodes first position y ]) ifTrue: [ 
+		nodes first translateBy: 0 @ -2.
+		nodes last translateBy: 0 @ -2 ]
+"
+	| allAtTheSameLevel tmpLevel |
+	allAtTheSameLevel := true.
+	tmpLevel := nil.
+	nodes doWithIndex: [ :n :index | 
+		n checkForCollision: platforms.
+		index = 1 
+			ifTrue: [ tmpLevel := n position y ]
+			ifFalse: [ n position y ~= tmpLevel ifTrue: [ allAtTheSameLevel ] ].
+		 ].
+	
+"	(nodes allSatisfy: #isOnPlatform) ifFalse: [ ^ self ]. "
+	allAtTheSameLevel ifFalse: [ ^ self ]. 
+	nodes first translateBy: 0 @ -2.
+	nodes last translateBy: 0 @ -2 
+-->
+
+
+
 
 <!--
 
