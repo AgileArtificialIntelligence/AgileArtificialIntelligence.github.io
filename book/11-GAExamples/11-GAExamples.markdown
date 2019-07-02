@@ -16,38 +16,38 @@ The fitness function is simply the absolute difference between the multiplicatio
 Consider the following script:
 
 ```Smalltalk
-	numberOfIdentifyFactors := 345.
-	primeNumbers := #(2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97 101 103 107 109 113 127 131 137 139 149 151 157 163 167 173 179 181 191 193 197 199).
-	candidateFactors := #(1), primeNumbers.
-	g := GAEngine new.
-	g endIfNoImprovementFor: 10.
-	g populationSize: 10000.
-	g numberOfGenes: 10.
-	g createGeneBlock: [ :rand :index :ind | candidateFactors atRandom: rand ].
-	g minimizeComparator.
-	g
-		fitnessBlock: [ :genes | 
-			((genes inject: 1 into: [ :r :v | r * v ]) - numberOfIdentifyFactors) abs ].
-	g run.
+numberOfIdentifyFactors := 345.
+primeNumbers := #(2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97 101 103 107 109 113 127 131 137 139 149 151 157 163 167 173 179 181 191 193 197 199).
+candidateFactors := #(1), primeNumbers.
+g := GAEngine new.
+g endIfNoImprovementFor: 10.
+g populationSize: 10000.
+g numberOfGenes: 10.
+g createGeneBlock: [ :rand :index :ind | candidateFactors atRandom: rand ].
+g minimizeComparator.
+g
+	fitnessBlock: [ :genes | 
+		((genes inject: 1 into: [ :r :v | r * v ]) - numberOfIdentifyFactors) abs ].
+g run.
 ```	
 
 The fitness function contains the expression `genes inject: 1 into: [ :r :v | r * v ]` which returns the multiplication of the numbers contained in the `genes` temporary variable. For example, `#(3 5 23) inject: 1 into: [ :r :v | r * v ]` evaluates to `345`. 
 
 After the execution of the script, we can verify how it did go with the expression:
 
-```Smalltalk
+~~~~~~
 ...
 g logs last bestFitness.
-```
+~~~~~~
 
 If the value is `0`, then we found the exact prime factors. If we did not found it, then we could increase the population size and / or increase the argument of `endIfNoImprovementFor:`. 
 
 The prime factors may be obtained using the expression:
 
-```Smalltalk
+~~~~~~
 ...
 g result copyWithout: 1.
-```
+~~~~~~
 
 ![Identification prime factors of `345`.](11-GAExamples/figures/primeNumbers.png){#fig:primeNumbersOf345}
 
@@ -213,7 +213,7 @@ Figure @fig:miniSodoku gives the grid to which the numbers should be located. Th
 
 ```Smalltalk
 "The number of locate in the grid"
-list := #(8 4 6 2 10 12 14 16 18).
+list := #(2 4 6 8 10 12 14 16 18).
 
 "The different combinations to sum.
 E.g., 
@@ -234,17 +234,18 @@ sums := {
 	#(2 5 8).
 	#(3 6 9) }.
 g := GAEngine new.
-g populationSize: 300.
-g endIfFitnessIsAbove: 8.
+g populationSize: 400.
+g endIfFitnessIsAbove: 9.
 g mutationRate: 0.01.
 g numberOfGenes: 9.
 g createGeneBlock: [ :rand :index | list atRandom: rand. ].
 g fitnessBlock: [ :genes |
-	(sums collect: [ :arr |
-		(arr collect: [:index | genes at: index]) sum ]) 
-		inject: 0 into: [ :a :b | a + (b = 30 
-			ifTrue: [ 1 ]
-			ifFalse: [ 0 ]) ] ].
+	| score penalty |
+	score := (sums collect: [ :arr |
+			(arr collect: [ :index | genes at: index]) sum ]) 
+				inject: 0 into: [ :a :b | a + (b - 30) abs ].
+	penalty := (genes size - genes asSet size) * 3.
+	9 - (score + penalty) ].
 g run.
 
 "Visualize the grid"
@@ -258,7 +259,11 @@ v
 
 The block provided to the method `fitnessBlock:` iterates over each combination contained in the `sums` variable, and add `1` if the sum is 30, else it adds `0`. The maximum we can have is 9, so the algorithm ends if we reaches a fitness above 8. 
 
+![Evolution of the fitness.](11-GAExamples/figures/miniSodokuFitness.png){#fig:miniSodokuFitness}
 
+![Result of the mini Soduku.](11-GAExamples/figures/miniSodokuResult.png){#fig:miniSodokuResult}
+
+Figure @fig:miniSodoku shows the evolution of the fitness and Figure @fig:miniSodokuResult shows the result.
 
 ## What have we seen in this chapter?
 
