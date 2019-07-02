@@ -263,7 +263,7 @@ The block provided to the method `fitnessBlock:` iterates over each combination 
 
 ![Result of the mini Soduku.](11-GAExamples/figures/miniSodokuResult.png){#fig:miniSodokuResult}
 
-Figure @fig:miniSodoku shows the evolution of the fitness and Figure @fig:miniSodokuResult shows the result.
+Figure @fig:miniSodoku shows the evolution of the fitness and Figure @fig:miniSodokuResult shows the result. We thanks Milton Mamani for this example.
 
 ## What have we seen in this chapter?
 
@@ -275,5 +275,5 @@ The chapter presents three examples on how genetic algorithm can be efficiently 
 
  As we have said, the genetic algorithm does not guarantee that the result is actually the optimal solution.
 
-The next chapter covers a larger example using genetic algorithm. It will also presents a limitation of the genetic operators we have used so far
+The next chapter covers a larger example using genetic algorithm. It will also presents a limitation of the genetic operators we have used so far.
 
