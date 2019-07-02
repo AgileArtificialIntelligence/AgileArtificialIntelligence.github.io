@@ -203,14 +203,72 @@ Since we wish to minimize the number of rooms and the number of overlaps, the ge
 
 The fitness function computes the number of different room and the number of overlaps. Finally, the number of different room is given by the expression `g result asSet size`. 
 
+## Mini Sodoku
+
+Consider the following set of numbers: `8 4 6 2 10 12 14 16 18`. How would you put these number in a 3X3 grid in such a way that each horizontal, vertical, and diagonal lines sum 30?
+
+![Mini Soduku.](11-GAExamples/figures/miniSodoku.png){#fig:miniSodoku}
+
+Figure @fig:miniSodoku gives the grid to which the numbers should be located. The following script: 
+
+```Smalltalk
+"The number of locate in the grid"
+list := #(8 4 6 2 10 12 14 16 18).
+
+"The different combinations to sum.
+E.g., 
+	the three first cells could be summed (#(1 2 3))
+	the diagonal top-left to bottom-right (#1 5 9))"
+sums := { 
+	"Horizontal sums"
+	#(1 2 3).
+	#(4 5 6).
+	#(7 8 9).
+	
+	"Diagonal sums"
+	#(1 5 9).
+	#(7 5 3).
+	
+	"Vertical sums"
+	#(1 4 7).
+	#(2 5 8).
+	#(3 6 9) }.
+g := GAEngine new.
+g populationSize: 300.
+g endIfFitnessIsAbove: 8.
+g mutationRate: 0.01.
+g numberOfGenes: 9.
+g createGeneBlock: [ :rand :index | list atRandom: rand. ].
+g fitnessBlock: [ :genes |
+	(sums collect: [ :arr |
+		(arr collect: [:index | genes at: index]) sum ]) 
+		inject: 0 into: [ :a :b | a + (b = 30 
+			ifTrue: [ 1 ]
+			ifFalse: [ 0 ]) ] ].
+g run.
+
+"Visualize the grid"
+v := RTView new.
+label := RTLabel new.
+elements := label elementsOn: g result. 
+v addAll: elements.
+RTGridLayout on: elements.
+v 
+```
+
+The block provided to the method `fitnessBlock:` iterates over each combination contained in the `sums` variable, and add `1` if the sum is 30, else it adds `0`. The maximum we can have is 9, so the algorithm ends if we reaches a fitness above 8. 
+
+
+
 ## What have we seen in this chapter?
 
 The chapter presents three examples on how genetic algorithm can be efficiently employed to find a solution to some optimization problems:
 
-- The fundamental theorem of arithmetic, which consists in finding for a given number $N$ a set of prime numbers that when multipled together is equals to $N$;
+- The fundamental theorem of arithmetic, which consists in finding for a given number $N$ a set of prime numbers that when multiplied together is equals to $N$;
 - Two variants of the knapsack problem, namely the _unbounded_ and _0-1_ variants;
 - The room scheduling problem which consists in assigning meeting to rooms while avoiding overlapping.
 
  As we have said, the genetic algorithm does not guarantee that the result is actually the optimal solution.
 
-The next chapter covers the 
+The next chapter covers a larger example using genetic algorithm. It will also presents a limitation of the genetic operators we have used so far
+

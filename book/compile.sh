@@ -11,7 +11,9 @@ FILES=`ls 01-introduction/*.markdown \
 	08-MatrixNN/*.markdown \
 	10-GeneticAlgorithm/*.markdown \
 	11-GAExamples/*.markdown \
-	12-TravelingSalesmanProblem/*.markdown`
+	12-TravelingSalesmanProblem/*.markdown \
+	13-Robot/*.markdown \
+	14-Zoomorphic/*.markdown`
 
 if [ ! -d "build" ]; then
 	mkdir build

@@ -9,11 +9,15 @@
 
 
 
+#FILES=`ls \
+#	13-Robot/*.markdown \
+#	14-Zoomorphic/*.markdown`
+
 FILES=`ls \
-	12-TravelingSalesmanProblem/*.markdown`
+	14-Zoomorphic/*.markdown`
 
 
-#FILES=`ls 06-Data/*.markdown`
+#FILES=`ls 13-Robot/*.markdown`
 
 
 if [ ! -d "build" ]; then

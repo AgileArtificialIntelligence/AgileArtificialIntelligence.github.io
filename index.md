@@ -19,7 +19,7 @@ Part II: Genetic Algorithm
 1. [Genetic Algorithm in Action](./book/build/11-GAExamples.html)
 1. Traveling salesman problem
 1. Robot looking for an exit
-1. Zoomorphic creature
+1. Simulating Zoomorphic creature
 
 Part III: Neuroevolution
 1. Neural Network Are Greedy of Examples

@@ -177,7 +177,7 @@ CNode>>translateTo: aPoint
 	element translateTo: aPoint.
 ```
 
-# Platform
+## Platform
 
 In addition to the gravity that we have described above, the environment may affect the nodes (and therefore the creatures) with platforms. We define the class `CPlatform` as a subclass of `CVisualElement`:
 
@@ -698,7 +698,7 @@ CCreature>>configureBall: numberOfNodes
 
 	"Create the visual elements"
 	self createElements.
-	self shuffleNodes
+	self randomlyLocateNodes
 ```
 
 The `configureBall:` takes as argument the number of nodes that will compose the ball. All the nodes are connected with all the other nodes. As a consequence, a ball creature will contains many muscles, which means that muscles should have a low strength.
@@ -710,8 +710,7 @@ CCreature>>configureNbNodes: nbNodes nbMuscles: nbMuscle
 	"Configure a creature with a given number of nodes and muscles."
 	| n1 n2 tryNewNode1 tryNewNode2 |
 	self configureNodes: nbNodes.
-	nbMuscle
-		timesRepeat: [ 
+	nbMuscle timesRepeat: [ 
 			n1 := nodes atRandom: random.
 			n2 := n1.
 			tryNewNode1 := 0.
@@ -730,29 +729,17 @@ CCreature>>configureNbNodes: nbNodes nbMuscles: nbMuscle
 			self addMuscleFrom: n1 to: n2 ].
 		
 	self createElements.
-	self shuffleNodes
+	self randomlyLocateNodes
 ```
 
-The method first define some nodes. Some constraints need to be set on the nodes that are joined by a muscle. In particular, we cannot have more than one muscle between two nodes. The small algorithm used in the method picks a pair of nodes if:
+The method first define some nodes. Some constraints need to be set on the nodes that are joined by a muscle. In particular, we cannot have more than one muscle between two nodes. The small algorithm used in the method avoid nodes in which there is at a muscle between the two nodes. In total, 10 tries are performed before giving up.
 
-- there is less than 10 tries to look for nodes
-- if the
-
-	"We want to avoid nodes to have more than one muscles between them.
-		We look for nodes if:
-			- there is less than 10 tries
-			- we look for another node if 
-				- the two nodes are the same, or 
-				- at least one muscle uses the two nodes"
-	"		[ (try <= 10 or: [ n2 == n1]) or: [ muscles anySatisfy: [ :mm | mm usesNodes: { n1 . n2 } ] ] ]  
-			whileTrue: [ try := try + 1. n2 := nodes atRandom: r ].
-"
-
+We also provide a way to build worm-like creature. We define the following methods
 
 ```Smalltalk
 CCreature>>configureWorm: length
+	"Create a work with the specified length"
 	| lastTwoNodes n1 n2 index |
-	
 	"HEAD"
 	nodes add: CNode new.
 	nodes add: CNode new.
@@ -769,37 +756,77 @@ CCreature>>configureWorm: length
 		self addMuscleFrom: lastTwoNodes first to: n2.
 		self addMuscleFrom: lastTwoNodes second to: n2.
 		self addMuscleFrom: n1 to: n2.
-	
-		lastTwoNodes := Array with: n1 with: n2.
-		].
+		lastTwoNodes := { n1 . n2 } ].
 
+	"We create the elements"
 	self createElements.
 
+	"Position the nodes to give the shape of a worm"
 	index := 0.
 	nodes pairsDo: [ :aNode :aSecondNode | 
 		aNode translateBy: (index * 10) @ 0. 
 		aSecondNode translateBy: (index * 10) @ 10.
 		index := index + 1 ]
-	
 ```
 
+The graphical elements are created using the method `createElements`:
 
 ```Smalltalk
 CCreature>>createElements
+	"Force the creation of the all graphical elements for nodes and muscles"
 	nodes do: #createElement.
 	muscles do: #createElement.
 ```
 
+Nodes and muscles are subject to the Newtonian physical laws, defined using the method:
+
+```Smalltalk
+CCreature>>reachStable
+	"Apply the physical law on a creature"
+	| n1 n2 delta actualLength unit force |
+	nodes do: #resetForce.
+	muscles do: [ :m |
+		n1 := m node1.
+		n2 := m node2.
+		delta := n2 position - n1 position.
+		actualLength := delta r max: 1.
+		unit := delta / actualLength.
+		force := 0.1 * m strength * (actualLength - m length) * unit.
+		n1 addForce: force.
+		n2 addForce: force negated ].
+```
+
+External forces on nodes are first canceled. We then compute the force from the strength of a muscle. Note that this force is applied to a node, and the opposite force to the second extremity node. 
+
+### Serialization and materialization of creature
+
+When we will hook our genetic algorithm, it is crucial to transform the individual genetic information as an array of numbers. Such numbers will therefore represent the attributes of each muscles of the creature. A creature is serialized using the method:
+
+```Smalltalk
+CCreature>>serialize
+	"Serialize the creature into an array of numbers"
+	^ (muscles
+		flatCollect: [ :m | 
+			muscleGenerator serializeMuscle: m ]) asArray
+```
+
+The opposite operation, the materialization of a creature from a set of numerical values, is carried out by the method:
 
 ```Smalltalk
 CCreature>>materialize: anArrayOfValues
+	"Materialize a array of numbers into a creature"
 	| valuesPerMuscles |
 	valuesPerMuscles := anArrayOfValues groupsOf: 5 atATimeCollect: [ :v | v ].
-
 	muscles with: valuesPerMuscles do: [ :m :values | 
 		muscleGenerator materialize: values inMuscle: m ]
 ```
 
+### Accessors and utility methods
+
+The largest part of the creature definition has been presented above. A new accessors and utility methods are necessary:
+
+
+@@ CHECK IF NECESSARY
 ```Smalltalk
 CCreature>>muscleGenerator
 	^ muscleGenerator
@@ -821,50 +848,32 @@ CCreature>>nodes
 	
 ```
 
+The position of the creature is computed as the average position of the nodes. Knowing the position of the creature is necessary when we will apply the genetic algorithm. The fitness will be based on the distance of the creature. The method `position` is defined as:
+
 ```Smalltalk
 CCreature>>position
+	"Return the position of the creature, as the average position of the nodes"
 	^ (self nodes collect: #position) sum / self nodes size
 ```
 
-```Smalltalk
-CCreature>>random: aRandomGenerator
-	random := aRandomGenerator
-```
-
-```Smalltalk
-CCreature>>reachStable
-	| n1 n2 delta actualLength unit force |
-	nodes do: #resetForce.
-	muscles do: [ :m |
-		n1 := m node1.
-		n2 := m node2.
-		delta := n2 position - n1 position.
-		actualLength := delta r max: 1.
-		unit := delta / actualLength.
-		force := 0.1 * m strength * (actualLength - m length) * unit.
-		n1 addForce: force.
-		n2 addForce: force negated.
-		 ].
-```
-
+At the beginning of a simulation, the creature has to be located above the main platform. We move the creature at an arbitrary position `0 @ -50`:
 
 ```Smalltalk
 CCreature>>resetPosition
-	self translateTo: 0 @ -50 .
+	"Locate the creature at an arbitrary position"
+	self translateTo: 0 @ -50
 ```
 
-```Smalltalk
-CCreature>>serialize
-	^ (muscles
-		flatCollect: [ :m | 
-			muscleGenerator serializeMuscle: m ]) asArray
-```
+Before applying the physical rules, it is important that the nodes are not all at the same position. We randomly assign a position to each node using `randomlyLocateNodes`:
 
 ```Smalltalk
-CCreature>>shuffleNodes
+CCreature>>randomlyLocateNodes
+	"Assign each node to a random position"
 	nodes
 		do: [ :n | n translateBy: (random nextInt: 50) @ (random nextInt: 50) ]
 ```
+
+Translating the creature to a given position is achieved using the method:
 
 ```Smalltalk
 CCreature>>translateTo: aPoint
@@ -873,6 +882,8 @@ CCreature>>translateTo: aPoint
 	delta := aPoint - averageCenter.
 	self nodes do: [ :n | n translateBy: delta ]
 ```
+
+## Defining the World
 
 ```Smalltalk
 CVisualElement subclass: #CWorld
