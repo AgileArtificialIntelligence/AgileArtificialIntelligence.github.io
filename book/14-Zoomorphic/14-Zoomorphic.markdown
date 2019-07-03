@@ -194,9 +194,16 @@ We initialize a platform with a width of 1000 pixels:
 ```Smalltalk
 CPlatform>>initialize
 	super initialize.
-	width := 1000.
+	self width: 100
 ```
 
+The width of a platform is set using:
+
+```Smalltalk
+CPlatform>>width: aWidthAsNumber
+	"Set the width of the platform"
+	width := aWidthAsNumber
+```
 The creation of the element is a simple rectangle:
 
 ```Smalltalk
@@ -204,6 +211,15 @@ CPlatform>>createElement
 	element := RTBox new width: width; height: 10; color: Color gray; element.
 	element @ RTDraggable	
 ```
+
+A platform may be translated to a particular position using:
+
+```Smalltalk
+CPlatform>>translateTo: aPosition
+	"Translate the platform to a particular position"
+	element translateTo: aPosition
+```
+
 
 The primitive to handle effect of the platform is the collision detection. We define the method `touch:`:
 
@@ -450,14 +466,20 @@ The initialization of a generator assign some values that are convenient in most
 ```Smalltalk
 CMuscleGenerator>>initialize
 	super initialize.
-	random := Random seed: 42.
-	
+	self resetSeed.	
 	minLength := 10.
 	deltaLength := 30.
 	minTime := 4.
 	deltaTime := 200.
 	minStrength := 1.
 	deltaStrength := 3
+```
+
+The random number generator is created using `resetSeed`:
+
+```Smalltalk
+CMuscleGenerator>>resetSeed.
+	random := Random seed: 42.
 ```
 
 The delta of a value corresponds to an interval from which values will be randomly picked. The delta length is set using:
@@ -633,6 +655,15 @@ CCreature>>addMuscleFrom: aNode to: anotherNode
 	"Generate and add a muscle between two nodes"
 	muscles add: (muscleGenerator createMuscleFrom: aNode to: anotherNode)
 ```
+
+The number of muscles is obtained with:
+
+```Smalltalk
+CCreature>>numberOfMuscles
+	"Return the number of muscles defining the creature"
+	^ muscles size
+```
+
 
 Each beat produces a beat for each node and each muscle. After, the physic rules have to be applied between the muscles and the nodes. The method `beat` is defined as:
 
@@ -826,17 +857,6 @@ CCreature>>materialize: anArrayOfValues
 The largest part of the creature definition has been presented above. A new accessors and utility methods are necessary:
 
 
-@@ CHECK IF NECESSARY
-```Smalltalk
-CCreature>>muscleGenerator
-	^ muscleGenerator
-```
-
-```Smalltalk
-CCreature>>muscleGenerator: aMuscleGenerator
-	muscleGenerator := aMuscleGenerator
-```
-
 ```Smalltalk
 CCreature>>muscles
 	^ muscles 
@@ -883,7 +903,11 @@ CCreature>>translateTo: aPoint
 	self nodes do: [ :n | n translateBy: delta ]
 ```
 
+Creatures are added in a world, defined in the subsequent section.
+
 ## Defining the World
+
+A world is defined as a set of creatures, a set of platforms, and a global timer. A world, in our case, is defined to be host of a race. We define the class `CWorld` as follows:
 
 ```Smalltalk
 CVisualElement subclass: #CWorld
@@ -893,19 +917,69 @@ CVisualElement subclass: #CWorld
 	category: 'Creature'
 ```
 
+When created, a world is initialized as empty. The `initialize` method is defined as:
+
+```Smalltalk
+CWorld>>initialize
+	"We give an extra distance to make sure there is no issue with the border"
+	super initialize.
+	creatures := OrderedCollection new.
+	platforms := OrderedCollection new.
+	time := 0.
+	self createElement.
+	self addGround
+```
+
+A world is associated to a Roassal view, as defined in:
+
+```Smalltalk
+CWorld>>createElement
+	"The visual representation of a World is a Roassal view"
+	element := RTView new.
+```
+
+The ground is represented as a large platform:
+
+```Smalltalk
+CWorld>>addGround
+	"Define the ground of the world"
+	| platform |
+	platform := CPlatform new width: self raceLength + 500.	
+	"We give an extra distance to make sure there is no issue with the border"
+	self addPlatform: platform.
+	platform translateTo: self raceLength / 2 @ 0
+```
+
+The length of the race is set by the method `raceLength`: 
+
+```Smalltalk
+CWorld>>raceLength
+	"Set the length of the race"
+	^ 5000
+```
+
+Adding a creature to a world is achieved using the method:
+
 ```Smalltalk
 CWorld>>addCreature: aCreature
+	"Add a creature to the world"
 	creatures add: aCreature.
 	element addAll: (aCreature nodes collect: #element).
 	element addAll: (aCreature muscles collect: #element).
+	aCreature resetPosition.
 ```
+
+When a creature is added to the world, all the graphical elements stemming from muscles and nodes are added to the view. Similarly, a platform is added to a world using:
 
 ```Smalltalk
 CWorld>>addPlatform: aPlatform
+	"Add a platform in the world"
 	platforms add: aPlatform.
 	aPlatform createElement.
 	element add: aPlatform element.
 ```
+
+A world has a global timer. A timer increases at each beat, occurring at each frame refresh. The `beat` method is defined as follows:
 
 ```Smalltalk
 CWorld>>beat	
@@ -913,48 +987,76 @@ CWorld>>beat
 	creatures do: [ :c | c beat; checkForCollision: platforms ]
 ```
 
-```Smalltalk
-CWorld>>createElement
-	element := RTView new.
-```
-
-```Smalltalk
-CWorld>>initialize
-	super initialize.
-	creatures := OrderedCollection new.
-	platforms := OrderedCollection new. 
-	time := 0.
-	self createElement
-```
+A each beat, physic rules must be applied on each creature. Note that creatures do not interact between each other.
 
 ```Smalltalk
 CWorld>>open
-	| lbl |
+	"Build the visual representation of the world"
+	| lbl animation |
 	creatures do: #resetPosition.
-
-	lbl := (RTLabel new elementOn: time) setAsFixed; yourself.
+	lbl := (RTLabel new elementOn: time)
+		setAsFixed;
+		yourself.
 	element add: lbl.
 	lbl translateBy: 80 @ 30.
-	element
-		addAnimation:
-			(RTActiveAnimation new
-				intervalInMilliseconds: 10;
-				blockToExecute: [ 
-					self beat.
-					lbl trachelShape text: time asString.
-					element signalUpdate ]).
+	animation := RTActiveAnimation new
+		intervalInMilliseconds: 10;
+		blockToExecute: [ | p |
+			self beat.
+			lbl trachelShape text: time asString.
+			p := creatures first position x @ 0.
+			element canvas camera translateTo: p.
+			element signalUpdate.
+			p x > self raceLength
+				ifTrue: [ element removeAnimation: animation ] ].
+	element addAnimation: animation.
+	self addPylons.
 	^ element open
 ```
 
+We add some pylons to a world using the method:
+
+```Smalltalk
+CWorld>>addPylons
+	(0 to: self raceLength by: 100)
+		do: [ :flagPosition | 
+			| pylon |
+			pylon := RTBox new
+				color: Color green darker;
+				width: 3;
+				height: 100;
+				elementOn: flagPosition.
+			element add: pylon.
+			pylon @ RTLabeled.
+			pylon translateTo: flagPosition @ -50.
+			pylon pushBack ]
+```
 
 
 ## Dry run
 
+We can now open a world and add a creature to it:
+
+```Smalltalk
+creature := CCreature new configureWorm: 5.
+c := CWorld new.
+c addCreature: creature.
+c open
+```
+
+![Adding an untrained creature to the world.](14-Zoomorphic/figures/dryRunZoomorphic.png.png){#fig:dryRunZoomorphic}
+
+Figure @fig:dryRunZoomorphic gives the result of the script. At that stage, the creature moves without a particular objective. The next chapter will exactly show how to make a creature evolve.
 
 
 ## What have we seen in this chapter?
 
-This chapter focuses on laying down the infrastructure to define and build zoomorphic creature. 
+This chapter focuses on laying down the infrastructure to define and build zoomorphic creature. It was a very long chapter. We had to provide enough code to build up an interesting codebase on which we can experiment in the next chapter.
+
+The chapter covers:
+
+- a simple physical engine, supporting muscles and nodes;
+- the definition of a creature and a world in which it can live.
 
 Note that we could have added bones in the way we model creature. Once we have the notion of bone, we could have build skeletons. Although appealing, it would have significantly increased the amount of source code.
 
