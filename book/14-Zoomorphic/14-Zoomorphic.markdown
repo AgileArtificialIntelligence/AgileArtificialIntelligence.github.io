@@ -1044,7 +1044,7 @@ c addCreature: creature.
 c open
 ```
 
-![Adding an untrained creature to the world.](14-Zoomorphic/figures/dryRunZoomorphic.png.png){#fig:dryRunZoomorphic}
+![Adding an untrained creature to the world.](14-Zoomorphic/figures/dryRunZoomorphic.png){#fig:dryRunZoomorphic}
 
 Figure @fig:dryRunZoomorphic gives the result of the script. At that stage, the creature moves without a particular objective. The next chapter will exactly show how to make a creature evolve.
 
