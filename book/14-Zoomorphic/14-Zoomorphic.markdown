@@ -1,5 +1,5 @@
 
-# Simulating Zoomorphic Creature
+# Building Zoomorphic Creature
 
 This chapter is about creating zoomorphic creatures. Such creature will have to solve a simple task, such as moving toward a direction or jumping.
 
@@ -948,38 +948,13 @@ CWorld>>open
 
 
 
+## Dry run
 
-
-
-
-```Smalltalk
-GAAbstractCrossoverOperation subclass: #GAConstrainedCrossoverOperation
-	instanceVariableNames: 'possibleCutpoints'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'GeneticAlgorithm-Core'
-```
-
-```Smalltalk
-GAConstrainedCrossoverOperation>>pickCutPointFor: partnerA
-	"Argument is not used now. Maybe we can improve that"
-	self assert: [ possibleCutpoints notNil ] description: 'Need to provide the possible cut points, using #possibleCutpoints:'.
-	^ possibleCutpoints at: (random nextInt: possibleCutpoints size)
-```
-
-```Smalltalk
-GAConstrainedCrossoverOperation>>possibleCutpoints
-	^ possibleCutpoints
-```
-
-```Smalltalk
-GAConstrainedCrossoverOperation>>possibleCutpoints: indexes
-	possibleCutpoints := indexes
-```
 
 
 ## What have we seen in this chapter?
 
+This chapter focuses on laying down the infrastructure to define and build zoomorphic creature. 
 
 Note that we could have added bones in the way we model creature. Once we have the notion of bone, we could have build skeletons. Although appealing, it would have significantly increased the amount of source code.
 

@@ -17,8 +17,9 @@ Part I: Neural Network
 Part II: Genetic Algorithm
 1. [Genetic Algorithm](./book/build/10-GeneticAlgorithm.html)
 1. [Genetic Algorithm in Action](./book/build/11-GAExamples.html)
-1. Traveling salesman problem
-1. Robot looking for an exit
+1. [Traveling salesman problem](./book/build/12-TravelingSalesmanProblem.html)
+1. [Robot looking for an exit](./book/build/13-Robot.html)
+1. [Building Zoomorphic creature](./book/build/14-Zoomorphic.html)
 1. Simulating Zoomorphic creature
 
 Part III: Neuroevolution
