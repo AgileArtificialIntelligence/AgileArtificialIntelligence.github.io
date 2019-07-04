@@ -11,13 +11,15 @@ Consider the example given in Figure @fig:TSPExample. The figure shows four citi
 
 ![Illustration of the Traveling Salesman Problem.](12-TravelingSalesmanProblem/figures/TSPDifferentPaths.png){#fig:TSPDifferentPaths}
 
-As illustrated in Figure @fig:TSPDifferentPaths, different paths are possible, including ABCD, ABDC, ADBC, ACDB, and ADCB. _What is the shortest path to visit all the cites?_ Since the distance between City B and City D is the shortest segment, the shortest path to visit all cities should necessarily contains the segment BD or DB.
+As illustrated in Figure @fig:TSPDifferentPaths, different paths are possible, including ABCD, ABDC, ADBC, ACDB, and ADCB. _What is the shortest path to visit all the cites?_ Since the distance between City B and City D is the shortest segment, the shortest path to visit all cities should necessarily contain the segment BD or DB.
 
 ## Relevance of the Traveling Salesman Problem
 
-The Traveling Salesman Problem (TSP) is a relevant problem to focus on, both from a theoretical and practical points of view. The TSP was formulated in the early 1930 and is among the most studied algorithmic problems. Applications of the TSP are numerous, ranging from combinatorial optimization (_i.e.,_ finding an optimal object from a finite set of objects) to resource planning, DNA sequencing, and microchip manufacturing. 
+The Traveling Salesman Problem (TSP) is a relevant problem to focus on, both from a theoretical and practical points of view. The TSP was formulated in the early 1930 and is among the most studied algorithmic problems. Applications of the TSP are numerous, ranging from combinatorial optimization (_i.e.,_ finding an optimal object from a finite set of objects) to resource planning, DNA sequencing, and microchip manufacturing. Even though it has been studied for a long time, no general solution has been discovered yet. 
 
-TSP is considered as _NP-hard_ @@TODO
+TSP is apparently a simple problem: one should simply connect some cities, in an optimal way. However, TSP is a very difficult problem and is considered as _NP-hard_. Being NP-hard means that a correct solutions are easy to verify (_e.g.,_ given two paths, it is easy to pick which one is shortest), but there is no efficient way to solve the problem itself. If someone, one day, finds an analytic solution to the TSP, the World is surely set to be impacted. Analytically solving an NP-hard problem means that NP-complete can also be analytically solved. Have you heard about P versus NP problems? This is one of the most challenging question mathematicians are facing today. Actually, a millennium prize of 1 000 000 USD will be given by the Clay Mathematics Institute if one solves this problem. 
+
+In this chapter we do not pretend analytically solving this problem. However, genetic algorithm is a pretty solid technique to find a good path, although no guaranty is provided on whether this path is optimal or not. 
 
 ## Naive Approach
 
