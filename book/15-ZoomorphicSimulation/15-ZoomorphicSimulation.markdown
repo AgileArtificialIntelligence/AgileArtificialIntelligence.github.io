@@ -1,8 +1,25 @@
 
 # Simulating Zoomorphic Creature
 
+The previous chapter presents the infrastructure to define and build zoomorphic creature. However, so far, they cannot do much. They are likely to not move much. This chapter will make a creature evolve to accomplish some simple tasks, such as moving toward a particular direction or passing through some obstacles.
 
-## Hooking Genetic Algorithm
+## Process Interruption 
+
+Making creatures evolve is a very costly operation. Most of the script given in this chapter may requires many minutes or hours to complete. We suggest you to be familiar with the way Pharo can be interrupting by pressing the `Cmd` and `.` keys on Mac OSX. On Windows or Linux, you should use the `Alt` key. 
+
+Interrupting Pharo will bring up a Pharo debugger. When this happens, the execution has been interrupted. You can then execute any arbitrary code. 
+Closing the debugger will simply end the ongoing computation. Keeping the debugger open means you can always resume the execution you interrupted by clicking on `Proceed`.
+
+## Dedicated Genetic Operator
+
+So far, we have seen two crossover operations: 
+
+- `GACrossoverOperation` to perform a simple crossover, without enforcing any characteristics,
+- `GAOrderedCrossoverOperation` to avoid repetitions of particular genes.
+
+In the case of evolving our creatures, it is important to consider a muscle as a whole while performing the crossover. For example, it could be that two creatures have a similar behavior, but each with a very different genotype. We call this situation _competing conventions_. If we combine use the unconstrained crossover operation, it is likely that the children is worse that its parents. 
+
+One way to avoid this problem is to restrict the crossover to happen at _any_ point, but only at a muscle extremity. Combining the genetic information of two different muscle is not efficient in our situation. We define a new operator, called `GAConstrainedCrossoverOperation`:
 
 ```Smalltalk
 GAAbstractCrossoverOperation subclass: #GAConstrainedCrossoverOperation
@@ -12,6 +29,16 @@ GAAbstractCrossoverOperation subclass: #GAConstrainedCrossoverOperation
 	category: 'GeneticAlgorithm-Core'
 ```
 
+The operator consider a set of possible cutpoints with the variable `possibleCutpoints`, which is set using:
+
+```Smalltalk
+GAConstrainedCrossoverOperation>>possibleCutpoints: indexes
+	"Set the possible pointcuts considered by the operator"
+	possibleCutpoints := indexes
+```
+
+We also add a utility method used to hook it into our framework:
+
 ```Smalltalk
 GAConstrainedCrossoverOperation>>pickCutPointFor: partnerA
 	"Argument is not used now. Maybe we can improve that"
@@ -19,21 +46,47 @@ GAConstrainedCrossoverOperation>>pickCutPointFor: partnerA
 	^ possibleCutpoints at: (random nextInt: possibleCutpoints size)
 ```
 
-```Smalltalk
-GAConstrainedCrossoverOperation>>possibleCutpoints
-	^ possibleCutpoints
-```
-
-```Smalltalk
-GAConstrainedCrossoverOperation>>possibleCutpoints: indexes
-	possibleCutpoints := indexes
-```
-
 ## Simple Creature
+
+Making creatures evolve is a very costly operation.
+
+Consider the following script:
+~~~~~~
+numberOfNodes := 3.
+numberOfMuscles := (CCreature new configureBall: numberOfNodes) numberOfMuscles.
+mg := CMuscleGenerator new
+		minStrength: 0.01;
+		deltaStrength: 0.8;
+		minLength: 10;
+		deltaLength: 80;
+		deltaTime: 200;
+		minTime: 20.
+g := GAEngine new.
+g crossoverOperator: (GAConstrainedCrossoverOperation new possibleCutpoints: (1 to: numberOfMuscles*5 by: 5)).
+g selection: (GATournamentSelection new).
+g mutationRate: 0.02.
+g endForMaxNumberOfGeneration: 500.
+"g endIfNoImprovementFor: 100 withinRangeOf: 40."
+g populationSize: 100.
+g numberOfGenes: numberOfMuscles * 5.
+g createGeneBlock: [ :r :index | mg valueForIndex: index ].
+g fitnessBlock: [ :genes |
+	creature := CCreature new configureBall: numberOfNodes.
+	creature materialize: genes.
+	creature resetPosition.
+	c := CWorld new.
+	c addCreature: creature.
+	1500 timesRepeat: [ c beat ].
+	creature position x
+].
+g run. 
+g.
+~~~~~~
+
 
 ## Ball 
 
-```Smalltalk
+~~~~~~
 numberOfMuscles := 90.
 mg := CMuscleGenerator new
 		minStrength: 0.01;
@@ -46,8 +99,8 @@ g := GAEngine new.
 g crossoverOperator: (GAConstrainedCrossoverOperation new possibleCutpoints: (1 to: numberOfMuscles*5 by: 5)).
 g selection: (GATournamentSelection new).
 g mutationRate: 0.02.
-"g endForMaxNumberOfGeneration: 50."
-g endIfNoImprovementFor: 100 withinRangeOf: 40.
+g endForMaxNumberOfGeneration: 500.
+"g endIfNoImprovementFor: 100 withinRangeOf: 40."
 g populationSize: 100.
 g numberOfGenes: numberOfMuscles * 5.
 g createGeneBlock: [ :r :index | mg valueForIndex: index ].
@@ -56,16 +109,19 @@ g fitnessBlock: [ :genes |
 	creature materialize: genes.
 	creature resetPosition.
 	c := CWorld new.
-	c addPlatform: CPlatform new.
+	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 100 @ -10).
+	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 400 @ -10).
+	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 700 @ -10).
+	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 1000 @ -10).
 	c addCreature: creature.
-	3000 timesRepeat: [ c beat ].
+	1500 timesRepeat: [ c beat ].
 	creature position x
 ].
 g run. 
 g.
-```
+~~~~~~
 
-```Smalltalk
+~~~~~~
 ...
 creature := CCreature new configureBall: 10.
 creature materialize: g result.
@@ -73,7 +129,7 @@ c := CWorld new.
 c addPlatform: CPlatform new.
 c addCreature: creature.
 c open
-```
+~~~~~~
 
 ![The fitness evolution of a creature made of 10 nodes and 90 muscles.](15-ZoomorphicSimulation/figures/zoomorphicBall.png){#fig:zoomorphicBall}
 
@@ -89,8 +145,39 @@ c open
 ```
 
 
+## Competing creatures
+
+~~~~~~~~
+c := CWorld new.
+creature := CCreature new color: Color red; configureBall: 10.
+creature materialize: g logs last fittestIndividual genes.
+c addCreature: creature.
+
+creature := CCreature new color: Color yellow darker darker; configureBall: 10.
+creature materialize: (g logs at: 70) fittestIndividual genes.
+c addCreature: creature.
+
+creature := CCreature new color: Color blue darker darker; configureBall: 10.
+creature materialize: (g logs at: 100) fittestIndividual genes.
+c addCreature: creature.
+
+creature := CCreature new color: Color green darker darker; configureBall: 10.
+creature materialize: (g logs at: 180) fittestIndividual genes.
+c addCreature: creature.
+
+
+
+
+	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 100 @ -10).
+	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 400 @ -10).
+	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 700 @ -10).
+	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 1000 @ -10).
+
+c open.
+~~~~~~~~
+
 ## Worm
-```Smalltalk
+~~~~~~~~
 numberOfMuscles := 26.
 mg := CMuscleGenerator new
 		minStrength: 0.01;
@@ -126,4 +213,5 @@ c := CWorld new.
 c addPlatform: CPlatform new.
 c addCreature: creature.
 c open
-```
+~~~~~~~~
+

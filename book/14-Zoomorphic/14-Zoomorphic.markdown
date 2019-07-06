@@ -1,7 +1,7 @@
 
 # Building Zoomorphic Creature
 
-This chapter is about creating zoomorphic creatures. Such creature will have to solve a simple task, such as moving toward a direction or jumping.
+This chapter is about defining and creating zoomorphic creatures. 
 
 ![Example of a creature.](14-Zoomorphic/figures/CreatureExample.png){#fig:CreatureExample}
 
@@ -13,7 +13,10 @@ A creature is subject to the gravity. Muscles have no weight, but a join point h
 
 Such a creature, at its inception, does not do much. However, we will make it evolve to solve a particular task. The task we will consider are displacing itself toward a direction and jumping.
 
-The chapter is (unfortunately) very long as it lays out the infrastructure to simulate a complex. We will produce creature, that we qualify as _zoomorphic_ since they could be (although remotely) considered as a small digital animal.
+The chapter is very long as it lays out the infrastructure to simulate a complex. We will produce creature, that we qualify as _zoomorphic_ since they could be (although remotely) considered as a small digital animal.
+
+Note that this long chapter is does not directly related to genetic algorithm. The following chapter will evolve creatures to solve a simple task, such as moving toward a direction or going through some obstacles.
+
 
 ## Modeling Join Points
 
@@ -183,18 +186,19 @@ In addition to the gravity that we have described above, the environment may aff
 
 ```Smalltalk
 CVisualElement subclass: #CPlatform
-	instanceVariableNames: 'width'
+	instanceVariableNames: 'width height'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Creature'
 ```
 
-We initialize a platform with a width of 1000 pixels:
+We initialize a platform with a width of 100 pixels:
 
 ```Smalltalk
 CPlatform>>initialize
 	super initialize.
-	self width: 100
+	self width: 100.
+	self height: 10
 ```
 
 The width of a platform is set using:
@@ -204,12 +208,22 @@ CPlatform>>width: aWidthAsNumber
 	"Set the width of the platform"
 	width := aWidthAsNumber
 ```
+
+The height of a platform is set using:
+
+```Smalltalk
+CPlatform>>height: aHeightAsNumber
+	"Set the width of the platform"
+	height := aHeightAsNumber.
+	
+```
+
 The creation of the element is a simple rectangle:
 
 ```Smalltalk
 CPlatform>>createElement
-	element := RTBox new width: width; height: 10; color: Color gray; element.
-	element @ RTDraggable	
+	element ifNotNil: [ "already created" ^ self ].
+	element := RTBox new width: width; height: height; color: Color gray; element.
 ```
 
 A platform may be translated to a particular position using:
@@ -217,6 +231,7 @@ A platform may be translated to a particular position using:
 ```Smalltalk
 CPlatform>>translateTo: aPosition
 	"Translate the platform to a particular position"
+	self createElement.
 	element translateTo: aPosition
 ```
 
@@ -226,10 +241,7 @@ The primitive to handle effect of the platform is the collision detection. We de
 ```Smalltalk
 CPlatform>>touch: node
 	"Answer whether the platform touch the node provided as argument"
-	| bottomNode topPlatform |
-	bottomNode := node element encompassingRectangle bottomCenter y.
-	topPlatform := self element encompassingRectangle topCenter y.
-	^ topPlatform <= bottomNode
+	^ node element encompassingRectangle intersects: self element encompassingRectangle
 ```
 
 The method `touch:` returns `true` or `false` indicating whether the provided `node` is above a platform.
@@ -334,6 +346,16 @@ CMuscle>>createElement
 	element := RTLine new color: (color alpha: 0.3); width: 5; 
 				edgeFrom: node1 element to: node2 element
 ```
+
+The color of a muscle is set by:
+
+```Smalltalk
+CMuscle>>color: aColor
+	"Set the color of the muscle"
+	color := aColor
+```
+
+Note that the method `createElement` will make the color translucent. This is useful as many muscles do overlap.
 
 A muscle as a variable length. The actual length of a muscle is either `length1` or `length2`. If the muscle timer is below a lower threshold (_i.e.,_ value of `self minTime`), then the muscle length is `length1`, else it is `length2`. We define the method `length` as follows:
 
@@ -629,7 +651,7 @@ We define a creature as an instance of the class `CCreature`, defined as follow:
 
 ```Smalltalk
 Object subclass: #CCreature
-	instanceVariableNames: 'nodes muscles random muscleGenerator'
+	instanceVariableNames: 'nodes muscles random muscleGenerator color'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Creature'
@@ -646,6 +668,15 @@ CCreature>>initialize
 	muscles := OrderedCollection new.
 	random := Random seed: 42.
 	muscleGenerator := CMuscleGenerator new.
+	color := Color red.
+```
+
+A muscle is red per default. Its colors may be particularized with:
+
+```Smalltalk
+CCreature>>color: aColor
+	"Set the color of the creature"
+	color := aColor
 ```
 
 Muscle and can be generated and added in a creature using the method:
@@ -711,6 +742,7 @@ A ball-like shape is created using:
 ```Smalltalk
 CCreature>>configureBall: numberOfNodes	
 	"Produce a ball-like creature"
+	| existingMuscles |
 	muscleGenerator := CMuscleGenerator new
 		minStrength: 0.01;
 		deltaStrength: 0.5;
@@ -723,9 +755,12 @@ CCreature>>configureBall: numberOfNodes
 	self configureNodes: numberOfNodes.
 
 	"Connect each node with all the other nodes"
+	existingMuscles := OrderedCollection new.
 	nodes do: [ :n1 |
 		(nodes copyWithout: n1) do: [ :n2 |
-			self addMuscleFrom: n1 to: n2. ] ].
+			(existingMuscles includes: n1 -> n2) ifFalse: [ 
+				self addMuscleFrom: n1 to: n2. 
+				existingMuscles add: n1 -> n2; add: n2 -> n1 ] ] ].
 
 	"Create the visual elements"
 	self createElements.
@@ -733,6 +768,8 @@ CCreature>>configureBall: numberOfNodes
 ```
 
 The `configureBall:` takes as argument the number of nodes that will compose the ball. All the nodes are connected with all the other nodes. As a consequence, a ball creature will contains many muscles, which means that muscles should have a low strength.
+
+We use the variable `existingMuscles` to make sure that only one muscle is within two nodes. 
 
 A more generic way of defining a creature is by specifying the number of nodes and the number of muscles. The method `configureNbNodes:nbMuscles:` is defined as follows:
 
@@ -806,6 +843,7 @@ The graphical elements are created using the method `createElements`:
 CCreature>>createElements
 	"Force the creation of the all graphical elements for nodes and muscles"
 	nodes do: #createElement.
+	muscles do: [ :m | m color: color ].
 	muscles do: #createElement.
 ```
 
@@ -1033,7 +1071,7 @@ CWorld>>addPylons
 ```
 
 
-## Dry run
+## Cold run
 
 We can now open a world and add a creature to it:
 
