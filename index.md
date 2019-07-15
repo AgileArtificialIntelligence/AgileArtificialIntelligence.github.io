@@ -20,7 +20,7 @@ Part II: Genetic Algorithm
 1. [Traveling salesman problem](./book/build/12-TravelingSalesmanProblem.html)
 1. [Robot looking for an exit](./book/build/13-Robot.html)
 1. [Building Zoomorphic creature](./book/build/14-Zoomorphic.html)
-1. Simulating Zoomorphic creature
+1. [Simulating Zoomorphic creature](./book/build/15-ZoomorphicSimulation.html)
 
 Part III: Neuroevolution
 1. Neural Network Are Greedy of Examples
