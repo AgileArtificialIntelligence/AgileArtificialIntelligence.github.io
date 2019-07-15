@@ -792,7 +792,7 @@ Transposing a vector produce a matrix of one row, as illustrates with the follow
 
 ```Smalltalk
 MMatrixTest>>testTransposedOnVector
-	| m expectedResult |
+	| m |
 	m := MMatrix newFromVector: #(1 2 3).
 	self assert: m transposed asStructuredArray equals: #(#(1 2 3))
 ```
