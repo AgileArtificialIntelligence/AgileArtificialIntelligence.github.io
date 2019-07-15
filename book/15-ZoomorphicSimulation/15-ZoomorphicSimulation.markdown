@@ -10,6 +10,33 @@ Making creatures evolve is a very costly operation. Most of the script given in 
 Interrupting Pharo will bring up a Pharo debugger. When this happens, the execution has been interrupted. You can then execute any arbitrary code. 
 Closing the debugger will simply end the ongoing computation. Keeping the debugger open means you can always resume the execution you interrupted by clicking on `Proceed`.
 
+## Monitoring Execution Time
+
+Running a genetic algorithm for our little creature is time consuming. We will extend our framework to keep track of the time
+
+```Smalltalk
+Object subclass: #GALog
+	instanceVariableNames: 'generationNumber timeToProduceGeneration fittestIndividual worseFitness averageFitness time'
+	classVariableNames: ''
+	package: 'GeneticAlgorithm-Core'
+```
+
+```Smalltalk
+GALog>>initialize
+	super initialize.
+	time := DateAndTime now
+```
+
+The class `DateAndTime` represents a point in time. When a log object is created, we keep the creatime time in the variable `time`. 
+
+```Smalltalk
+GAEngine>>timeTaken
+	"Return the time taken to compute all the generations"
+	| lastLog |
+	lastLog := self logs last.
+	^ lastLog time + lastLog timeToProduceGeneration - self logs first time 
+```
+
 ## Dedicated Genetic Operator
 
 So far, we have seen two crossover operations: 
@@ -29,7 +56,7 @@ GAAbstractCrossoverOperation subclass: #GAConstrainedCrossoverOperation
 	category: 'GeneticAlgorithm-Core'
 ```
 
-The operator consider a set of possible cutpoints with the variable `possibleCutpoints`, which is set using:
+The operator considers a set of possible cutpoints with the variable `possibleCutpoints`, which is set using:
 
 ```Smalltalk
 GAConstrainedCrossoverOperation>>possibleCutpoints: indexes
@@ -46,17 +73,17 @@ GAConstrainedCrossoverOperation>>pickCutPointFor: partnerA
 	^ possibleCutpoints at: (random nextInt: possibleCutpoints size)
 ```
 
-## Simple Creature
 
-Making creatures evolve is a very costly operation.
+## Moving Forward 
 
-Consider the following script:
+Consider the task to move forward, to the right:
+
 ~~~~~~
-numberOfNodes := 3.
+numberOfNodes := 10.
 numberOfMuscles := (CCreature new configureBall: numberOfNodes) numberOfMuscles.
 mg := CMuscleGenerator new
 		minStrength: 0.01;
-		deltaStrength: 0.8;
+		deltaStrength: 1;
 		minLength: 10;
 		deltaLength: 80;
 		deltaTime: 200;
@@ -65,8 +92,177 @@ g := GAEngine new.
 g crossoverOperator: (GAConstrainedCrossoverOperation new possibleCutpoints: (1 to: numberOfMuscles*5 by: 5)).
 g selection: (GATournamentSelection new).
 g mutationRate: 0.02.
-g endForMaxNumberOfGeneration: 500.
-"g endIfNoImprovementFor: 100 withinRangeOf: 40."
+g endForMaxNumberOfGeneration: 128.
+g populationSize: 100.
+g numberOfGenes: numberOfMuscles * 5.
+g createGeneBlock: [ :r :index | mg valueForIndex: index ].
+g fitnessBlock: [ :genes |
+	creature := CCreature new configureBall: numberOfNodes.
+	creature materialize: genes.
+	c := CWorld new.
+	c addCreature: creature.
+	3000 timesRepeat: [ c beat ].
+	creature position x
+].
+g run. 
+~~~~~~
+
+The script considers a ball made of 10 nodes. The physic engine will locate these nodes in a circular fashion as a result of the physical rules. The number of muscles is obtained by evaluating the expression `(CCreature new configureBall: numberOfNodes) numberOfMuscles`. It simply creates a dummy creature and counts the number of muscles. A ball creature made of 10 nodes has 45 muscles. We then define a muscle generator useful to build the initial population and mutate a creature.
+
+Each muscle is defined by five attributes. A crossover operation may happen only at the junction of a muscle definition. The fitness function simulates the behavior of the creature in a new world. We took an arbitrary number of beats, 3000, to simulate the behavior. After these 3000 beats, the x coordinate of the creature position defines the function fitness. A fit creature will move forward to the right. The evolution happens over 128 generations (an arbitrary value). 
+
+![Evolving a 45-muscles creature.](15-ZoomorphicSimulation/figures/evolutionZoomorphic01.png){#fig:evolutionZoomorphic01}
+
+Figure @fig:evolutionZoomorphic01 shows the fitness evolution. The fitness indicates that the creature is able to move.
+
+We can see the result using the script:
+
+~~~~~~
+...
+creature := CCreature new configureBall: 10.
+creature materialize: g result.
+c := CWorld new.
+c addCreature: creature.
+c open
+~~~~~~
+
+
+![A creature in its environment.](15-ZoomorphicSimulation/figures/evolutionZoomorphic02.png){#fig:evolutionZoomorphic02}
+
+Figure @fig:evolutionZoomorphic02 illustrates a creature in its environment. We can monitor the evolution of a creature at a particular points in time. For example, consider the script:
+
+~~~~~~
+...
+c := CWorld new.
+creature := CCreature new color: Color red; configureBall: 10.
+creature materialize: g logs last fittestIndividual genes.
+c addCreature: creature.
+
+creature := CCreature new color: Color yellow darker darker; configureBall: 10.
+creature materialize: (g logs at: 50) fittestIndividual genes.
+c addCreature: creature.
+
+creature := CCreature new color: Color blue darker darker; configureBall: 10.
+creature materialize: (g logs at: 100) fittestIndividual genes.
+c addCreature: creature.
+
+creature := CCreature new color: Color green darker darker; configureBall: 10.
+creature materialize: (g logs at: 120) fittestIndividual genes.
+c addCreature: creature.
+
+c open
+~~~~~~
+
+![Creature at different stage of its evolution (yellow = generation 50, blue = generation 100, green = generation 120, red = generation 128).](15-ZoomorphicSimulation/figures/evolutionZoomorphic03.png){#fig:evolutionZoomorphic03}
+
+If you watch these competing creature, it is interesting to see that the red is not always in the first position. The green creature overtakes the red one at multiple times. Ultimately, the red one reaches the final pylon. 
+
+## Serializing the Muscle Attributes
+
+The expression `g result` returns the attributes of the muscles used in the creature. You can keep the computed result in case you do not wish to run the genetic algorithm all the time. For example, if you expand the `g result` expression, you obtain:
+
+```Smalltalk
+creature := CCreature new configureBall: 10.
+creature materialize: #(24 34 0.46040109215788594 216 145 75 50 0.522318108469396 127 33 33 39 0.9105445367193523 70 93 30 88 0.5458242390378492 55 104 32 78 0.9326984656055917 36 74 20 38 0.23007194683890417 169 77 25 31 0.6407352956527543 219 147 28 14 0.5132012814205146 70 67 41 32 0.4101663086936652 116 21 30 53 0.4132064962215752 140 69 26 16 0.67239310366213 174 81 90 40 0.9493843137376868 77 82 90 24 0.9472498080773512 72 76 77 15 0.8207815849644977 51 46 63 21 0.23135899086546108 29 170 33 24 0.8508932494190025 70 94 34 32 0.85425589900662 192 99 83 84 0.8219266167338596 153 144 74 57 0.18008196523882541 38 136 76 82 0.4098378945513805 108 122 73 25 0.13200707016606214 72 102 11 24 0.525760215705149 60 33 34 53 0.47843877270279395 207 167 53 53 0.06064744597796698 47 203 90 90 0.3480303188869871 101 204 77 42 0.05166656036007524 143 155 67 89 0.5535930274164271 146 23 35 39 0.8390450097196945 136 143 78 87 0.955747404799679 153 71 15 84 0.9765097738460218 34 26 36 14 0.13894161191253998 78 51 38 41 0.1316714140594338 114 205 74 74 0.7760572821116342 191 32 67 61 0.08824125377379416 219 149 18 70 0.1469941007052521 169 175 39 43 0.2866080141424239 133 71 90 42 0.8735930218098653 90 85 53 21 0.18471918099313936 39 146 60 44 0.3135163908747567 120 38 57 43 0.32777994628892276 187 148 34 23 0.3158802803540045 35 102 75 42 0.1347404502354285 109 125 28 76 0.12238997760805766 64 23 68 70 0.9608936917180632 179 175 28 24 0.06067319378753807 116 196 ).
+c := CWorld new.
+c addCreature: creature.
+c open
+```
+
+This long array of number constitutes the "DNA" of the creature. The objective of the genetic algorithm is to evolve the DNA to make the creature move to the right as much as possible. 
+
+
+## Passing Obstacles
+
+So far, our creature has evolved to move right. We can also train to pass obstacles. We can adapt our script to incorporate some obstacles. Consider:
+
+~~~~~
+numberOfNodes := 10.
+numberOfMuscles := (CCreature new configureBall: numberOfNodes) numberOfMuscles.
+mg := CMuscleGenerator new
+		minStrength: 0.01;
+		deltaStrength: 1;
+		minLength: 10;
+		deltaLength: 80;
+		deltaTime: 200;
+		minTime: 20.
+g := GAEngine new.
+g crossoverOperator: (GAConstrainedCrossoverOperation new possibleCutpoints: (1 to: numberOfMuscles*5 by: 5)).
+g selection: (GATournamentSelection new).
+g mutationRate: 0.02.
+g endForMaxNumberOfGeneration: 128.
+g populationSize: 100.
+g numberOfGenes: numberOfMuscles * 5.
+g createGeneBlock: [ :r :index | mg valueForIndex: index ].
+g fitnessBlock: [ :genes |
+	creature := CCreature new configureBall: numberOfNodes.
+	creature materialize: genes.
+	creature resetPosition.
+	c := CWorld new.
+	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 100 @ -10).
+	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 400 @ -10).
+	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 700 @ -10).
+	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 1000 @ -10).
+	c addCreature: creature.
+	3000 timesRepeat: [ c beat ].
+	creature position x
+].
+g run. 
+~~~~~
+
+![Evolving a zoomorphic creature in presence of obstacles.](15-ZoomorphicSimulation/figures/evolutionZoomorphic04.png){#fig:evolutionZoomorphic04}
+
+The result can be rendered using the script: 
+
+~~~~~
+...
+c := CWorld new.
+creature := CCreature new color: Color red; configureBall: 10.
+creature materialize: g logs last fittestIndividual genes.
+c addCreature: creature.
+
+creature := CCreature new color: Color yellow darker darker; configureBall: 10.
+creature materialize: (g logs at: 50) fittestIndividual genes.
+c addCreature: creature.
+
+creature := CCreature new color: Color blue darker darker; configureBall: 10.
+creature materialize: (g logs at: 100) fittestIndividual genes.
+c addCreature: creature.
+
+creature := CCreature new color: Color green darker darker; configureBall: 10.
+creature materialize: (g logs at: 90) fittestIndividual genes.
+c addCreature: creature.
+
+c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 100 @ -10).
+c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 400 @ -10).
+c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 700 @ -10).
+c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 1000 @ -10).
+c open
+~~~~~~
+
+![Different stages of the evolution.](15-ZoomorphicSimulation/figures/evolutionZoomorphic05.png){#fig:evolutionZoomorphic05}
+
+Figure @fig:evolutionZoomorphic05 illustrates different stages of an evolved creature.
+
+## Stair Climbing
+
+Creature can evolve to climb stairs. Consider the script:
+
+~~~~~~~~
+numberOfNodes := 10.
+numberOfMuscles := (CCreature new configureBall: numberOfNodes) numberOfMuscles.
+mg := CMuscleGenerator new
+		minStrength: 0.01;
+		deltaStrength: 1;
+		minLength: 10;
+		deltaLength: 80;
+		deltaTime: 200;
+		minTime: 20.
+g := GAEngine new.
+g crossoverOperator: (GAConstrainedCrossoverOperation new possibleCutpoints: (1 to: numberOfMuscles*5 by: 5)).
+g selection: (GATournamentSelection new).
+g mutationRate: 0.02.
+g endForMaxNumberOfGeneration: 128.
 g populationSize: 100.
 g numberOfGenes: numberOfMuscles * 5.
 g createGeneBlock: [ :r :index | mg valueForIndex: index ].
@@ -76,142 +272,44 @@ g fitnessBlock: [ :genes |
 	creature resetPosition.
 	c := CWorld new.
 	c addCreature: creature.
-	1500 timesRepeat: [ c beat ].
-	creature position x
-].
-g run. 
-g.
-~~~~~~
-
-
-## Ball 
-
-~~~~~~
-numberOfMuscles := 90.
-mg := CMuscleGenerator new
-		minStrength: 0.01;
-		deltaStrength: 0.8;
-		minLength: 10;
-		deltaLength: 80;
-		deltaTime: 200;
-		minTime: 20.
-g := GAEngine new.
-g crossoverOperator: (GAConstrainedCrossoverOperation new possibleCutpoints: (1 to: numberOfMuscles*5 by: 5)).
-g selection: (GATournamentSelection new).
-g mutationRate: 0.02.
-g endForMaxNumberOfGeneration: 500.
-"g endIfNoImprovementFor: 100 withinRangeOf: 40."
-g populationSize: 100.
-g numberOfGenes: numberOfMuscles * 5.
-g createGeneBlock: [ :r :index | mg valueForIndex: index ].
-g fitnessBlock: [ :genes |
-	creature := CCreature new configureBall: 10.
-	creature materialize: genes.
-	creature resetPosition.
-	c := CWorld new.
-	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 100 @ -10).
-	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 400 @ -10).
-	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 700 @ -10).
-	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 1000 @ -10).
-	c addCreature: creature.
-	1500 timesRepeat: [ c beat ].
-	creature position x
-].
-g run. 
-g.
-~~~~~~
-
-~~~~~~
-...
-creature := CCreature new configureBall: 10.
-creature materialize: g result.
-c := CWorld new.
-c addPlatform: CPlatform new.
-c addCreature: creature.
-c open
-~~~~~~
-
-![The fitness evolution of a creature made of 10 nodes and 90 muscles.](15-ZoomorphicSimulation/figures/zoomorphicBall.png){#fig:zoomorphicBall}
-
-Figure @fig:zoomorphicBall illustrates the evolution of the fitness through 800 generations.
-
-```Smalltalk
-creature := CCreature new configureBall: 10.
-creature materialize: #(46 57 0.6301436936017796 73 35 57 37 0.7455573501137819 143 107 49 14 0.35115768426151844 169 92 85 86 0.32359463274180644 140 113 54 65 0.6027750701982413 191 59 53 71 0.0963423280819982 143 183 83 85 0.11049838726431988 67 61 22 79 0.10700324130105006 152 78 29 21 0.4994542904987253 32 30 19 12 0.18657419451352872 27 55 59 68 0.05450737798796379 179 120 31 74 0.21743850181225619 119 120 83 85 0.2863947514241537 66 167 27 48 0.17051114171767198 216 171 81 54 0.27594237027035207 217 143 47 56 0.5765871857509889 98 27 59 29 0.3982801273783111 78 164 20 56 0.035925943267497214 72 103 66 14 0.10116308134568999 120 33 12 21 0.5109705314882894 128 160 51 72 0.363804226011878 210 163 38 17 0.5800702822627827 173 165 35 45 0.2560888502402645 46 23 40 51 0.7652406590223502 96 102 27 40 0.7232469962878372 204 138 29 20 0.6939245676453806 185 42 78 81 0.3826264731831041 212 149 64 80 0.35226660967910045 183 143 25 64 0.3604653526239402 94 110 23 45 0.0212987645023031 68 158 84 86 0.716524867148383 180 121 11 18 0.7855720127260183 159 96 24 14 0.08532353739967734 27 72 68 83 0.40073455612675035 73 125 38 47 0.7297066403551524 44 147 77 63 0.28087378775275956 46 48 82 83 0.5397561886393262 108 202 70 51 0.49820878588045425 96 164 25 25 0.5034138467970369 46 159 38 53 0.601270998768169 185 209 28 28 0.3700446695275813 152 30 33 35 0.6353292634269825 98 54 58 43 0.33866740912602633 43 199 55 30 0.668907751673324 112 193 34 57 0.07028041432624703 141 124 43 47 0.4181811143123457 112 25 90 24 0.11373324346902466 166 39 83 17 0.765568998658829 40 38 42 48 0.5093237132669071 172 189 89 75 0.5919386507300375 115 129 44 29 0.5096213185133512 157 160 18 49 0.1467636942010204 82 158 40 31 0.4694113184415788 176 46 28 46 0.06753185639974282 192 103 76 87 0.32120877280421967 74 108 16 89 0.19919975356627245 90 156 43 43 0.09584452051941515 22 159 21 79 0.5514990971523799 25 26 46 89 0.3122694458729911 116 215 55 42 0.6226618064067615 122 139 71 77 0.597576727842715 70 132 84 21 0.17913475290366207 128 72 75 75 0.2226853180176976 133 99 68 72 0.5840837394139188 186 163 67 75 0.18421771482295252 64 203 79 36 0.10981141802846055 194 43 67 62 0.7963004159118517 177 71 24 16 0.6151985344873735 142 22 29 52 0.19339112670318745 114 195 83 66 0.7405028043363723 132 212 61 30 0.06893818366291848 162 134 55 31 0.09137207891855952 121 178 86 77 0.7793096931880851 184 215 16 55 0.12008714479863977 127 113 31 12 0.3681450776933437 100 40 67 11 0.3293022803958982 96 135 46 50 0.1097400381135475 54 43 56 52 0.36743698643401124 43 111 20 37 0.3154938433251781 40 38 44 47 0.671295115510605 56 56 84 36 0.1317935234875388 114 128 21 20 0.7409173337793524 114 75 75 72 0.037982394410289076 77 171 30 67 0.05339182006353132 103 127 28 16 0.014642127083913482 217 114 81 64 0.43913139333442386 88 174 90 11 0.8039305391134371 26 40 68 71 0.0870067006708154 112 79 77 72 0.043118794873877805 68 109 76 85 0.561802780363617 140 156 ).
-c := CWorld new.
-c addPlatform: CPlatform new.
-c addCreature: creature.
-c open
-```
-
-
-## Competing creatures
-
-~~~~~~~~
-c := CWorld new.
-creature := CCreature new color: Color red; configureBall: 10.
-creature materialize: g logs last fittestIndividual genes.
-c addCreature: creature.
-
-creature := CCreature new color: Color yellow darker darker; configureBall: 10.
-creature materialize: (g logs at: 70) fittestIndividual genes.
-c addCreature: creature.
-
-creature := CCreature new color: Color blue darker darker; configureBall: 10.
-creature materialize: (g logs at: 100) fittestIndividual genes.
-c addCreature: creature.
-
-creature := CCreature new color: Color green darker darker; configureBall: 10.
-creature materialize: (g logs at: 180) fittestIndividual genes.
-c addCreature: creature.
-
-
-
-
-	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 100 @ -10).
-	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 400 @ -10).
-	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 700 @ -10).
-	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: 1000 @ -10).
-
-c open.
-~~~~~~~~
-
-## Worm
-~~~~~~~~
-numberOfMuscles := 26.
-mg := CMuscleGenerator new
-		minStrength: 0.01;
-		deltaStrength: 0.8;
-		minLength: 10;
-		deltaLength: 80;
-		deltaTime: 200;
-		minTime: 20.
-g := GAEngine new.
-g crossoverOperator: (GAConstrainedCrossoverOperation new possibleCutpoints: (1 to: numberOfMuscles * 5 by: 5)).
-g selection: (GATournamentSelection new).
-g mutationRate: 0.02.
-g endForMaxNumberOfGeneration: 800.
-g populationSize: 100.
-g numberOfGenes: numberOfMuscles * 5.
-g createGeneBlock: [ :r :index | mg valueForIndex: index ].
-g fitnessBlock: [ :genes |
-	creature := CCreature new configureWorm: 5.
-	creature materialize: genes.
-	creature resetPosition.
-	c := CWorld new.
-	c addPlatform: CPlatform new.
+	1 to: 25 by: 3 do: [ :x |
+		c addPlatform: (CPlatform new height: 20; width: 80; translateTo: x * 100 @ -10).
+		c addPlatform: (CPlatform new height: 20; width: 80; translateTo: x * 100 + 50 @ -30).
+		c addPlatform: (CPlatform new height: 20; width: 80; translateTo: x * 100 + 100 @ -50).
+		c addPlatform: (CPlatform new height: 20; width: 80; translateTo: x * 100 + 150 @ -70).
+	].
 	c addCreature: creature.
 	3000 timesRepeat: [ c beat ].
 	creature position x
 ].
 g run. 
-g.
+~~~~~~~~
 
-creature := CCreature new configureWorm: 5.
+The script is very similar to the previous ones. It simply add some well positioned platforms to form stairs. Result may be seen with the following script (Figure @fig:evolutionZoomorphic06):
+
+~~~~~~~~
+...
+creature := CCreature new configureBall: 10.
 creature materialize: g result.
 c := CWorld new.
-c addPlatform: CPlatform new.
+"We build couple of stairs"
+1 to: 25 by: 3 do: [ :x |
+	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: x * 100 @ -10).
+	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: x * 100 + 50 @ -30).
+	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: x * 100 + 100 @ -50).
+	c addPlatform: (CPlatform new height: 20; width: 80; translateTo: x * 100 + 150 @ -70).
+].
 c addCreature: creature.
 c open
 ~~~~~~~~
 
+![Climbing stairs.](15-ZoomorphicSimulation/figures/evolutionZoomorphic06.png){#fig:evolutionZoomorphic06}
+
+## What have we seen in this chapter?
+
+This chapter illustrates how some creature, which we qualify as _zoomorphic_ due to their organic way of moving, evolve to solve some tasks. In particular, the chapter covers:
+
+- a basic technique to interrupt long-running processes. This is central aspect of this chapter as the evolution we deal with takes several minutes;
+- the evolution of a creature in three different scenarios: without any obstacles, with some simple obstacles, and with stairs.
+
+This chapter closes the second part of the book. 

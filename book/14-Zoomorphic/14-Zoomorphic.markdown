@@ -771,6 +771,7 @@ The `configureBall:` takes as argument the number of nodes that will compose the
 
 We use the variable `existingMuscles` to make sure that only one muscle is within two nodes. 
 
+<!--
 A more generic way of defining a creature is by specifying the number of nodes and the number of muscles. The method `configureNbNodes:nbMuscles:` is defined as follows:
 
 ```Smalltalk
@@ -801,8 +802,9 @@ CCreature>>configureNbNodes: nbNodes nbMuscles: nbMuscle
 ```
 
 The method first define some nodes. Some constraints need to be set on the nodes that are joined by a muscle. In particular, we cannot have more than one muscle between two nodes. The small algorithm used in the method avoid nodes in which there is at a muscle between the two nodes. In total, 10 tries are performed before giving up.
+-->
 
-We also provide a way to build worm-like creature. We define the following methods
+We also provide a way to build worm-like creature. We define the following method:
 
 ```Smalltalk
 CCreature>>configureWorm: length
@@ -836,7 +838,7 @@ CCreature>>configureWorm: length
 		aSecondNode translateBy: (index * 10) @ 10.
 		index := index + 1 ]
 ```
-
+@@CHECK IF A WORM IS REALLY NECESSARY
 The graphical elements are created using the method `createElements`:
 
 ```Smalltalk
