@@ -14,7 +14,7 @@
 #	14-Zoomorphic/*.markdown`
 
 FILES=`ls \
-	14-Zoomorphic/*.markdown`
+	15-ZoomorphicSimulation/*.markdown`
 
 
 #FILES=`ls 13-Robot/*.markdown`
