@@ -127,7 +127,7 @@ c open
 ~~~~~~
 
 
-![A creature in its environment.](15-ZoomorphicSimulation/figures/evolutionZoomorphic02.png){#fig:evolutionZoomorphic02}
+![A creature in its environment.](15-ZoomorphicSimulation/figures/evolutionZoomorphic02.png){#fig:evolutionZoomorphic02 width=400px}
 
 Figure @fig:evolutionZoomorphic02 illustrates a creature in its environment. We can monitor the evolution of a creature at a particular points in time. For example, consider the script:
 

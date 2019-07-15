@@ -5,11 +5,11 @@ The Traveling Salesman Problem is a classical algorithm problem. It consists in 
 
 ## Illustration
 
-![Illustration of the Traveling Salesman Problem.](12-TravelingSalesmanProblem/figures/TSPExample.png){#fig:TSPExample}
+![Illustration of the Traveling Salesman Problem.](12-TravelingSalesmanProblem/figures/TSPExample.png){#fig:TSPExample width=200px}
 
 Consider the example given in Figure @fig:TSPExample. The figure shows four cities located as an horizontal diamond. Each city has a 2D coordinate and is therefore located in a two-dimensional plan. Assuming the traveler begins its journey in city A, many paths are possible to visit all the cities. 
 
-![Illustration of the Traveling Salesman Problem.](12-TravelingSalesmanProblem/figures/TSPDifferentPaths.png){#fig:TSPDifferentPaths}
+![Illustration of the Traveling Salesman Problem.](12-TravelingSalesmanProblem/figures/TSPDifferentPaths.png){#fig:TSPDifferentPaths width=600px}
 
 As illustrated in Figure @fig:TSPDifferentPaths, different paths are possible, including ABCD, ABDC, ADBC, ACDB, and ADCB. _What is the shortest path to visit all the cites?_ Since the distance between City B and City D is the shortest segment, the shortest path to visit all cities should necessarily contain the segment BD or DB.
 

@@ -3,7 +3,7 @@
 
 This chapter is about defining and creating zoomorphic creatures. 
 
-![Example of a creature.](14-Zoomorphic/figures/CreatureExample.png){#fig:CreatureExample}
+![Example of a creature.](14-Zoomorphic/figures/CreatureExample.png){#fig:CreatureExample width=200px}
 
 Figure @fig:CreatureExample gives the example of such a creature. It is make of join points and muscles. Each muscles has two extremities and each extremity is connected a join point. A join point may be host of several extremities. 
 
@@ -1084,7 +1084,7 @@ c addCreature: creature.
 c open
 ```
 
-![Adding an untrained creature to the world.](14-Zoomorphic/figures/dryRunZoomorphic.png){#fig:dryRunZoomorphic}
+![Adding an untrained creature to the world.](14-Zoomorphic/figures/dryRunZoomorphic.png){#fig:dryRunZoomorphic width=400px}
 
 Figure @fig:dryRunZoomorphic gives the result of the script. At that stage, the creature moves without a particular objective. The next chapter will exactly show how to make a creature evolve.
 
