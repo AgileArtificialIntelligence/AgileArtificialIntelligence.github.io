@@ -113,7 +113,7 @@ ActivationFunction>>derivative: output
 	^ self subclassResponsibility
 ```
 
-The two methods we have just defined are abtract methods, which means they are placeholder for subclasses of `ActivationFunction` to actually provide an adequate implementation of these methods.
+The two methods we have just defined are abstract methods, which means they are placeholder for subclasses of `ActivationFunction` to actually provide an adequate implementation of these methods.
 
 We can now define the two activation functions, each as being a subclass of `ActivationFunction`. The sigmoid function may be defined as:
 
@@ -166,7 +166,7 @@ The formulation of the `derivative:` of the step function does not match the mat
 
 ## Extending the neuron with the activation functions
 
-We can now generalize the way an artificial neuron can learn from examples. Assume an example value $(x, d)$, in which $x$ is example input and $d$ is the example output. At the beginning, when providing the input $x = (x_1, ..., x_i, ..., x_N)$ to a sidmoid neuron, the output is likely to be different than $d$, a number between $0$ and $1$. This is not surprising since the weights and bias are randomly chosen. This is exactly why we are training the neuron with that example, to have the neuron output $d$ if $x$ is provided.
+We can now generalize the way an artificial neuron can learn from examples. Assume an example value $(x, d)$, in which $x$ is example input and $d$ is the example output. At the beginning, when providing the input $x = (x_1, ..., x_i, ..., x_N)$ to a sigmoid neuron, the output is likely to be different than $d$, a number between $0$ and $1$. This is not surprising since the weights and bias are randomly chosen. This is exactly why we are training the neuron with that example, to have the neuron output $d$ if $x$ is provided.
 
 
 The learning mechanism may be summarized with the following rules:
