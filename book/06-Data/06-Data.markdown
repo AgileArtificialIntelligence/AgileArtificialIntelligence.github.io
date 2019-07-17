@@ -391,11 +391,11 @@ The result of the script is the value of the `irisData` variable. In the remaini
 
 Training a network is actually easy since we carefully prepared the battlefield. The remaining of the chapter assumes that the variable `irisData` is defined as shown in the previous section. Consider the following code:
 
-```Smalltalk
+~~~~~~~
 n := NNetwork new.
 n configure: 4 hidden: 6 nbOfOutputs: 3.
 n train: irisData nbEpochs: 1000.
-```
+~~~~~~~
 
 The code above builds a network with 4 input values, one hidden layer with 6 neurons, and the output layer has 3 neurons. The number of inputs represents the size of a row in the iris dataset minus 1, the expected output value which is not part of the input. We pick an arbitrary 6 as the size of the hidden layer. A general thumb-rule for the hidden layer size, is to contain 50% more neurons than the number of inputs. We have three neurons in the output layers since there are three different families of Iris.
 
@@ -410,33 +410,33 @@ The configuration of our network has two parameters: the number of neurons in th
 When we defined the `Neuron` class, in Chapter 2, we defined the method `learningRate:` to set the learning rate of the neuron. In general, for a single neuron, higher the learning rate, quicker it will be to learn. This effect can be easily illustrated. Consider the following example (Figure @fig:learningRateSingleNeuron):
 
 ```Smalltalk
-	g := RTGrapher new.
-	#(0.001 0.01 0.1 0.2 0.3)
-		doWithIndex: [ :lr :index | 
-			learningCurveNeuron := OrderedCollection new.
-			0 to: 1000 do: [ :nbOfTrained | 
-				r := Random new seed: 42.
-				p := Neuron new.
-				p weights: #(-1 -1).
-				p bias: 2.
-				p learningRate: lr.
-				nbOfTrained
-					timesRepeat: [ p train: #(0 0) desiredOutput: 0.
-						p train: #(0 1) desiredOutput: 0.
-						p train: #(1 0) desiredOutput: 0.
-						p train: #(1 1) desiredOutput: 1 ].
-				res := ((p feed: #(0 0)) - 0) abs + ((p feed: #(0 1)) - 0) abs
-					+ ((p feed: #(1 0)) - 0) abs + ((p feed: #(1 1)) - 1) abs.
-				learningCurveNeuron add: res / 4 ].
-			d := RTData new.
-			d label: 'Sigmoid neuron lr = ' , lr asString.
-			d noDot.
-			d connectColor: (RTPalette c1 at: index).
-			d points: learningCurveNeuron.
-			d y: #yourself.
-			g add: d ].
-	g legend addText: 'Learning rate effect'.
-	g
+g := RTGrapher new.
+#(0.001 0.01 0.1 0.2 0.3)
+	doWithIndex: [ :lr :index | 
+		learningCurveNeuron := OrderedCollection new.
+		0 to: 1000 do: [ :nbOfTrained | 
+			r := Random new seed: 42.
+			p := Neuron new.
+			p weights: #(-1 -1).
+			p bias: 2.
+			p learningRate: lr.
+			nbOfTrained
+				timesRepeat: [ p train: #(0 0) desiredOutput: 0.
+					p train: #(0 1) desiredOutput: 0.
+					p train: #(1 0) desiredOutput: 0.
+					p train: #(1 1) desiredOutput: 1 ].
+			res := ((p feed: #(0 0)) - 0) abs + ((p feed: #(0 1)) - 0) abs
+				+ ((p feed: #(1 0)) - 0) abs + ((p feed: #(1 1)) - 1) abs.
+			learningCurveNeuron add: res / 4 ].
+		d := RTData new.
+		d label: 'Sigmoid neuron lr = ' , lr asString.
+		d noDot.
+		d connectColor: (RTPalette c1 at: index).
+		d points: learningCurveNeuron.
+		d y: #yourself.
+		g add: d ].
+g legend addText: 'Learning rate effect'.
+g
 ```
 
 ![Effect of the learning rate for a single neuron.](06-Data/figures/learningRateSingleNeuron.png){#fig:learningRateSingleNeuron}
@@ -445,12 +445,12 @@ Figure @fig:learningRateSingleNeuron represents the error curves during the trai
 
 The effect observed on a single sigmoid neuron _cannot_ be observed on a whole network. We can train a network for the Iris dataset for different values of the learning rate. Consider the script:
 
-```Smalltalk
+~~~~~~~~
 n := NNetwork new.
 n configure: 4 hidden: 6 nbOfOutputs: 3.
 n learningRate: 0.3. " Repeat the script with a different value"
 n train: irisData nbEpochs: 1000.
-```
+~~~~~~~~
 
 We run the script for each of the value 0.001, 0.01, 0.1, and 0.3. Results are presented in Figure @fig:learningRateNetwork.
 
@@ -472,28 +472,30 @@ One way to answer this question, is to divide the iris dataset in two distinct p
 - _Test dataset_: a second portion used to see how effective the trained network is.
 
 Consider the following script:
-```
+
+~~~~~~~
 cut := 0.8.
 cutTraining := (irisData size * cut) rounded.
 cutTest := (irisData size * (1 - cut)) rounded.
 trainingData := irisData first: cutTraining.
 testData := irisData last: cutTest.
-```
+~~~~~~~
 
 The variable `cut` represents the portion of the original iris dataset used for the training: 80% of `irisData` is used for training. The variable `cutTraining` represents the number of `irisData` elements used for the training. Similarly, `cutTest` represents the number of elements for the test. The message `rounded`, when sent to a float value, returns the integer nearest to the float value (_e.g.,_ `4.6 rounded` returns `5`, `4.3 rounded` returns 4, and `4.5 rounded` returns `5`).
 
 We can train a network based on the `trainingData`:
-```
+
+~~~~~~~
 n := NNetwork new.
 n configure: 4 hidden: 6 nbOfOutputs: 3.
 n train: trainingData nbEpochs: 1000.
-```
+~~~~~~~
 
 We see that the network is able to properly learn `trainingData`, as the error curve is close to 0, similarly than in Figure @fig:networkOnIris.
 
 Consider the script (it assumes the existence of the previously seen variable `irisData`):
 
-```Smalltalk
+~~~~~~~
 cut := 0.8.
 cutTraining := (irisData size * cut) rounded.
 cutTest := (irisData size * (1 - cut)) rounded.
@@ -506,16 +508,17 @@ n train: trainingData nbEpochs: 1000.
 (((testData collect: [ :d |
 	(n predict: d allButLast) = d last
 ]) select: #yourself) size / testData size) asFloat round: 2 
-```
+~~~~~~~
 
 Evaluating the script returns 0.9, which represents the accuracy of our network: 90% of the elements contained in `testData` are correctly predicted. 
 
 We will now detail the last part of the script:
-```
+
+~~~~~~~
 (((testData collect: [ :d |
 	(n predict: d allButLast) = d last
 ]) select: #yourself) size / testData size) asFloat round: 2 
-```
+~~~~~~~
 
 For all the elements of `testData`, we predict the classification of the input (`d allButLast`) and compare the network result with the expected result (`d last`). The result of the `collect:` instruction is a list of binary values (`true` or `false`). We only select the `true` values (`select: #yourself`), count how many they are (`size`). We then compute the ratio with the size of test data (`/ testData size`). Finally, we only consider a float value with two decimal digits.
 
@@ -523,7 +526,7 @@ For all the elements of `testData`, we predict the classification of the input (
 
 Consider a cut of 0.7, as illustrated in the script:
 
-```Smalltalk
+~~~~~~~
 cut := 0.7.
 cutTraining := (irisData size * cut) rounded.
 cutTest := (irisData size * (1 - cut)) rounded.
@@ -536,7 +539,7 @@ n train: trainingData nbEpochs: 1000.
 (((testData collect: [ :d |
 	(n predict: d allButLast) = d last
 ]) select: #yourself) size / testData size) asFloat round: 2 
-```
+~~~~~~~
 
 The result is 0.0, indicating that the network is not able to make any prediction. Why so? Reducing the size of the training data, for example, if cut equals to 0.5, increases the accuracy of the network. This is an effect due to the data organization. 
 
@@ -544,7 +547,7 @@ If we inspect the 150 values of `irisData`, we see that they are actually ordere
 
 Consider this new script: 
 
-```Smalltalk
+~~~~~~~
 shuffledIrisData := irisData shuffleBy: (Random seed: 42).
 cut := 0.8.
 cutTraining := (shuffledIrisData size * cut) rounded.
@@ -558,7 +561,7 @@ n train: trainingData nbEpochs: 1000.
 (((testData collect: [ :d |
 	(n predict: d allButLast) = d last
 ]) select: #yourself) size / testData size) asFloat round: 2 
-```
+~~~~~~~
 
 The script introduces a new variable, called `shuffledIrisData`. It is initialized with `irisData shuffleBy: (Random seed: 42)`, which as the effect to create a copy of `irisData` shuffled using a random number. In case we wish to not use a random number generator and therefore have slightly different result at each run, we could simply use `shuffled` instead of `shuffleBy: (Random seed: 42)`.
 
@@ -566,7 +569,7 @@ The script introduces a new variable, called `shuffledIrisData`. It is initializ
 
 When we presented the perceptron and the sigmoid neuron, we have seen that the activation function is applied to the value $z = w.x + b$. Applied to a neuron with two inputs, we have $z = x_1 . w_1 + x_2 . w_2 + b$. In the examples we have considered so far, all the $x_i$ and output values ranges in the same interval, from 0 to 1. In the logical gate example, each $x_i$ is either 0 or 1. In the Iris dataset, we can compute the minimum and maximum for each input value:
 
-```Smalltalk
+~~~~~~~
 max := OrderedCollection new.
 min := OrderedCollection new.
 (1 to: 4) collect: [ :i |
@@ -574,7 +577,7 @@ min := OrderedCollection new.
 	min add: (irisData collect: [ :d | d at: i ]) min.
 ].
 { max . min }
-```
+~~~~~~~
 
 The result of this script indicates that overall, the values ranges from 
 0.1 to 7.9. Said in other words, all the input values have a range within the same magnitude.

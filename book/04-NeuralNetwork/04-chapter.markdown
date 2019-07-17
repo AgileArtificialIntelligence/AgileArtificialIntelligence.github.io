@@ -465,7 +465,7 @@ NNetwork>>train: someInputs desiredOutputs: desiredOutputs
 	| realOutputs t |
 	realOutputs := self feed: someInputs.
 	t := (1 to: desiredOutputs size) collect: 
-			[ :i | ((desiredOutputs at: i) - (realOutputs at: i)) raisedTo: 2 ].
+			[ :i | ((desiredOutputs at: i) - (realOutputs at: i)) squared ].
 	self backwardPropagateError: desiredOutputs.
 	self updateWeight: someInputs.
 ```

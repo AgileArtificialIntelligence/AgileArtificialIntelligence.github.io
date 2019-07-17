@@ -3627,7 +3627,7 @@ m + m</code></pre>
     self assert: m transposed asStructuredArray equals: expectedResult asStructuredArray</code></pre>
 <p>Transposing a vector produce a matrix of one row, as illustrates with the following test method:</p>
 <pre class="smalltalk"><code>MMatrixTest&gt;&gt;testTransposedOnVector
-    | m expectedResult |
+    | m |
     m := MMatrix newFromVector: #(1 2 3).
     self assert: m transposed asStructuredArray equals: #(#(1 2 3))</code></pre>
 <h2 id="example"><span class="header-section-number">1.15</span> Example</h2>

@@ -3351,7 +3351,7 @@ h4:hover a { color: #333; } h5:hover a { color: #333; } h6:hover a { color: #333
     | realOutputs t |
     realOutputs := self feed: someInputs.
     t := (1 to: desiredOutputs size) collect: 
-            [ :i | ((desiredOutputs at: i) - (realOutputs at: i)) raisedTo: 2 ].
+            [ :i | ((desiredOutputs at: i) - (realOutputs at: i)) squared ].
     self backwardPropagateError: desiredOutputs.
     self updateWeight: someInputs.</code></pre>
 <p>And Voila! We have implemented the necessary to train a neural network.</p>

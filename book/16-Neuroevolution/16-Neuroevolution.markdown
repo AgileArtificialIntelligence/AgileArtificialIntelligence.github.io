@@ -1,15 +1,21 @@
 
 # Neuroevolution
 
-This chapter opens the third and last part of the book. The first part covers the topic of neural network, a metaphor for a natural brain. The second part covers genetic algorithm, a metaphor for mechanism that enable evolution of species. Neuroevolution is a form of artificial intelligence that combines neural network and genetic algorithm. 
+This chapter opens the third and last part of the book. The first part covers the topic of neural network, a metaphor for a biological brain. The second part covers genetic algorithm, a metaphor for mechanism that enables evolution of species. Neuroevolution is a form of artificial intelligence that combines neural network and genetic algorithm. 
 
-## Supervised Learning
+## Supervised, Unsupervised Learning, Reinformcement learning
 
-In the first part, we have seen that neural network requires example to operate. For example, in order for a neural network to learn a behavior a labeled dataset has to be provided. In many situations, obtaining such a dataset is not problematic. For example, Facebook has a large dataset of labeled pictures. Each time you label a friend in a picture, you provide an example with which Facebook can improve its models. 
+In the first part, we have seen that neural network requires example to operate. For example, in order for a neural network to learn a behavior a labeled dataset has to be provided. This way to `learning` is called _supervised learning_: the algorithm learns from labeled data. 
 
-There are some case where having a labeled dataset is difficult, too costly, or even impossible to produce at an adequate quality. 
+In many situations, obtaining such a labeled dataset is not problematic. For example, Facebook has a large dataset of labeled pictures. Each time you label a friend in a picture, you provide an example with which Facebook can improve its models. 
 
+Whereas supervised learning finds pattern in a dataset for which we have the right answer, _unsupervised learning_ is about finding patterns without having these right anwers. Algorithms including k-means and autoencoder ar commonly used in unsupervised learning. 
 
+There are some case where having a labeled dataset is difficult, too costly, or even impossible to produce with a satisfactory quality. Autonomous vehicle and gaming may be the most two prominent domains for which having examples of a good quality is difficult. _Reinforcement learning_ a third form of learning in which software agents learns from the environment and make proper decision. Neuroevolution is a technique that is associated to reinforcement learning.
+
+## Core Idea of Neuroevolution
+
+Neuroevolution is a technique that consists in making a network evolve. Along generations, the network become better at recognizing patterns. 
 
 
 ## Extending Our Network
@@ -55,8 +61,7 @@ NNetwork>>setWeightsAndBias: weightsAndBias
 	
 	self neurons
 		do: [ :n | 
-			n
-				weights: (weightsAndBias copyFrom: index to: n numberOfWeights + index - 1).
+			n weights: (weightsAndBias copyFrom: index to: n numberOfWeights + index - 1).
 			index := index + n numberOfWeights.
 			n bias: (weightsAndBias at: index).
 			index := index + 1 ]
