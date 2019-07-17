@@ -435,13 +435,13 @@ g
 
 The script produces Figure @fig:perceptronVsSigmoid. No matter the learning rate defined, the perceptron is indeed much faster to learn than the sigmoid neuron. 
 
-The next chapter will reveals the true power of sigmoid neuron, which will shadow the fact it is slower to learn.
+The next chapter will reveals the true power of sigmoid neuron, which will offset the fact it is slower to learn.
 
 
 ## What have we seen in this chapter
 This chapter covers the following topics:
 
-- _Briefly discussed the limitation of the perceptron._ The perceptron cannot learn when combined with other perceptrons. Although we have not discussed this aspect further, you need to trust me for now. In the next chapter we will develop this further.
+- _Briefly discussed the limitation of the perceptron._ The perceptron cannot learn when combined with other perceptrons. Although we have not discussed this aspect further, you need to trust me for now. In the next chapter we will develop this further.is
 - _Definition of the sigmoid neuron._ The sigmoid neuron is an improvement of the perceptron since it can be combined with other sigmoid neurons and this combination can learn. In the next chapter we will detail the backpropagation algorithm, a central aspect when making a neural network learn.
 - _Activation functions._ We have seen two activation functions, the step and sigmoid functions. Many other activation functions are around. 
 
