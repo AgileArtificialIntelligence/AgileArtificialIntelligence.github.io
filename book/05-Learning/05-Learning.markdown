@@ -71,7 +71,7 @@ points :={(1 @ 3.0) . (3 @ 5.2) . (2 @ 4.1) . (4 @ 7.5)}.
 a := 0.5.
 b := 3.
 f := [ :x | a * x + b ].
-j := (points collect: [ :p | (p y - (f value: p x)) raisedTo: 2 ]) sum / points size.
+j := (points collect: [ :p | (p y - (f value: p x)) squared ]) sum / points size.
 ```
 
 The script returns the value `1.75`. If we change `a` for `2` and `b` for `-0.5`, `j` equals to `0.67`. If you draw the line with `a := 2` and `b := -0.5`, you will see that the blue line is closer to the red dots. 
@@ -242,7 +242,7 @@ result := OrderedCollection new.
 	a := a - (learningRate * deriMSEa).
 	b := b - (learningRate * deriMSEb).
 	
-	mse := (points collect: [ :aPoint | (aPoint y - (f value: aPoint x)) raisedTo: 2 ]) sum / points size.
+	mse := (points collect: [ :aPoint | (aPoint y - (f value: aPoint x)) squared ]) sum / points size.
 	result add: mse ].
 
 g := RTGrapher new.
@@ -316,7 +316,7 @@ result := OrderedCollection new.
 	a := a - (learningRate * deriMSEa).
 	b := b - (learningRate * deriMSEb).
 	
-	mse := (points collect: [ :aPoint | (aPoint y - (f value: aPoint x)) raisedTo: 2 ]) sum / points size.
+	mse := (points collect: [ :aPoint | (aPoint y - (f value: aPoint x)) squared ]) sum / points size.
 	result add: mse ].
 
 g := RTGrapher new.
@@ -387,7 +387,7 @@ result := OrderedCollection new.
 		a := a - (learningRate * deriMSEa).
 		b := b - (learningRate * deriMSEb).
 	
-		mse := (pointsBatch collect: [ :aPoint | (aPoint y - (f value: aPoint x)) raisedTo: 2 ]) sum / points size.
+		mse := (pointsBatch collect: [ :aPoint | (aPoint y - (f value: aPoint x)) squared ]) sum / points size.
 		accumulatedMse := accumulatedMse + mse
 	].
 	result add: accumulatedMse ].
@@ -433,7 +433,7 @@ result := OrderedCollection new.
 	a := a - (learningRate * deriMSEa).
 	b := b - (learningRate * deriMSEb).
 	
-	mse := (points collect: [ :aPoint | (aPoint y - (f value: aPoint x)) raisedTo: 2 ]) sum / points size.
+	mse := (points collect: [ :aPoint | (aPoint y - (f value: aPoint x)) squared ]) sum / points size.
 	result add: mse ]. ] timeToRun
 "==> "0:00:00:27.479"
 ```
@@ -469,7 +469,7 @@ result := OrderedCollection new.
 		a := a - (learningRate * deriMSEa).
 		b := b - (learningRate * deriMSEb).
 	
-		mse := (pointsBatch collect: [ :aPoint | (aPoint y - (f value: aPoint x)) raisedTo: 2 ]) sum / points size.
+		mse := (pointsBatch collect: [ :aPoint | (aPoint y - (f value: aPoint x)) squared ]) sum / points size.
 		accumulatedMse := accumulatedMse + mse
 	].
 	result add: accumulatedMse ].
