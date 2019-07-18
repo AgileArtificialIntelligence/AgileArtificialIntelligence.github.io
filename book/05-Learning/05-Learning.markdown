@@ -80,7 +80,7 @@ We are here highlighting an important use of the loss function. Changing paramet
 
 How does this simple line relate to the learning mechanism of a neural network? The backpropagation algorithm is directly based on this mechanism but at a larger scale. In this example we look for two values (`a` and `b`), in a neural networks we could look for thousands or millions of values, which correspond to the weights and biases. 
 
-Let's come back to the points and lines example. Our original problem is to find the straight line that is the closest to the red point. This problem can therefore be translated into looking for `a` and `b` that minimize the MSE value. Looking for these two values manually is rather tedious and laborious. The natural next step is automatically finding the `a` and `b` that minimize the loss function. No need to say how much programers do like to automatize everything :-)
+Let's come back to the points and lines example. Our original problem is to find the straight line that is the closest to the red points. This problem can therefore be translated into looking for `a` and `b` that minimize the MSE value. Looking for these two values manually is rather tedious and laborious. The natural next step is automatically finding the `a` and `b` that minimize the loss function. No need to say how much programers do like to automatize everything :-)
 
 ## Gradient Descent
 
