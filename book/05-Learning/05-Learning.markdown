@@ -85,7 +85,7 @@ Let's come back to the points and lines example. Our original problem is to find
 ## Gradient Descent
 
 We know that modifying the $a$ value changes the slope of our line, and modifying the $b$ value moves the point in which the line intersects the Y axis.
-So, each of the values modifies our line in a particular way. We are indeed searching for the best $a$ and $b$, but we cannot try all the possibilities, essentially for two reasons: (i) it could be extremelly expensive (trying all the combinations of possible values of $a$ and $b$ is a Dantean task), and (ii) since $a$ and $b$ are continuous values, in theory, there is not there is not a finite set of values to try out.
+So, each of the values modifies our line in a particular way. We are indeed searching for the best $a$ and $b$, but we cannot try all the possibilities, essentially for two reasons: (i) it could be extremely expensive (trying all the combinations of possible values of $a$ and $b$ is a Dantean task), and (ii) since $a$ and $b$ are continuous values, in theory, there is not a finite set of values to try out.
 
 In a general case, we have many parameters to search and it is not clear what each of them do. So to express a small change in our model we introduce the derivative. Since we focus on a small change of a single parameter in a multivariable function, we need to use the partial derivative.
 
@@ -99,7 +99,7 @@ If we expand the $f$ function in $J$, we obtain:
 
 $$J(a,b) = \frac{1}{n} \sum_{i=1}^{n}(y_i - (a.x_i + b))^2$$
 
-We can deduce the following partial derivatives, with respecto to $a$ and $b$:
+We can deduce the following partial derivatives, with respect to $a$ and $b$:
 
 $$\frac{\partial J(a,b)}{\partial a} = \frac{-2}{n}\sum_{i}x_{i} .(y_i - (a.x_i + b))$$
 
@@ -165,7 +165,7 @@ f(x+e) = f(x) + e f'(x)/1! +  e^2 f''(x)/2! + ...
 $$
 
 <!-- So, we want to know in which direction to go. We know that the derivative tell us the value we should change, but do not tell us in which direction. We use the Taylor series to solve this problem. -->
-Why is computing $f(x+e)$ such a thing? Well, neural network is about making prediction / regression, and learning is about determining which changes in the weights and biased makes the network perform better, which is indirectly expressed with $f(x+e)$. If $f$ is our loss function, we would like to change weights and biased in such a way that $f(x+e)$ is closer to 0 than $f(x)$.
+Why is computing $f(x+e)$ such a thing? Well, neural network is about making prediction / regression, and learning is about determining which changes in the weights and biased makes the network perform better, which is indirectly expressed with $f(x+e)$. If $f$ is our loss function, we would like to change weights and biases in such a way that $f(x+e)$ is closer to 0 than $f(x)$.
 
 
 If we know $f(x)$ and we search for $f(x+e)$ to be less than $f(x)$, so we should changes the parameters of the network to follow a descending slope of $f$. 
