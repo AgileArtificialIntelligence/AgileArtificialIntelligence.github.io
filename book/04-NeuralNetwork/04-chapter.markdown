@@ -462,12 +462,9 @@ This ends the third and last phase of the backpropagation algorithm. We are now 
 ```Smalltalk
 NNetwork>>train: someInputs desiredOutputs: desiredOutputs
 	"Train the neural network with a set of inputs and some expected output"
-	| realOutputs t |
-	realOutputs := self feed: someInputs.
-	t := (1 to: desiredOutputs size) collect: 
-			[ :i | ((desiredOutputs at: i) - (realOutputs at: i)) raisedTo: 2 ].
+	self feed: someInputs.
 	self backwardPropagateError: desiredOutputs.
-	self updateWeight: someInputs.
+	self updateWeight: someInputs
 ```
 
 And Voila! We have implemented the necessary to train a neural network. 
