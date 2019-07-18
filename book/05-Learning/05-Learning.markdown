@@ -55,7 +55,7 @@ g
 
 ![Points and a line.](05-Learning/figures/pointsAndLine.png){#fig:pointsAndLine width=400px}
 
-Figure @fig:pointsAndLine shows the points and the blue line that we arbitrarily defined. As one can see, the value we picked for `a` and `b` are not really good since the blue line is rather far away from the first and the fourth points. If we want to look for better `a` and `b`, then we need to translate in some way how far the blue lines is from the points. We know our line is not great, but _how_ bad is it? It is important that we have some way of measuring how good is our approximation.
+Figure @fig:pointsAndLine shows the points and the blue line that we arbitrarily defined. As one can see, the value we picked for `a` and `b` are not really good since the blue line is rather far away from the first and the fourth points. If we want to look for better `a` and `b`, then we need to translate in some way how far the blue lines is from the points. We know our line is not great, but _how_ bad is it? It is important that we have some way of measuring how good our approximation is.
 
 A _loss function_ is a mathematical function that maps an event, described as a set of values of one or more variables, into a numerical value. The numerical value given by the loss function intuitively represents the _cost_ associated with the event, generally a numerical value. In our case, the loss function approximates the distance between the straight blue line with the four points. If the blue line is close to the four points, then the cost will be relatively low. Oppositely, if it is far away from the points, then the cost will be high. In our case, let's make the loss function tell us how off is the straight blue line approximating the 4 points.
 
