@@ -55,7 +55,7 @@ g
 
 ![Points and a line.](05-Learning/figures/pointsAndLine.png){#fig:pointsAndLine width=400px}
 
-Figure @fig:pointsAndLine shows the points and the blue line that we arbitrarily defined. As one can see, the value we picked for `a` and `b` are not really good since the blue line is rather far away from the first and the fourth points. If we want to look for better `a` and `b`, then we need to translate in some way how far the blue lines is from the points. We know our line is not great, but _how_ bad is it? It is important that we have some way of measuring how good is our approximation.
+Figure @fig:pointsAndLine shows the points and the blue line that we arbitrarily defined. As one can see, the value we picked for `a` and `b` are not really good since the blue line is rather far away from the first and the fourth points. If we want to look for better `a` and `b`, then we need to translate in some way how far the blue lines is from the points. We know our line is not great, but _how_ bad is it? It is important that we have some way of measuring how good our approximation is.
 
 A _loss function_ is a mathematical function that maps an event, described as a set of values of one or more variables, into a numerical value. The numerical value given by the loss function intuitively represents the _cost_ associated with the event, generally a numerical value. In our case, the loss function approximates the distance between the straight blue line with the four points. If the blue line is close to the four points, then the cost will be relatively low. Oppositely, if it is far away from the points, then the cost will be high. In our case, let's make the loss function tell us how off is the straight blue line approximating the 4 points.
 
@@ -80,12 +80,12 @@ We are here highlighting an important use of the loss function. Changing paramet
 
 How does this simple line relate to the learning mechanism of a neural network? The backpropagation algorithm is directly based on this mechanism but at a larger scale. In this example we look for two values (`a` and `b`), in a neural networks we could look for thousands or millions of values, which correspond to the weights and biases. 
 
-Let's come back to the points and lines example. Our original problem is to find the straight line that is the closest to the red point. This problem can therefore be translated into looking for `a` and `b` that minimize the MSE value. Looking for these two values manually is rather tedious and laborious. The natural next step is automatically finding the `a` and `b` that minimize the loss function. No need to say how much programers do like to automatize everything :-)
+Let's come back to the points and lines example. Our original problem is to find the straight line that is the closest to the red points. This problem can therefore be translated into looking for `a` and `b` that minimize the MSE value. Looking for these two values manually is rather tedious and laborious. The natural next step is automatically finding the `a` and `b` that minimize the loss function. No need to say how much programers do like to automatize everything :-)
 
 ## Gradient Descent
 
 We know that modifying the $a$ value changes the slope of our line, and modifying the $b$ value moves the point in which the line intersects the Y axis.
-So, each of the values modifies our line in a particular way. We are indeed searching for the best $a$ and $b$, but we cannot try all the possibilities, essentially for two reasons: (i) it could be extremelly expensive (trying all the combinations of possible values of $a$ and $b$ is a Dantean task), and (ii) since $a$ and $b$ are continuous values, in theory, there is not there is not a finite set of values to try out.
+So, each of the values modifies our line in a particular way. We are indeed searching for the best $a$ and $b$, but we cannot try all the possibilities, essentially for two reasons: (i) it could be extremely expensive (trying all the combinations of possible values of $a$ and $b$ is a Dantean task), and (ii) since $a$ and $b$ are continuous values, in theory, there is not a finite set of values to try out.
 
 In a general case, we have many parameters to search and it is not clear what each of them do. So to express a small change in our model we introduce the derivative. Since we focus on a small change of a single parameter in a multivariable function, we need to use the partial derivative.
 
@@ -99,7 +99,7 @@ If we expand the $f$ function in $J$, we obtain:
 
 $$J(a,b) = \frac{1}{n} \sum_{i=1}^{n}(y_i - (a.x_i + b))^2$$
 
-We can deduce the following partial derivatives, with respecto to $a$ and $b$:
+We can deduce the following partial derivatives, with respect to $a$ and $b$:
 
 $$\frac{\partial J(a,b)}{\partial a} = \frac{-2}{n}\sum_{i}x_{i} .(y_i - (a.x_i + b))$$
 
@@ -165,7 +165,7 @@ f(x+e) = f(x) + e f'(x)/1! +  e^2 f''(x)/2! + ...
 $$
 
 <!-- So, we want to know in which direction to go. We know that the derivative tell us the value we should change, but do not tell us in which direction. We use the Taylor series to solve this problem. -->
-Why is computing $f(x+e)$ such a thing? Well, neural network is about making prediction / regression, and learning is about determining which changes in the weights and biased makes the network perform better, which is indirectly expressed with $f(x+e)$. If $f$ is our loss function, we would like to change weights and biased in such a way that $f(x+e)$ is closer to 0 than $f(x)$.
+Why is computing $f(x+e)$ such a thing? Well, neural network is about making prediction / regression, and learning is about determining which changes in the weights and biased makes the network perform better, which is indirectly expressed with $f(x+e)$. If $f$ is our loss function, we would like to change weights and biases in such a way that $f(x+e)$ is closer to 0 than $f(x)$.
 
 
 If we know $f(x)$ and we search for $f(x+e)$ to be less than $f(x)$, so we should changes the parameters of the network to follow a descending slope of $f$. 

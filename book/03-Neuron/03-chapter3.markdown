@@ -113,7 +113,7 @@ ActivationFunction>>derivative: output
 	^ self subclassResponsibility
 ```
 
-The two methods we have just defined are abtract methods, which means they are placeholder for subclasses of `ActivationFunction` to actually provide an adequate implementation of these methods.
+The two methods we have just defined are abstract methods, which means they are placeholder for subclasses of `ActivationFunction` to actually provide an adequate implementation of these methods.
 
 We can now define the two activation functions, each as being a subclass of `ActivationFunction`. The sigmoid function may be defined as:
 
@@ -166,7 +166,7 @@ The formulation of the `derivative:` of the step function does not match the mat
 
 ## Extending the neuron with the activation functions
 
-We can now generalize the way an artificial neuron can learn from examples. Assume an example value $(x, d)$, in which $x$ is example input and $d$ is the example output. At the beginning, when providing the input $x = (x_1, ..., x_i, ..., x_N)$ to a sidmoid neuron, the output is likely to be different than $d$, a number between $0$ and $1$. This is not surprising since the weights and bias are randomly chosen. This is exactly why we are training the neuron with that example, to have the neuron output $d$ if $x$ is provided.
+We can now generalize the way an artificial neuron can learn from examples. Assume an example value $(x, d)$, in which $x$ is example input and $d$ is the example output. At the beginning, when providing the input $x = (x_1, ..., x_i, ..., x_N)$ to a sigmoid neuron, the output is likely to be different than $d$, a number between $0$ and $1$. This is not surprising since the weights and bias are randomly chosen. This is exactly why we are training the neuron with that example, to have the neuron output $d$ if $x$ is provided.
 
 
 The learning mechanism may be summarized with the following rules:
@@ -435,13 +435,13 @@ g
 
 The script produces Figure @fig:perceptronVsSigmoid. No matter the learning rate defined, the perceptron is indeed much faster to learn than the sigmoid neuron. 
 
-The next chapter will reveals the true power of sigmoid neuron, which will shadow the fact it is slower to learn.
+The next chapter will reveals the true power of sigmoid neuron, which will offset the fact it is slower to learn.
 
 
 ## What have we seen in this chapter
 This chapter covers the following topics:
 
-- _Briefly discussed the limitation of the perceptron._ The perceptron cannot learn when combined with other perceptrons. Although we have not discussed this aspect further, you need to trust me for now. In the next chapter we will develop this further.
+- _Briefly discussed the limitation of the perceptron._ The perceptron cannot learn when combined with other perceptrons. Although we have not discussed this aspect further, you need to trust me for now. In the next chapter we will develop this further.is
 - _Definition of the sigmoid neuron._ The sigmoid neuron is an improvement of the perceptron since it can be combined with other sigmoid neurons and this combination can learn. In the next chapter we will detail the backpropagation algorithm, a central aspect when making a neural network learn.
 - _Activation functions._ We have seen two activation functions, the step and sigmoid functions. Many other activation functions are around. 
 

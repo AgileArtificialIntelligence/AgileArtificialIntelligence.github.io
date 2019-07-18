@@ -295,7 +295,7 @@ So far, we built a network as a set of neurons, each being initialized with rand
 The backpropagation algorithm is composed of three steps:
 
 1. _Forward feeding the inputs_. We first activate each neurons of our network to make the network produce an output. As we have previously seen, this forward feeding goes from the left-most layer to the output layer.
-1. _Backward propagating the errors through the network_. The output produced in the previous step has to be contrasted with the actual training dataset. We can therefore compute the error made by the network. This error is key to indicate how far our network is from correctly predicting the training set. This backward propagation goes from the right-most layers (i.e., the output layer) to the left-most layer (i.e., the first hidden layer).
+1. _Backward propagating the errors through the network_. The output produced in the previous step has to be contrasted with the actual training dataset. We can therefore compute the error made by the network. This error is key to indicate how far our network is from correctly predicting the training set. This backward propagation goes from the right-most layer (i.e., the output layer) to the left-most layer (i.e., the first hidden layer).
 1. _Updating the neurons weights and biases_. From the error computed in the previous step, we adequately adjust each neuron weights and bias to, hopefully, reduce the error made by the network. In our implementation, we will start it from the left-most layer until the output layer.
 
 ### Step 1: Forward feeding
@@ -462,12 +462,9 @@ This ends the third and last phase of the backpropagation algorithm. We are now 
 ```Smalltalk
 NNetwork>>train: someInputs desiredOutputs: desiredOutputs
 	"Train the neural network with a set of inputs and some expected output"
-	| realOutputs t |
-	realOutputs := self feed: someInputs.
-	t := (1 to: desiredOutputs size) collect: 
-			[ :i | ((desiredOutputs at: i) - (realOutputs at: i)) squared ].
+	self feed: someInputs.
 	self backwardPropagateError: desiredOutputs.
-	self updateWeight: someInputs.
+	self updateWeight: someInputs
 ```
 
 And Voila! We have implemented the necessary to train a neural network. 

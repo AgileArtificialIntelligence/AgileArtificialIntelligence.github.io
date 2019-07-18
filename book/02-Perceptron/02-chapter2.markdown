@@ -777,7 +777,7 @@ This chapter covered the following topics:
 
 ## Exercises
 
-- We have seen how the perceptron can be used to implement some logical gates. In particular, we have seen how the AND, OR, and NOT can be implemented. What about the XOR gate? Can you train a perceptron to learn the XOR behavior? (As a remainder, we have `0 XOR 0 = 0`, `0 XOR 1 = 1`, `1 XOR 0 = 1`, and `1 XOR 1 = 0`). 
+- We have seen how the perceptron can be used to implement some logical gates. In particular, we have seen how the AND, OR, and NOT can be implemented. What about the XOR gate? Can you train a perceptron to learn the XOR behavior? (As a reminder, we have `0 XOR 0 = 0`, `0 XOR 1 = 1`, `1 XOR 0 = 1`, and `1 XOR 1 = 0`). 
 - We have seen how five perceptrons may be combined to form a digital comparator. Do you think you can train the combination of these five perceptrons as a whole to learn the behavior of the digital comparator? 
 
 ## Further reading about Pharo
