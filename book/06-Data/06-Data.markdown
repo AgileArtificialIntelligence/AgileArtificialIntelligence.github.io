@@ -50,7 +50,7 @@ Predicting the output for a given set of input values may be implemented using a
 
 ```Smalltalk
 NNetwork>>predict: inputs
-	"Make a prediction. This method assumes that the number of outputs is the same than the number of different values the network can output"
+	"Make a prediction. This method assumes that the number of outputs is the same as the number of different values the network can output"
 	"The index of a collection begins at 1 in Pharo"
 	| outputs |
 	outputs := self feed: inputs.
