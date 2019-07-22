@@ -338,7 +338,7 @@ However, fetching the file is just the first small step toward making the file p
 
 In order to feed a network with the iris data set, we need to perform the following steps:
 
-1. Fetch the file from internet net;
+1. Fetch the file from the internet;
 2. Cut the file content, represented as a very long text, into textual lines;
 3. Ignore the first line of the file, since it contains the CSV header, which is not relevant for the network;
 4. Each row has 5 entries for which the first 4 ones are numerical values and the last one is the flower name. We need to cut into pieces a row, each substring piece is separated by a comma. The last column needs to be presented, which is processed in the next step;
