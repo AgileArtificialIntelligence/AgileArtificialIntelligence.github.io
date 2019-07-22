@@ -541,7 +541,7 @@ n train: trainingData nbEpochs: 1000.
 ]) select: #yourself) size / testData size) asFloat round: 2 
 ~~~~~~~
 
-The result is 0.0, indicating that the network is not able to make any prediction. Why so? Reducing the size of the training data, for example, if cut equals to 0.5, increases the accuracy of the network. This is an effect due to the data organization. 
+The result is 0.0, indicating that the network is not able to make any prediction. Why so? Reducing the size of the training data, for example, if the cut equals to 0.5, the accuracy of the network increases. This is an effect of the data organization. 
 
 If we inspect the 150 values of `irisData`, we see that they are actually ordered: the first 50 entries are Iris setosa (the expected value is 0), the subsequent 50 entries are Iris versicolor (the expected value is 1), and the last 50 entries are Iris virginica (the expected value is 2). The fact that the original dataset is ordered has an impact on the accuracy of the network. Luckily, this is a problem that is easy to solve: a simple shuffling of the original data will prevent our network to suffer from the entry order.
 
