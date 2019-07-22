@@ -441,7 +441,7 @@ g
 
 ![Effect of the learning rate for a single neuron.](06-Data/figures/learningRateSingleNeuron.png){#fig:learningRateSingleNeuron}
 
-Figure @fig:learningRateSingleNeuron represents the error curves during the training for five different values of the learning rate (0.001, 0.01, 0.1, 0.2, and 0.3). The graphs indicates that higher the learning rate, quicker it learns. 
+Figure @fig:learningRateSingleNeuron represents the error curves during the training for five different values of the learning rate (0.001, 0.01, 0.1, 0.2, and 0.3). The graphs indicates that the higher the learning rate, the quicker it learns. 
 
 The effect observed on a single sigmoid neuron _cannot_ be observed on a whole network. We can train a network for the Iris dataset for different values of the learning rate. Consider the script:
 
