@@ -462,7 +462,7 @@ Unfortunately, there is no general methodology to identify the adequate learning
 
 ## Test and Validation
 
-So far, we built a network trained on the whole iris dataset: we consider all the entries in the `.csv` file to train the network. The network seems to properly learn as the network does less error and the precision is increasing along the epochs (_i.e.,_ the error curve is getting very close to 0). 
+So far, we built a network trained on the whole iris dataset: we consider all the entries in the `.csv` file to train the network. The network seems to properly learn as the network makes fewer errors while increasing the precision along the epochs (_i.e.,_ the error curve is getting very close to 0). 
 
 The error curve indicates how well the network is learning for the provided dataset. If we wish to know how well the network classifies data, it would not make much sense to test it on data it was trained with. Asking a network how well it performs in presence of the very same data used for the training is not much of a challenge. However, an important question is how well does the network behave in presence of data that it has never seen. Said in other word: _how well the network classifies unknown data?_
 
