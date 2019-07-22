@@ -378,7 +378,7 @@ To summarize, the script converts a very long string similar to:
 '
 ```
 
-into collection of numbers:
+into a collection of numbers:
 
 ```
 #(#(5.1 3.5 1.4 0.2 0) #(4.9 3.0 1.4 0.2 0) #(4.7 3.2 1.3 0.2 0) ...
@@ -401,7 +401,7 @@ The code above builds a network with 4 input values, one hidden layer with 6 neu
 
 ![Learning the Iris dataset.](06-Data/figures/networkOnIris.png){#fig:networkOnIris}
 
-Figure @fig:networkOnIris represents the error curve of the network. The blue curve is very close to 0, which indicates that the network is learning and the dataset does not have contradiction. The red curve is very close to 1.0, which means that the network has an excellent precision. The network is able to learn and achieve a good precision during that learning process.
+Figure @fig:networkOnIris represents the error curve of the network. The blue curve is very close to 0, which indicates that the network is learning and the dataset does not have a contradiction. The red curve is very close to 1.0, which means that the network has an excellent precision. The network is able to learn and achieve a good precision during that learning process.
 
 The configuration of our network has two parameters: the number of neurons in the hidden layers, and the number of epochs to consider. There are no general rules on how to pick these parameters. For now, experiments and ad-hoc tries remain the easiest approach to configure a network. The third part of the book, about neuroevolution, will cover the search of hyperparameters using genetic algorithm
 
