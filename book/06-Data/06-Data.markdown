@@ -507,7 +507,7 @@ n train: trainingData nbEpochs: 1000.
 
 (((testData collect: [ :d |
 	(n predict: d allButLast) = d last
-]) select: #yourself) size / testData size) asFloat round: 2 
+]) select: [ :d | d = true]) size / testData size) asFloat round: 2 
 ~~~~~~~
 
 Evaluating the script returns 0.9, which represents the accuracy of our network: 90% of the elements contained in `testData` are correctly predicted. 
