@@ -517,10 +517,10 @@ We will now detail the last part of the script:
 ~~~~~~~
 (((testData collect: [ :d |
 	(n predict: d allButLast) = d last
-]) select: #yourself) size / testData size) asFloat round: 2 
+]) select: [ :d | d = true]) size / testData size) asFloat round: 2 
 ~~~~~~~
 
-For all the elements of `testData`, we predict the classification of the input (`d allButLast`) and compare the network result with the expected result (`d last`). The result of the `collect:` instruction is a list of binary values (`true` or `false`). We only select the `true` values (`select: #yourself`), count how many they are (`size`). We then compute the ratio with the size of test data (`/ testData size`). Finally, we only consider a float value with two decimal digits.
+For all the elements of `testData`, we predict the classification of the input (`d allButLast`) and compare the network result with the expected result (`d last`). The result of the `collect:` instruction is a list of binary values (`true` or `false`). We only select the `true` values, count how many they are (`size`). We then compute the ratio with the size of test data (`/ testData size`). Finally, we only consider a float value with two decimal digits.
 
 *EXERCISE:* Determine the accuracy of the network when a cut of 0.6, 0.5, and 0.4.
 
