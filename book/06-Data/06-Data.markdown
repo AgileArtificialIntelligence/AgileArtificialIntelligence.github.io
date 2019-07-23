@@ -458,7 +458,7 @@ We run the script for each of the value 0.001, 0.01, 0.1, and 0.3. Results are p
 
 We clearly see that for a low learning rate, the precision and error curves are rather stable. While for a relatively high learning rate, we experience very frequent peaks. 
 
-Unfortunately, there is no general methodology to identify the adequate learning rate or the architecture of the network. Manual tuning is the norm so far. Some optimization algorithms, _e.g.,_ the Adam optimization algorithm, variates the learning rate. During the training the learning rate varies.  
+Unfortunately, there is no general methodology to identify the adequate learning rate or the architecture of the network. Manual tuning is the norm so far. Some optimization algorithms, _e.g.,_ the Adam optimization algorithm, vary the learning rate during training.  
 
 ## Test and Validation
 
