@@ -538,7 +538,7 @@ n train: trainingData nbEpochs: 1000.
 
 (((testData collect: [ :d |
 	(n predict: d allButLast) = d last
-]) select: #yourself) size / testData size) asFloat round: 2 
+]) select: [ :d | d = true]) size / testData size) asFloat round: 2 
 ~~~~~~~
 
 The result is 0.0, indicating that the network is not able to make any prediction. Why so? Reducing the size of the training data, for example, if the cut equals to 0.5, the accuracy of the network increases. This is an effect of the data organization. 
@@ -560,7 +560,7 @@ n train: trainingData nbEpochs: 1000.
 
 (((testData collect: [ :d |
 	(n predict: d allButLast) = d last
-]) select: #yourself) size / testData size) asFloat round: 2 
+]) select: [ :d | d = true]) size / testData size) asFloat round: 2 
 ~~~~~~~
 
 The script introduces a new variable, called `shuffledIrisData`. It is initialized with `irisData shuffleBy: (Random seed: 42)`, which as the effect to create a copy of `irisData` shuffled using a random number. In case we wish to not use a random number generator and therefore have slightly different result at each run, we could simply use `shuffled` instead of `shuffleBy: (Random seed: 42)`.
