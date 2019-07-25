@@ -50,7 +50,7 @@ Predicting the output for a given set of input values may be implemented using a
 
 ```Smalltalk
 NNetwork>>predict: inputs
-	"Make a prediction. This method assumes that the number of outputs is the same than the number of different values the network can output"
+	"Make a prediction. This method assumes that the number of outputs is the same as the number of different values the network can output"
 	"The index of a collection begins at 1 in Pharo"
 	| outputs |
 	outputs := self feed: inputs.
@@ -338,7 +338,7 @@ However, fetching the file is just the first small step toward making the file p
 
 In order to feed a network with the iris data set, we need to perform the following steps:
 
-1. Fetch the file from internet net;
+1. Fetch the file from the internet;
 2. Cut the file content, represented as a very long text, into textual lines;
 3. Ignore the first line of the file, since it contains the CSV header, which is not relevant for the network;
 4. Each row has 5 entries for which the first 4 ones are numerical values and the last one is the flower name. We need to cut into pieces a row, each substring piece is separated by a comma. The last column needs to be presented, which is processed in the next step;
@@ -378,7 +378,7 @@ To summarize, the script converts a very long string similar to:
 '
 ```
 
-into collection of numbers:
+into a collection of numbers:
 
 ```
 #(#(5.1 3.5 1.4 0.2 0) #(4.9 3.0 1.4 0.2 0) #(4.7 3.2 1.3 0.2 0) ...
@@ -401,7 +401,7 @@ The code above builds a network with 4 input values, one hidden layer with 6 neu
 
 ![Learning the Iris dataset.](06-Data/figures/networkOnIris.png){#fig:networkOnIris}
 
-Figure @fig:networkOnIris represents the error curve of the network. The blue curve is very close to 0, which indicates that the network is learning and the dataset does not have contradiction. The red curve is very close to 1.0, which means that the network has an excellent precision. The network is able to learn and achieve a good precision during that learning process.
+Figure @fig:networkOnIris represents the error curve of the network. The blue curve is very close to 0, which indicates that the network is learning and the dataset does not have a contradiction. The red curve is very close to 1.0, which means that the network has an excellent precision. The network is able to learn and achieve a good precision during that learning process.
 
 The configuration of our network has two parameters: the number of neurons in the hidden layers, and the number of epochs to consider. There are no general rules on how to pick these parameters. For now, experiments and ad-hoc tries remain the easiest approach to configure a network. The third part of the book, about neuroevolution, will cover the search of hyperparameters using genetic algorithm
 
@@ -441,7 +441,7 @@ g
 
 ![Effect of the learning rate for a single neuron.](06-Data/figures/learningRateSingleNeuron.png){#fig:learningRateSingleNeuron}
 
-Figure @fig:learningRateSingleNeuron represents the error curves during the training for five different values of the learning rate (0.001, 0.01, 0.1, 0.2, and 0.3). The graphs indicates that higher the learning rate, quicker it learns. 
+Figure @fig:learningRateSingleNeuron represents the error curves during the training for five different values of the learning rate (0.001, 0.01, 0.1, 0.2, and 0.3). The graphs indicates that the higher the learning rate, the quicker it learns. 
 
 The effect observed on a single sigmoid neuron _cannot_ be observed on a whole network. We can train a network for the Iris dataset for different values of the learning rate. Consider the script:
 
@@ -458,11 +458,11 @@ We run the script for each of the value 0.001, 0.01, 0.1, and 0.3. Results are p
 
 We clearly see that for a low learning rate, the precision and error curves are rather stable. While for a relatively high learning rate, we experience very frequent peaks. 
 
-Unfortunately, there is no general methodology to identify the adequate learning rate or the architecture of the network. Manual tuning is the norm so far. Some optimization algorithms, _e.g.,_ the Adam optimization algorithm, variates the learning rate. During the training the learning rate varies.  
+Unfortunately, there is no general methodology to identify the adequate learning rate or the architecture of the network. Manual tuning is the norm so far. Some optimization algorithms, _e.g.,_ the Adam optimization algorithm, vary the learning rate during training.  
 
 ## Test and Validation
 
-So far, we built a network trained on the whole iris dataset: we consider all the entries in the `.csv` file to train the network. The network seems to properly learn as the network does less error and the precision is increasing along the epochs (_i.e.,_ the error curve is getting very close to 0). 
+So far, we built a network trained on the whole iris dataset: we consider all the entries in the `.csv` file to train the network. The network seems to properly learn as the network makes fewer errors while increasing the precision along the epochs (_i.e.,_ the error curve is getting very close to 0). 
 
 The error curve indicates how well the network is learning for the provided dataset. If we wish to know how well the network classifies data, it would not make much sense to test it on data it was trained with. Asking a network how well it performs in presence of the very same data used for the training is not much of a challenge. However, an important question is how well does the network behave in presence of data that it has never seen. Said in other word: _how well the network classifies unknown data?_
 
@@ -507,7 +507,7 @@ n train: trainingData nbEpochs: 1000.
 
 (((testData collect: [ :d |
 	(n predict: d allButLast) = d last
-]) select: #yourself) size / testData size) asFloat round: 2 
+]) select: [ :d | d = true]) size / testData size) asFloat round: 2 
 ~~~~~~~
 
 Evaluating the script returns 0.9, which represents the accuracy of our network: 90% of the elements contained in `testData` are correctly predicted. 
@@ -517,10 +517,10 @@ We will now detail the last part of the script:
 ~~~~~~~
 (((testData collect: [ :d |
 	(n predict: d allButLast) = d last
-]) select: #yourself) size / testData size) asFloat round: 2 
+]) select: [ :d | d = true]) size / testData size) asFloat round: 2 
 ~~~~~~~
 
-For all the elements of `testData`, we predict the classification of the input (`d allButLast`) and compare the network result with the expected result (`d last`). The result of the `collect:` instruction is a list of binary values (`true` or `false`). We only select the `true` values (`select: #yourself`), count how many they are (`size`). We then compute the ratio with the size of test data (`/ testData size`). Finally, we only consider a float value with two decimal digits.
+For all the elements of `testData`, we predict the classification of the input (`d allButLast`) and compare the network result with the expected result (`d last`). The result of the `collect:` instruction is a list of binary values (`true` or `false`). We only select the `true` values, count how many they are (`size`). We then compute the ratio with the size of test data (`/ testData size`). Finally, we only consider a float value with two decimal digits.
 
 *EXERCISE:* Determine the accuracy of the network when a cut of 0.6, 0.5, and 0.4.
 
@@ -538,10 +538,10 @@ n train: trainingData nbEpochs: 1000.
 
 (((testData collect: [ :d |
 	(n predict: d allButLast) = d last
-]) select: #yourself) size / testData size) asFloat round: 2 
+]) select: [ :d | d = true]) size / testData size) asFloat round: 2 
 ~~~~~~~
 
-The result is 0.0, indicating that the network is not able to make any prediction. Why so? Reducing the size of the training data, for example, if cut equals to 0.5, increases the accuracy of the network. This is an effect due to the data organization. 
+The result is 0.0, indicating that the network is not able to make any prediction. Why so? Reducing the size of the training data, for example, if the cut equals to 0.5, the accuracy of the network increases. This is an effect of the data organization. 
 
 If we inspect the 150 values of `irisData`, we see that they are actually ordered: the first 50 entries are Iris setosa (the expected value is 0), the subsequent 50 entries are Iris versicolor (the expected value is 1), and the last 50 entries are Iris virginica (the expected value is 2). The fact that the original dataset is ordered has an impact on the accuracy of the network. Luckily, this is a problem that is easy to solve: a simple shuffling of the original data will prevent our network to suffer from the entry order.
 
@@ -560,7 +560,7 @@ n train: trainingData nbEpochs: 1000.
 
 (((testData collect: [ :d |
 	(n predict: d allButLast) = d last
-]) select: #yourself) size / testData size) asFloat round: 2 
+]) select: [ :d | d = true]) size / testData size) asFloat round: 2 
 ~~~~~~~
 
 The script introduces a new variable, called `shuffledIrisData`. It is initialized with `irisData shuffleBy: (Random seed: 42)`, which as the effect to create a copy of `irisData` shuffled using a random number. In case we wish to not use a random number generator and therefore have slightly different result at each run, we could simply use `shuffled` instead of `shuffleBy: (Random seed: 42)`.
