@@ -809,10 +809,10 @@ h := 20.        "Size of the hidden layer"
 dout := 5.      "Number of output values"
 
 r := Random seed: 42.
-x := (MMatrix newRows: n columns: din) random.
-y := (MMatrix newRows: n columns: dout) random.
-w1 := (MMatrix newRows: din columns: h) random.
-w2 := (MMatrix newRows: h columns: dout) random.
+x := (MMatrix newRows: n columns: din) random: r.
+y := (MMatrix newRows: n columns: dout) random: r.
+w1 := (MMatrix newRows: din columns: h) random: r.
+w2 := (MMatrix newRows: h columns: dout) random: r.
 
 learningRate := 1e-6.
 losses := OrderedCollection new.
