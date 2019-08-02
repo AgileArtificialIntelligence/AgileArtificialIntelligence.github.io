@@ -85,7 +85,7 @@ Let's come back to the points and lines example. Our original problem is to find
 ## Gradient Descent
 
 We know that modifying the $a$ value changes the slope of our line, and modifying the $b$ value moves the point in which the line intersects the Y axis.
-So, each of the values modifies our line in a particular way. We are indeed searching for the best $a$ and $b$, but we cannot try all the possibilities, essentially for two reasons: (i) it could be extremely expensive (trying all the combinations of possible values of $a$ and $b$ is a Dantean task), and (ii) since $a$ and $b$ are continuous values, in theory, there is not a finite set of values to try out.
+So, each of the values modifies our line in a particular way. We are indeed searching for the best $a$ and $b$, but we cannot try all the possibilities, essentially for two reasons: (i) it could be extremely expensive (trying all the combinations of possible values of $a$ and $b$ is a daunting task), and (ii) since $a$ and $b$ are continuous values, in theory, there is not a finite set of values to try out.
 
 In a general case, we have many parameters to search and it is not clear what each of them do. So to express a small change in our model we introduce the derivative. Since we focus on a small change of a single parameter in a multivariable function, we need to use the partial derivative.
 

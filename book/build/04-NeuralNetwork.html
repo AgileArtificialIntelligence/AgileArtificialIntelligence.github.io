@@ -3242,7 +3242,7 @@ h4:hover a { color: #333; } h5:hover a { color: #333; } h6:hover a { color: #333
 <p>The backpropagation algorithm is composed of three steps:</p>
 <ol type="1">
 <li><em>Forward feeding the inputs</em>. We first activate each neurons of our network to make the network produce an output. As we have previously seen, this forward feeding goes from the left-most layer to the output layer.</li>
-<li><em>Backward propagating the errors through the network</em>. The output produced in the previous step has to be contrasted with the actual training dataset. We can therefore compute the error made by the network. This error is key to indicate how far our network is from correctly predicting the training set. This backward propagation goes from the right-most layers (i.e., the output layer) to the left-most layer (i.e., the first hidden layer).</li>
+<li><em>Backward propagating the errors through the network</em>. The output produced in the previous step has to be contrasted with the actual training dataset. We can therefore compute the error made by the network. This error is key to indicate how far our network is from correctly predicting the training set. This backward propagation goes from the right-most layer (i.e., the output layer) to the left-most layer (i.e., the first hidden layer).</li>
 <li><em>Updating the neurons weights and biases</em>. From the error computed in the previous step, we adequately adjust each neuron weights and bias to, hopefully, reduce the error made by the network. In our implementation, we will start it from the left-most layer until the output layer.</li>
 </ol>
 <h3 id="step-1-forward-feeding"><span class="header-section-number">1.4.1</span> Step 1: Forward feeding</h3>
@@ -3348,12 +3348,9 @@ h4:hover a { color: #333; } h5:hover a { color: #333; } h6:hover a { color: #333
 <p>This ends the third and last phase of the backpropagation algorithm. We are now ready to hook the backpropagation phases all together:</p>
 <pre class="smalltalk"><code>NNetwork&gt;&gt;train: someInputs desiredOutputs: desiredOutputs
     &quot;Train the neural network with a set of inputs and some expected output&quot;
-    | realOutputs t |
-    realOutputs := self feed: someInputs.
-    t := (1 to: desiredOutputs size) collect: 
-            [ :i | ((desiredOutputs at: i) - (realOutputs at: i)) squared ].
+    self feed: someInputs.
     self backwardPropagateError: desiredOutputs.
-    self updateWeight: someInputs.</code></pre>
+    self updateWeight: someInputs</code></pre>
 <p>And Voila! We have implemented the necessary to train a neural network.</p>
 <p>We can now test our network with the XOR example:</p>
 <pre class="smalltalk"><code>NNetworkTest&gt;&gt;testXOR
