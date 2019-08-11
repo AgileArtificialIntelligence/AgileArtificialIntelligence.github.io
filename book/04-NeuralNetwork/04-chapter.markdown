@@ -75,13 +75,13 @@ NeuronLayer>>feed: someInputValues
 		ifFalse: [ nextLayer feed: someOutputs ]
 ```
 
-The method invokes `feed:` on each of its neurons (the method `Neuron>>feed:` is detailed in the previous chapter). The results is then kept as an array. The method then checks if the layer is an output layer. If this is the case, the result of the method is simply the results of each neurons. If the layer is not an output (_i.e.,_ it is  an hidden layer), we feed-forward the computed values to the next layer.
+The method invokes `feed:` on each of its neurons (the method `Neuron>>feed:` is detailed in the previous chapter). The results are then kept as an array. The method then checks if the layer is an output layer. If this is the case, the result of the method is simply the results of each neurons. If the layer is not an output (_i.e.,_ it is a hidden layer), we feed-forward the computed values to the next layer.
 
 
 We need to determine if a neuron layer is the output layer or not. We can easily achieve this using the predicate `isOutputLayer`:
 ```Smalltalk
 NeuronLayer>>isOutputLayer
-	"Return true of the layer is the output layer (i.e., the last layer, right-most, in the network)"
+	"Return true if the layer is the output layer (i.e., the last layer, right-most, in the network)"
 	^ self nextLayer isNil
 ```
 
@@ -383,7 +383,7 @@ Once the neuron in the output layer have their delta value adjusted, previous la
 NeuronLayer>>backwardPropagateError
 	"This is a recursive method. The back propagation begins with the output layer (i.e., the last layer)"
 
-	"We are in an hidden layer"
+	"We are in a hidden layer"
 	neurons doWithIndex: [ :neuron :j |
 		| theError |
 		theError := 0.0.
