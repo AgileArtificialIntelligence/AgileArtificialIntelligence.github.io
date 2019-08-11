@@ -3,7 +3,7 @@
 
 In the previous chapter we have seen how a perceptron operates and how a simple learning algorithm can be implemented. However, the perceptron has some serious limitations, which will motivate us to formulate a more robust artificial neuron, called the sigmoid neuron.
 
-This chapters uses Roassal to plot values. As seen in the previous chapter, Roassal may be loaded in Pharo by executing the following script in a playground:
+This chapter uses Roassal to plot values. As seen in the previous chapter, Roassal may be loaded in Pharo by executing the following script in a playground:
 
 ```Smalltalk
 Metacello new
