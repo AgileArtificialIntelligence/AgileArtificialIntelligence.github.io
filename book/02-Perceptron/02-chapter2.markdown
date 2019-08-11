@@ -554,7 +554,7 @@ We will now see a new application of the perceptron. A perceptron can be used to
 - A space composed of red and blue points
 - A straight line divides the red points from the blue points
 
-Consider the following interaction between two (real) people, a teacher and a student. The goal of the teacher is to let the student infer where is the straight separation line between the blue and the red points. First, the teacher can gives an arbitrary number of examples. Each example is given to the student as a location and a color. After a few examples, the students is able to guess the color of a random location. Intuitively, more examples the teacher will give to the student, more the student will be likely to correctly predict the color of a location.
+Consider the following interaction between two (real) people, a teacher and a student. The goal of the teacher is to let the student infer where is the straight separation line between the blue and the red points. First, the teacher can give an arbitrary number of examples. Each example is given to the student as a location and a color. After a few examples, the students is able to guess the color of a random location. Intuitively, more examples the teacher will give to the student, more the student will be likely to correctly predict the color of a location.
 
 Some questions arise:
 
@@ -593,7 +593,7 @@ The script begins by defining a set of 500 points, ranging within a squared area
 
 We assign to the variable `f` a block representing our function $f(x)$, written in the Pharo syntax. A block may be evaluated with the message `value:`. For example, we have `f value: 3` that returns `-9` and `f value: -2` that returns `1`.
 
-The remainder of the script uses Grapher to plot the points. A point `p` is red if `p y` is greater than `f value: p x`, else it is blue. The expression `Color red trans` evaluates to a transparent red color. 
+The remainder of the script uses Grapher to plot the points. A point `p` is red if `p second` is greater than `f value: p first`, else it is blue. The expression `Color red trans` evaluates to a transparent red color. 
 
 We can add the actual line defined by `f` to our graph. Consider the small revision (Figure @fig:simpleLine2):
 
