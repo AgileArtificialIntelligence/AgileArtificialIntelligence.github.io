@@ -42,7 +42,7 @@ Once we have the definite set of topics to be presented, we will provide a sched
 Palo Alto, CA, 94303
 [Google Map](https://www.google.com/maps?daddr=824+San+Antonio+Road,+Palo+Alto,+CA+94303)
 
-Detail about the location may be found: [https://www.peerspace.com/invite/pid-SyVoen9xL](https://www.peerspace.com/invite/pid-SyVoen9xL)
+Detail about the location may be found in the invitation form: [https://www.peerspace.com/invite/pid-SyVoen9xL](https://www.peerspace.com/invite/pid-SyVoen9xL)
 
 # Contacts
 
