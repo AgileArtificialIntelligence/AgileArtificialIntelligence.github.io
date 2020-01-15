@@ -7,14 +7,18 @@ On Saturday 25 of January 2020, we will held a Smalltalk Meetup. The goal of the
 
 If you wish to attend:
 
-- you should register on [online inscription](https://www.peerspace.com/invite/pid-SyVoen9xL). You need to create an account, but this is really light to do so. It does not take long
-- if you wish to present something, then use this google [online form](https://forms.gle/PJkQJNVLV95ACy8DA)
+- you should register on [online inscription](https://www.peerspace.com/invite/pid-SyVoen9xL). You need to create an account on peerspace, but it is really light to do so (1 minute max).
+- if you wish to present something for which we encourage you to do so, then use this google [online form](https://forms.gle/PJkQJNVLV95ACy8DA)
 
-Thanks to our sponsors, we will try to provide a light lunch, coffee, and drinks. For that reason, it would be great to have the final number of participants by Tuesday 21, January. 
+Thanks to our sponsors, we will try to provide a light lunch, coffee, and drinks. For that reason, it would be great to have the final number of participants by *Tuesday 21, January*. 
+
+# When is it exactly?
+
+Saturday 25 January, beginning at 9:00 am. The room is rented until 5:00pm. 
 
 # Cost 
 
-The event is _free_ for participants, including the meal and drinks (if they happen to be).
+The event is _free_ for participants, including the meal and drinks (if they happen to be). Yes, our sponsors are making the World a better place. 
 
 # Program
 
@@ -30,6 +34,7 @@ We will have the following presentations:
 - Smalltalk and CAD
 
 We will also have some hands-on / pair-programming sessions.
+Once we have the definite set of topics to be presented, we will provide a schedule.
 
 # Location 
 
