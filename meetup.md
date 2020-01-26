@@ -1,6 +1,8 @@
 
 # Smalltalk Meetup in Palo Alto, CA
 
+*The Meetup is over, thank you very much for all the participants! It is likely that we will organize the meeting on a regular base. See you in January 2021!*
+
 On Saturday 25 of January 2020, we will held a Smalltalk Meetup. The goal of the meeting is to meet, discuss about Smalltalk, watch presentations, share ideas demonstrations, pair programming, and most importantly... having fun.
 
 # Registration
@@ -28,10 +30,10 @@ We will have the following presentations:
 - Unit Testing Generation 
 - Roassal 3
 - Bridging Smalltalk and Python
-- Corpus for IBM Chatbot
 - Shark drone
 - VM development environment
 - Smalltalk and CAD
+- Smalltalk in high School
 
 We will also have some hands-on / pair-programming sessions.
 Once we have the definite set of topics to be presented, we will provide a schedule.
